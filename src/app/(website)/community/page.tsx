@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PageShell } from "@/components/website/page-shell";
 import { getPublishedCommunity } from "@/lib/content/queries";
 import { cn } from "@/lib/utils";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export const metadata: Metadata = { title: "Community" };
 
@@ -46,9 +47,7 @@ export default async function CommunityPage() {
               className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary"
             >
               Read More
-              <span className="material-symbols-outlined text-[18px]">
-                arrow_right_alt
-              </span>
+              <MaterialIcon name="arrow_right_alt" className="text-[18px]" />
             </Link>
           </article>
         ))}

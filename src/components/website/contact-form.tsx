@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "pending" | "ok" | "error">(
@@ -119,7 +120,7 @@ export function ContactForm() {
         className="h-12 rounded-xl bg-primary px-8 shadow-lg shadow-primary/15"
       >
         {pending ? "Sending…" : "Send message"}
-        <span className="material-symbols-outlined text-[18px]">send</span>
+        <MaterialIcon name="send" className="text-[18px]" />
       </Button>
       </FormLock>
     </form>

@@ -7,6 +7,7 @@ import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { signInAction, type AuthActionState } from "@/lib/auth/actions";
 import { cn } from "@/lib/utils";
 
@@ -37,9 +38,10 @@ export function LoginForm() {
               Email Address
             </span>
             <div className="relative">
-              <span className="material-symbols-outlined notranslate absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground">
-                mail
-              </span>
+              <MaterialIcon
+                name="mail"
+                className="absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground"
+              />
               <Input
                 name="email"
                 type="email"
@@ -56,9 +58,10 @@ export function LoginForm() {
               Password
             </span>
             <div className="relative">
-              <span className="material-symbols-outlined notranslate absolute top-1/2 left-4 z-10 -translate-y-1/2 text-muted-foreground">
-                lock
-              </span>
+              <MaterialIcon
+                name="lock"
+                className="absolute top-1/2 left-4 z-10 -translate-y-1/2 text-muted-foreground"
+              />
               <PasswordInput
                 name="password"
                 required
@@ -94,9 +97,7 @@ export function LoginForm() {
             )}
           >
             {pending ? "Please wait…" : "Sign In"}
-            <span className="material-symbols-outlined notranslate text-[18px]">
-              arrow_forward
-            </span>
+            <MaterialIcon name="arrow_forward" className="text-[18px]" />
           </Button>
         </FormLock>
       </form>

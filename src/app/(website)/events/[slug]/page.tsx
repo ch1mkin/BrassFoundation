@@ -4,6 +4,7 @@ import { EventRegisterForm } from "@/components/website/event-register-form";
 import { PageShell } from "@/components/website/page-shell";
 import { getUserContext } from "@/lib/auth/session";
 import { formatEventDate, getEventBySlug } from "@/lib/content/queries";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -36,9 +37,7 @@ export default async function EventDetailPage({ params }: Props) {
           ) : null}
           {event.location ? (
             <p className="mt-4 flex items-center gap-2 text-muted-foreground">
-              <span className="material-symbols-outlined">
-                {event.location_icon}
-              </span>
+              <MaterialIcon name={event.location_icon || "location_on"} />
               {event.location}
             </p>
           ) : null}

@@ -6,6 +6,7 @@ import {
   getPublishedEvents,
 } from "@/lib/content/queries";
 import { cn } from "@/lib/utils";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export const metadata: Metadata = { title: "Events" };
 
@@ -47,9 +48,7 @@ export default async function EventsPage() {
                 ) : null}
                 {event.location ? (
                   <p className="mt-2 flex items-center justify-center gap-1 text-sm text-muted-foreground md:justify-start">
-                    <span className="material-symbols-outlined text-[18px]">
-                      {event.location_icon}
-                    </span>
+                    <MaterialIcon name={event.location_icon || "location_on"} className="text-[18px]" />
                     {event.location}
                   </p>
                 ) : null}

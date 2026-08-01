@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { cn } from "@/lib/utils";
 
 type NavItem = {
@@ -80,9 +81,10 @@ export function PortalSidebar({
           className="hidden rounded-lg border border-border p-1.5 text-muted-foreground hover:bg-surface-low md:inline-flex"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          <span className="material-symbols-outlined text-[18px]">
-            {collapsed ? "chevron_right" : "chevron_left"}
-          </span>
+          <MaterialIcon
+            name={collapsed ? "chevron_right" : "chevron_left"}
+            className="text-[18px]"
+          />
         </button>
       </div>
 
@@ -105,9 +107,7 @@ export function PortalSidebar({
                   : "text-muted-foreground hover:bg-surface-low hover:text-foreground",
               )}
             >
-              <span className="material-symbols-outlined text-[18px]">
-                {item.icon}
-              </span>
+              <MaterialIcon name={item.icon} className="text-[18px]" />
               {!collapsed ? <span className="truncate">{item.label}</span> : null}
             </Link>
           );
@@ -121,7 +121,7 @@ export function PortalSidebar({
           className={cn("w-full rounded-xl", collapsed && "px-2")}
         >
           {collapsed ? (
-            <span className="material-symbols-outlined text-[18px]">logout</span>
+            <MaterialIcon name="logout" className="text-[18px]" />
           ) : (
             "Sign out"
           )}
@@ -139,7 +139,7 @@ export function PortalSidebar({
           className="rounded-xl border border-border bg-white p-2 shadow-sm"
           aria-label="Open menu"
         >
-          <span className="material-symbols-outlined">menu</span>
+          <MaterialIcon name="menu" />
         </button>
       </div>
 

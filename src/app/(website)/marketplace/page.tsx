@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { PageShell } from "@/components/website/page-shell";
 import { getPublishedMarketplace } from "@/lib/content/queries";
 
@@ -23,9 +24,7 @@ export default async function MarketplacePage() {
               className="rounded-2xl border border-border/30 bg-white p-6 transition-shadow hover:shadow-2xl"
             >
               <div className="mb-4 flex h-64 items-center justify-center rounded-xl bg-surface-low">
-                <span className="material-symbols-outlined text-6xl text-primary/40">
-                  menu_book
-                </span>
+                <MaterialIcon name="menu_book" className="text-6xl text-primary/40" />
               </div>
               <h2 className="font-heading text-lg font-semibold">
                 {book.title}
@@ -37,15 +36,11 @@ export default async function MarketplacePage() {
               ) : null}
               <div className="mt-2 flex items-center gap-1 text-tertiary">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <span
+                  <MaterialIcon
                     key={i}
-                    className="material-symbols-outlined text-base"
-                    style={{
-                      fontVariationSettings: `'FILL' ${i < rating ? 1 : 0}`,
-                    }}
-                  >
-                    star
-                  </span>
+                    name="star"
+                    className={`text-base ${i < rating ? "fill-current" : "opacity-30"}`}
+                  />
                 ))}
                 <span className="ml-1 text-xs text-muted-foreground">
                   ({book.review_count} Reviews)

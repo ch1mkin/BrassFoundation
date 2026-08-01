@@ -80,7 +80,8 @@ function collectTargets(root: ParentNode = document) {
     if (text.length < 2) return false;
     if (isMostlyCodeOrId(text)) return false;
     // Skip if element contains an icon child — translate would scramble ligatures
-    if (el.querySelector(".material-symbols-outlined")) return false;
+    if (el.querySelector(".material-symbols-outlined, [data-icon], svg.lucide"))
+      return false;
     return true;
   }) as HTMLElement[];
 }

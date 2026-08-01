@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "@/components/website/page-shell";
 import { createClient } from "@/lib/supabase/server";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export const metadata: Metadata = { title: "Blog" };
 
@@ -41,9 +42,7 @@ export default async function BlogIndexPage() {
                 />
               ) : (
                 <div className="flex h-44 items-center justify-center bg-surface-high">
-                  <span className="material-symbols-outlined text-4xl text-primary/40">
-                    article
-                  </span>
+                  <MaterialIcon name="article" className="text-4xl text-primary/40" />
                 </div>
               )}
               <div className="p-5">

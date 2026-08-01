@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { STAT_ICONS } from "@/lib/cms/stat-icons";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export type EditableStat = {
   label: string;
@@ -62,9 +63,7 @@ export function StatsEditor({
       {stats.map((stat, index) => (
         <div key={index} className="rounded-2xl border border-border/50 p-4">
           <div className="mb-3 flex items-center justify-between">
-            <span className="material-symbols-outlined text-2xl text-primary">
-              {stat.icon}
-            </span>
+            <MaterialIcon name={stat.icon} className="text-2xl text-primary" />
             <button
               type="button"
               onClick={() => removeStat(index)}
@@ -126,9 +125,7 @@ export function StatsEditor({
                 className={`rounded-lg border p-1.5 ${stat.icon === icon ? "border-primary bg-primary/10" : "border-border"}`}
                 title={icon}
               >
-                <span className="material-symbols-outlined text-[18px]">
-                  {icon}
-                </span>
+                <MaterialIcon name={icon} className="text-[18px]" />
               </button>
             ))}
           </div>

@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import {
   submitMembershipApplicationAction,
   type MembershipActionState,
@@ -148,7 +149,7 @@ export function MembershipForm() {
         className="h-12 rounded-xl bg-primary px-8 shadow-lg shadow-primary/20"
       >
         {pending ? "Submitting…" : "Submit application"}
-        <span className="material-symbols-outlined text-[18px]">person_add</span>
+        <MaterialIcon name="person_add" className="text-[18px]" />
       </Button>
       </FormLock>
     </form>
