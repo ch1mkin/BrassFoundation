@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 export type AuthActionState = {
   error?: string;
   success?: string;
+  redirectTo?: string;
 };
 
 function safeNext(next: string) {
@@ -26,14 +27,34 @@ export async function signInAction(
     return { error: "Email and password are required." };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  if (error) {
-    return { error: error.message };
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    return { error: "Authentication is not configured." };
   }
 
-  redirect(safeNext(next));
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    // Return path instead of redirect() so useActionState pending can clear.
+    return { success: "Signed in", redirectTo: safeNext(next) };
+  } catch (err) {
+    return {
+      error:
+        err instanceof Error
+          ? err.message
+          : "Sign-in failed. Please try again.",
+    };
+  }
 }
 
 export async function signUpAction(

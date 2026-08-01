@@ -1,22 +1,72 @@
 "use client";
 
-import { useActionState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState, useTransition } from "react";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
-import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { MaterialIcon } from "@/components/ui/material-icon";
-import { signInAction, type AuthActionState } from "@/lib/auth/actions";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
-const initial: AuthActionState = {};
+function safeNext(next: string | null) {
+  if (!next || !next.startsWith("/")) return "/member";
+  return next;
+}
 
 export function LoginForm() {
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/member";
-  const [state, signIn, pending] = useActionState(signInAction, initial);
+  const next = safeNext(searchParams.get("next"));
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+  const [submitting, setSubmitting] = useState(false);
+  const busy = pending || submitting;
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setSubmitting(true);
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const email = String(formData.get("email") || "")
+      .trim()
+      .toLowerCase();
+    const password = String(formData.get("password") || "");
+
+    if (!email || !password) {
+      setError("Email and password are required.");
+      setSubmitting(false);
+      return;
+    }
+
+    try {
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        setError(signInError.message);
+        setSubmitting(false);
+        return;
+      }
+
+      // Hard navigation so session cookies are applied and pending never sticks.
+      startTransition(() => {
+        window.location.assign(next);
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Sign-in failed. Please try again.",
+      );
+      setSubmitting(false);
+    }
+  }
 
   return (
     <div className="w-full">
@@ -29,10 +79,15 @@ export function LoginForm() {
         </p>
       </div>
 
-      <form action={signIn} className="space-y-5">
-        <FormLock pending={pending} className="space-y-5">
-          <input type="hidden" name="next" value={next} />
-
+      <form onSubmit={onSubmit} className="space-y-5" noValidate>
+        <fieldset
+          disabled={busy}
+          aria-busy={busy}
+          className={cn(
+            "min-w-0 space-y-5 border-0 p-0",
+            busy && "opacity-70",
+          )}
+        >
           <label className="block space-y-2">
             <span className="ml-1 text-sm font-medium text-muted-foreground">
               Email Address
@@ -82,24 +137,24 @@ export function LoginForm() {
             </Link>
           </div>
 
-          {state.error && (
+          {error ? (
             <p className="text-sm text-destructive" role="alert">
-              {state.error}
+              {error}
             </p>
-          )}
+          ) : null}
 
           <Button
             type="submit"
             size="lg"
-            disabled={pending}
+            disabled={busy}
             className={cn(
               "h-12 w-full rounded-xl bg-primary text-sm font-medium shadow-lg shadow-primary/10 hover:bg-primary/90",
             )}
           >
-            {pending ? "Please wait…" : "Sign In"}
+            {busy ? "Please wait…" : "Sign In"}
             <MaterialIcon name="arrow_forward" className="text-[18px]" />
           </Button>
-        </FormLock>
+        </fieldset>
       </form>
 
       <div className="mt-10 text-center">
