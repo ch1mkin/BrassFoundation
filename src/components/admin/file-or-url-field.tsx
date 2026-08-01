@@ -3,13 +3,16 @@
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { uploadAdminFile, type UploadBucket } from "@/lib/storage/upload";
+import {
+  uploadFileClient,
+  type UploadBucket,
+} from "@/lib/storage/client-upload";
 
 export function FileOrUrlField({
   name,
   label,
   bucket,
-  accept,
+  accept = "image/jpeg,image/png,image/webp,image/gif",
   folder,
   defaultUrl,
 }: {
@@ -28,7 +31,7 @@ export function FileOrUrlField({
     if (!file) return;
     setError(null);
     startTransition(async () => {
-      const result = await uploadAdminFile(bucket, file, folder);
+      const result = await uploadFileClient(bucket, file, folder);
       if (!result.ok) {
         setError(result.error);
         return;
@@ -52,7 +55,10 @@ export function FileOrUrlField({
           type="file"
           accept={accept}
           className="max-w-full text-xs"
-          onChange={(e) => onFile(e.target.files?.[0] || null)}
+          onChange={(e) => {
+            onFile(e.target.files?.[0] || null);
+            e.target.value = "";
+          }}
         />
         {pending ? (
           <span className="text-xs text-muted-foreground">Uploading…</span>
@@ -69,6 +75,14 @@ export function FileOrUrlField({
           </Button>
         ) : null}
       </div>
+      {url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={url}
+          alt=""
+          className="mt-1 h-28 w-auto max-w-full rounded-xl border border-border object-cover"
+        />
+      ) : null}
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
     </div>
   );

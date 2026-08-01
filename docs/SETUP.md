@@ -41,6 +41,7 @@ This way all email leaves through your Hostinger mailbox.
    - `supabase/migrations/20260801060000_blogs_stats_thumbnails.sql`
    - `supabase/migrations/20260801070000_hero_background.sql`
    - `supabase/migrations/20260801080000_i18n_payments.sql`
+   - `supabase/migrations/20260801090000_fix_hero_upload.sql`
 
 This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS (including hero background + Punjabi fields), membership applications, payments/mandates/transactions, UI translations, a **role dropdown** on `profiles.role_id`, public content modules, **storage buckets**, gallery, org tree, blogs, and resource PDF thumbnails.
 
