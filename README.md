@@ -13,12 +13,14 @@ Headless Organization Management System for Brass Foundation — public website,
 
 ```bash
 npm install
-cp .env.example .env.local
-# Fill in Supabase and other keys
+cp .env.example .env
+# Fill in Supabase + Hostinger SMTP keys (see docs/SETUP.md)
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+Full setup (DB migration, Super Admin, SMTP): [docs/SETUP.md](./docs/SETUP.md).
 
 ## App structure
 

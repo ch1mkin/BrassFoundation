@@ -81,7 +81,7 @@ Brass Foundation OMS
 - TipTap Rich Text Editor
 - React PDF Viewer
 - React Email
-- Resend (emails)
+- Hostinger SMTP (emails via Nodemailer)
 
 ## Deployment
 

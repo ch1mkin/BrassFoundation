@@ -1,0 +1,49 @@
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { sendEmail } from "@/lib/email/smtp";
+
+const schema = z.object({
+  name: z.string().min(1).max(120),
+  email: z.string().email(),
+  message: z.string().min(1).max(5000),
+});
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const parsed = schema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid contact form data." },
+        { status: 400 },
+      );
+    }
+
+    const { name, email, message } = parsed.data;
+    const inbox = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER;
+
+    if (!inbox) {
+      return NextResponse.json(
+        { error: "Email inbox is not configured." },
+        { status: 500 },
+      );
+    }
+
+    await sendEmail({
+      to: inbox,
+      replyTo: email,
+      subject: `Contact form — ${name}`,
+      html: `
+        <p><strong>From:</strong> ${name} (${email})</p>
+        <p>${message.replace(/\n/g, "<br/>")}</p>
+      `,
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to send email.";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
