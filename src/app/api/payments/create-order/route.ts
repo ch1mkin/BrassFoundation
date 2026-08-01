@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     let amountPaise = body.amountPaise;
-    let applicationId = body.applicationId || null;
+    const applicationId = body.applicationId || null;
 
     if (purpose === "registration_fee") {
       amountPaise = REGISTRATION_FEE_PAISE;

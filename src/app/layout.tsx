@@ -67,12 +67,6 @@ export default async function RootLayout({
       className={locale === "pa" ? "locale-pa" : "locale-en"}
       suppressHydrationWarning
     >
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body
         className={`${poppins.variable} ${inter.variable} ${cormorant.variable} ${gurmukhi.variable} antialiased`}
       >

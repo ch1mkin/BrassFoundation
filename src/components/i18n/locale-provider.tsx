@@ -85,8 +85,7 @@ function ensureGoogleTranslateScript() {
 
   window.googleTranslateElementInit = () => {
     if (!window.google?.translate?.TranslateElement) return;
-    // eslint-disable-next-line no-new
-    new window.google.translate.TranslateElement(
+    void new window.google.translate.TranslateElement(
       {
         pageLanguage: "en",
         includedLanguages: "en,pa",
