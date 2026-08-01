@@ -1,9 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { BrandLogo } from "@/components/brand/logo";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +24,6 @@ type HeroSectionProps = {
 };
 
 export function HeroSection({
-  eyebrow,
   headline,
   subheadline,
   primaryLabel,
@@ -35,77 +34,110 @@ export function HeroSection({
   const lines = headline.split("\n");
 
   return (
-    <section className="relative flex min-h-[100svh] items-center overflow-hidden bg-[#0B1C28]">
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 72% 38%, rgba(17,181,201,0.32) 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 18% 82%, rgba(0,43,91,0.55) 0%, transparent 50%), linear-gradient(160deg, #0B1C28 0%, #002B5B 100%)",
-        }}
-      />
+    <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-surface pt-20">
       <HeroParticles />
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-24 pb-20 lg:px-8">
-        <div className="glass max-w-2xl rounded-2xl p-8 sm:p-10">
-          <BrandLogo size="xl" href={null} priority className="mb-6" />
+      <div className="relative z-10 mx-auto max-w-[1280px] px-4 py-16 text-center sm:px-6 lg:px-20">
+        <div className="mb-12 flex justify-center">
+          <div className="relative">
+            <motion.div
+              className="floating-animation"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7 }}
+            >
+              <Image
+                src="/brand/logo.png"
+                alt="Brass Foundation"
+                width={192}
+                height={192}
+                priority
+                className="h-40 w-40 object-contain drop-shadow-2xl sm:h-48 sm:w-48"
+              />
+            </motion.div>
 
-          <motion.p
-            className="font-heading text-sm font-medium tracking-[0.22em] text-brand uppercase"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-          >
-            {eyebrow}
-          </motion.p>
-
-          <motion.h1
-            className="mt-4 font-heading text-4xl font-medium tracking-tight text-white sm:text-5xl lg:text-[3.4rem] lg:leading-[1.12]"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
-          >
-            {lines.map((line) => (
-              <span key={line} className="block">
-                {line}
+            <div
+              className="glass-card absolute -top-8 -left-16 hidden rounded-xl p-3 animate-bounce sm:block"
+              style={{ animationDuration: "4s" }}
+            >
+              <span className="font-heading block text-xl font-semibold text-primary">
+                10k+
               </span>
-            ))}
-          </motion.h1>
-
-          <motion.p
-            className="mt-5 max-w-lg text-base leading-relaxed text-white/75 sm:text-lg"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-          >
-            {subheadline}
-          </motion.p>
-
-          <motion.div
-            className="mt-8 flex flex-wrap gap-3"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.55 }}
-          >
-            <Link
-              href={primaryHref}
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "rounded-2xl bg-gold px-5 text-gold-foreground hover:bg-gold/90",
-              )}
+              <span className="text-xs font-semibold text-muted-foreground">
+                Active Members
+              </span>
+            </div>
+            <div
+              className="glass-card absolute top-16 -right-20 hidden rounded-xl p-3 animate-bounce sm:block"
+              style={{ animationDuration: "5s" }}
             >
-              {primaryLabel}
-            </Link>
-            <Link
-              href={secondaryHref}
-              className={cn(
-                buttonVariants({ variant: "outline", size: "lg" }),
-                "rounded-2xl border-white/25 bg-transparent px-5 text-white hover:bg-white/10 hover:text-white",
-              )}
-            >
-              {secondaryLabel}
-            </Link>
-          </motion.div>
+              <span className="font-heading block text-xl font-semibold text-secondary">
+                25+
+              </span>
+              <span className="text-xs font-semibold text-muted-foreground">
+                Districts Covered
+              </span>
+            </div>
+          </div>
         </div>
+
+        <motion.h1
+          className="font-heading mx-auto mb-6 max-w-4xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-[48px] lg:leading-[1.1]"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.6 }}
+        >
+          {lines.map((line, i) => (
+            <span key={line} className="block">
+              {i === lines.length - 1 ? (
+                <span className="text-primary">{line}</span>
+              ) : (
+                line
+              )}
+            </span>
+          ))}
+        </motion.h1>
+
+        <motion.p
+          className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-muted-foreground"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+        >
+          {subheadline}
+        </motion.p>
+
+        <motion.div
+          className="flex flex-col justify-center gap-4 sm:flex-row"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.6 }}
+        >
+          <Link
+            href={primaryHref}
+            className={cn(
+              buttonVariants({ size: "lg" }),
+              "h-14 rounded-lg bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90",
+            )}
+          >
+            {primaryLabel}
+            <span className="material-symbols-outlined text-[20px]">
+              person_add
+            </span>
+          </Link>
+          <Link
+            href={secondaryHref}
+            className={cn(
+              buttonVariants({ variant: "secondary", size: "lg" }),
+              "h-14 rounded-lg bg-surface-highest px-8 text-base font-bold text-primary hover:bg-surface-high",
+            )}
+          >
+            {secondaryLabel}
+            <span className="material-symbols-outlined text-[20px]">
+              auto_stories
+            </span>
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

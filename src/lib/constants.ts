@@ -3,7 +3,7 @@ export const SITE = {
   tagline: "Education · Empowerment · Equality",
   slogan: "Education to Prosperity",
   description:
-    "An Ambedkarite organization dedicated to education, empowerment, equality, leadership, and community development.",
+    "Brass Foundation is dedicated to education, equality, leadership and community development inspired by the vision of Dr. B. R. Ambedkar.",
   logo: "/brand/logo.png",
 } as const;
 
@@ -20,79 +20,14 @@ export type NavItem = {
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  {
-    label: "About",
-    href: "/about",
-    children: [
-      {
-        href: "/about",
-        label: "Who We Are",
-        description: "Mission, vision, and founding purpose",
-      },
-      {
-        href: "/about#history",
-        label: "History",
-        description: "Our journey and milestones",
-      },
-      {
-        href: "/about#founder",
-        label: "Founder Message",
-        description: "Words that guide the foundation",
-      },
-      {
-        href: "/about#team",
-        label: "Leadership",
-        description: "Organization structure and team",
-      },
-    ],
-  },
-  {
-    label: "Engage",
-    children: [
-      {
-        href: "/community",
-        label: "Community Work",
-        description: "Programs that create impact",
-      },
-      {
-        href: "/events",
-        label: "Events",
-        description: "Upcoming gatherings and camps",
-      },
-      {
-        href: "/membership",
-        label: "Membership",
-        description: "Join and grow with us",
-      },
-    ],
-  },
-  {
-    label: "Learn",
-    children: [
-      {
-        href: "/resources",
-        label: "Resources",
-        description: "Books, PDFs, and study material",
-      },
-      {
-        href: "/marketplace",
-        label: "Marketplace",
-        description: "Community publishing platform",
-      },
-      {
-        href: "/news",
-        label: "News",
-        description: "Announcements and articles",
-      },
-    ],
-  },
-  {
-    label: "Contact",
-    href: "/contact",
-  },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Community", href: "/community" },
+  { label: "Resources", href: "/resources" },
+  { label: "Events", href: "/events" },
+  { label: "Contact", href: "/contact" },
 ];
 
-/** Flat links kept for footer / simple lists */
 export const NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "/community", label: "Community" },
@@ -104,60 +39,153 @@ export const NAV_LINKS = [
 ] as const;
 
 export const STATS = [
-  { label: "Members", value: 2500, suffix: "+" },
-  { label: "Events", value: 180, suffix: "+" },
-  { label: "Scholarships", value: 420, suffix: "+" },
-  { label: "Districts", value: 45, suffix: "+" },
-  { label: "Books Published", value: 65, suffix: "+" },
-  { label: "Community Drives", value: 310, suffix: "+" },
+  { label: "Members", value: 10000, suffix: "+", icon: "groups" },
+  { label: "Districts", value: 25, suffix: "+", icon: "map" },
+  { label: "Books Distributed", value: 5000, suffix: "+", icon: "library_books" },
+  { label: "Events Held", value: 150, suffix: "+", icon: "event" },
+  { label: "Scholarships", value: 500, suffix: "+", icon: "school" },
 ] as const;
 
 export const CORE_VALUES = [
   {
-    title: "Knowledge",
-    description: "Education as the foundation of liberation and progress.",
+    title: "Our Vision",
+    description:
+      "A society where every individual has the resources to lead and succeed.",
+    icon: "visibility",
   },
   {
-    title: "Leadership",
-    description: "Building capable leaders who serve with integrity.",
+    title: "Our Mission",
+    description:
+      "Providing scholarships, mentorship, and educational materials to marginalized communities.",
+    icon: "rocket_launch",
+  },
+] as const;
+
+export const LEADERSHIP = [
+  {
+    name: "Dr. Anita Shinde",
+    role: "President",
+    bio: "A dedicated social activist with 20 years of experience in rural education reform.",
   },
   {
-    title: "Equality",
-    description: "Dignity and opportunity for every individual.",
+    name: "Rahul Kamble",
+    role: "General Secretary",
+    bio: "Specializing in digital infrastructure for remote learning programs.",
   },
   {
-    title: "Community",
-    description: "Collective growth through solidarity and service.",
+    name: "Prof. V. Jadhav",
+    role: "Advisory Board",
+    bio: "Former Vice-Chancellor with expertise in institutional development.",
+  },
+  {
+    name: "Meena Pawar",
+    role: "Treasurer",
+    bio: "Financial expert focused on transparent resource allocation for NGO growth.",
   },
 ] as const;
 
 export const COMMUNITY_WORK = [
-  { title: "Blood Donation", slug: "blood-donation" },
-  { title: "Educational Programs", slug: "educational-programs" },
-  { title: "Legal Awareness", slug: "legal-awareness" },
-  { title: "Book Distribution", slug: "book-distribution" },
-  { title: "Scholarships", slug: "scholarships" },
-  { title: "Women's Empowerment", slug: "womens-empowerment" },
-  { title: "Youth Development", slug: "youth-development" },
-  { title: "Volunteer Programs", slug: "volunteer-programs" },
+  {
+    title: "Blood Donation Camps",
+    slug: "blood-donation",
+    description:
+      "Organizing quarterly camps to support local hospitals and emergency reserves.",
+    badge: "URGENT",
+    badgeTone: "error" as const,
+  },
+  {
+    title: "Digital Literacy Program",
+    slug: "educational-programs",
+    description:
+      "Empowering youth with coding, software use, and internet navigation skills.",
+    badge: "ONGOING",
+    badgeTone: "primary" as const,
+  },
+  {
+    title: "Women Leadership Circle",
+    slug: "womens-empowerment",
+    description:
+      "Providing a platform for women to develop leadership skills and community impact.",
+    badge: "FEATURED",
+    badgeTone: "secondary" as const,
+  },
 ] as const;
 
-/** Fallback homepage CMS content until Supabase CMS is seeded */
+export const UPCOMING_EVENTS = [
+  {
+    month: "OCT",
+    day: "14",
+    title: "Ambedkar Memorial Lecture 2024",
+    location: "Main Auditorium, City University",
+    locationIcon: "location_on",
+    tone: "primary" as const,
+  },
+  {
+    month: "OCT",
+    day: "22",
+    title: "Career Guidance Seminar",
+    location: "Online Webinar (Zoom)",
+    locationIcon: "videocam",
+    tone: "secondary" as const,
+  },
+] as const;
+
+export const RESOURCES_PREVIEW = [
+  {
+    title: "Constitution of India",
+    subtitle: "Multi-language PDF Version",
+    size: "12MB",
+    icon: "menu_book",
+    tone: "primary" as const,
+  },
+  {
+    title: "Ambedkar’s Writings",
+    subtitle: "Volume 1 - Educational Philosophy",
+    size: "8MB",
+    icon: "history_edu",
+    tone: "secondary" as const,
+  },
+  {
+    title: "Rights Awareness Kit",
+    subtitle: "Guide for Rural Communities",
+    size: "15MB",
+    icon: "gavel",
+    tone: "tertiary" as const,
+  },
+  {
+    title: "Leadership Podcasts",
+    subtitle: "Audio Series - Season 1",
+    size: "240MB",
+    icon: "mic",
+    tone: "brand" as const,
+  },
+] as const;
+
+export const FEATURED_BOOKS = [
+  { title: "Annihilation of Caste", price: "₹399", rating: 5, reviews: 452 },
+  {
+    title: "The Buddha and His Dhamma",
+    price: "₹549",
+    rating: 4,
+    reviews: 318,
+  },
+  { title: "Waiting for a Visa", price: "₹199", rating: 5, reviews: 210 },
+] as const;
+
 export const DEFAULT_HOMEPAGE = {
   hero_eyebrow: "Brass Foundation",
-  hero_headline: "Knowledge that liberates.\nCommunity that rises.",
+  hero_headline: "Empowering Communities\nThrough Education.",
   hero_subheadline:
-    "An Ambedkarite organization building education, equality, and leadership for generations ahead.",
+    "Brass Foundation is dedicated to education, equality, leadership and community development inspired by the vision of Dr. B. R. Ambedkar.",
   hero_cta_primary_label: "Become a Member",
   hero_cta_primary_href: "/membership",
   hero_cta_secondary_label: "Explore Resources",
   hero_cta_secondary_href: "/resources",
-  about_eyebrow: "Who We Are",
-  about_headline:
-    "Building a platform for dignity, learning, and collective progress.",
+  about_eyebrow: "Our Mission & Vision",
+  about_headline: "Our Mission & Vision",
   about_body:
-    "Brass Foundation exists to advance Ambedkarite values through education, community service, and leadership development — with professionalism that matches our purpose.",
-  membership_headline: "Join Brass Foundation.",
+    "Inspired by the profound legacy of Dr. B.R. Ambedkar, we strive to break down barriers to education and equality. Brass Foundation is more than an organization; it's a movement toward intellectual freedom.",
+  membership_headline: "Become Part of the Movement",
   membership_body:
-    "Register online, receive your digital membership card, and take part in programs that advance education and equality.",
+    "Join thousands of members dedicated to propagating the ideas of equality and justice through education.",
 } as const;

@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Libre_Baskerville, Public_Sans } from "next/font/google";
+import { Cormorant_Garamond, Inter, Poppins } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const libreBaskerville = Libre_Baskerville({
+const poppins = Poppins({
   variable: "--font-heading",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const publicSans = Public_Sans({
+const inter = Inter({
   variable: "--font-body",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -31,15 +31,7 @@ export const metadata: Metadata = {
     template: "%s · Brass Foundation",
   },
   description:
-    "An Ambedkarite organization dedicated to education, empowerment, equality, leadership, and community development.",
-  keywords: [
-    "Brass Foundation",
-    "Ambedkarite",
-    "education",
-    "empowerment",
-    "equality",
-    "community",
-  ],
+    "Empowering communities through education, equality, leadership and community development inspired by Dr. B. R. Ambedkar.",
 };
 
 export default function RootLayout({
@@ -49,8 +41,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${libreBaskerville.variable} ${publicSans.variable} ${cormorant.variable} antialiased`}
+        className={`${poppins.variable} ${inter.variable} ${cormorant.variable} antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

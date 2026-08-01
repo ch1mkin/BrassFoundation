@@ -32,8 +32,8 @@ function Field({
   children?: React.ReactNode;
 }) {
   return (
-    <label className="block space-y-1.5">
-      <span className="text-sm font-medium text-foreground">
+    <label className="block space-y-2">
+      <span className="ml-1 text-sm font-medium text-muted-foreground">
         {label}
         {required ? <span className="text-destructive"> *</span> : null}
       </span>
@@ -44,7 +44,7 @@ function Field({
             required={required}
             placeholder={placeholder}
             rows={4}
-            className="w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="w-full rounded-xl border border-input bg-white px-3 py-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
           />
         ) : (
           <Input
@@ -52,7 +52,7 @@ function Field({
             type={type}
             required={required}
             placeholder={placeholder}
-            className="h-10 rounded-2xl"
+            className="h-11 rounded-xl bg-white"
           />
         ))}
     </label>
@@ -67,8 +67,8 @@ export function MembershipForm() {
 
   if (state.success) {
     return (
-      <div className="rounded-2xl bg-card p-8 shadow-soft">
-        <p className="font-heading text-2xl font-medium text-primary">
+      <div className="glass-card rounded-2xl p-8">
+        <p className="font-heading text-2xl font-semibold text-primary">
           Application received
         </p>
         <p className="mt-3 text-muted-foreground">{state.success}</p>
@@ -82,9 +82,9 @@ export function MembershipForm() {
   }
 
   return (
-    <form action={action} className="space-y-8">
-      <section className="space-y-4 rounded-2xl bg-card p-6 shadow-soft sm:p-8">
-        <h2 className="font-heading text-xl font-medium">Personal details</h2>
+    <form action={action} className="space-y-6">
+      <section className="glass-card space-y-4 rounded-2xl p-6 sm:p-8">
+        <h2 className="font-heading text-xl font-semibold">Personal details</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Full name" name="full_name" required />
           <Field label="Email" name="email" type="email" required />
@@ -104,13 +104,13 @@ export function MembershipForm() {
         />
       </section>
 
-      <section className="space-y-4 rounded-2xl bg-card p-6 shadow-soft sm:p-8">
-        <h2 className="font-heading text-xl font-medium">Membership</h2>
+      <section className="glass-card space-y-4 rounded-2xl p-6 sm:p-8">
+        <h2 className="font-heading text-xl font-semibold">Membership</h2>
         <Field label="Membership type" required>
           <select
             name="membership_type"
             defaultValue="general"
-            className="h-10 w-full rounded-2xl border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="h-11 w-full rounded-xl border border-input bg-white px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             {membershipTypes.map((type) => (
               <option key={type} value={type}>
@@ -143,9 +143,10 @@ export function MembershipForm() {
         type="submit"
         size="lg"
         disabled={pending}
-        className="rounded-2xl bg-gold text-gold-foreground hover:bg-gold/90"
+        className="h-12 rounded-xl bg-primary px-8 shadow-lg shadow-primary/20"
       >
         {pending ? "Submitting…" : "Submit application"}
+        <span className="material-symbols-outlined text-[18px]">person_add</span>
       </Button>
     </form>
   );

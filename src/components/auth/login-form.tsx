@@ -3,7 +3,6 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { BrandLogo } from "@/components/brand/logo";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,104 +33,107 @@ export function LoginForm() {
   const pending = mode === "signup" ? signUpPending : signInPending;
 
   return (
-    <div className="w-full max-w-md">
-      <div className="mb-8 lg:hidden">
-        <BrandLogo size="md" showWordmark />
+    <div className="w-full">
+      <div className="mb-10 text-center">
+        <h2 className="font-heading mb-2 text-3xl font-semibold text-foreground">
+          {mode === "signup" ? "Join the Community" : "Welcome Back"}
+        </h2>
+        <p className="text-muted-foreground">
+          {mode === "signup"
+            ? "Create your Brass Foundation account"
+            : "Access your learning dashboard"}
+        </p>
       </div>
-
-      <div className="flex gap-2 rounded-2xl bg-muted p-1">
-        <Link
-          href={`/login?next=${encodeURIComponent(next)}`}
-          className={cn(
-            "flex-1 rounded-xl py-2 text-center text-sm font-medium transition-colors",
-            mode === "signin"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          Sign in
-        </Link>
-        <Link
-          href={`/login?mode=signup&next=${encodeURIComponent(next)}`}
-          className={cn(
-            "flex-1 rounded-xl py-2 text-center text-sm font-medium transition-colors",
-            mode === "signup"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          Register
-        </Link>
-      </div>
-
-      <h1 className="font-heading mt-8 text-3xl font-normal tracking-tight">
-        {mode === "signup" ? "Create your account" : "Welcome back"}
-      </h1>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        {mode === "signup"
-          ? "Register with your email and a secure password."
-          : "Sign in with your email and password."}
-      </p>
 
       <form
         action={mode === "signup" ? signUp : signIn}
-        className="mt-8 space-y-4"
+        className="space-y-5"
       >
         <input type="hidden" name="next" value={next} />
 
         {mode === "signup" && (
-          <label className="block space-y-1.5">
-            <span className="text-sm font-medium">Full name</span>
+          <label className="block space-y-2">
+            <span className="ml-1 text-sm font-medium text-muted-foreground">
+              Full name
+            </span>
             <Input
               name="full_name"
               required
               placeholder="Your full name"
               autoComplete="name"
-              className="h-11 rounded-2xl"
+              className="h-12 rounded-xl border-border bg-white"
             />
           </label>
         )}
 
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium">Email</span>
-          <Input
-            name="email"
-            type="email"
-            required
-            placeholder="you@example.com"
-            autoComplete="email"
-            className="h-11 rounded-2xl"
-          />
+        <label className="block space-y-2">
+          <span className="ml-1 text-sm font-medium text-muted-foreground">
+            Email Address
+          </span>
+          <div className="relative">
+            <span className="material-symbols-outlined absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground">
+              mail
+            </span>
+            <Input
+              name="email"
+              type="email"
+              required
+              placeholder="name@foundation.org"
+              autoComplete="email"
+              className="h-12 rounded-xl border-border bg-white pr-4 pl-12"
+            />
+          </div>
         </label>
 
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium">
+        <label className="block space-y-2">
+          <span className="ml-1 text-sm font-medium text-muted-foreground">
             {mode === "signup" ? "Create password" : "Password"}
           </span>
-          <PasswordInput
-            name="password"
-            required
-            minLength={8}
-            placeholder={
-              mode === "signup" ? "At least 8 characters" : "Your password"
-            }
-            autoComplete={
-              mode === "signup" ? "new-password" : "current-password"
-            }
-          />
+          <div className="relative">
+            <span className="material-symbols-outlined absolute top-1/2 left-4 z-10 -translate-y-1/2 text-muted-foreground">
+              lock
+            </span>
+            <PasswordInput
+              name="password"
+              required
+              minLength={8}
+              placeholder="••••••••"
+              autoComplete={
+                mode === "signup" ? "new-password" : "current-password"
+              }
+              className="pl-12"
+            />
+          </div>
         </label>
 
         {mode === "signup" && (
-          <label className="block space-y-1.5">
-            <span className="text-sm font-medium">Repeat password</span>
+          <label className="block space-y-2">
+            <span className="ml-1 text-sm font-medium text-muted-foreground">
+              Repeat password
+            </span>
             <PasswordInput
               name="confirm_password"
               required
               minLength={8}
-              placeholder="Re-enter password"
+              placeholder="••••••••"
               autoComplete="new-password"
             />
           </label>
+        )}
+
+        {mode === "signin" && (
+          <div className="flex items-center justify-between pt-1">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <input
+                type="checkbox"
+                className="size-4 rounded border-border text-primary focus:ring-primary"
+              />
+              Remember Me
+            </label>
+            <span className="text-sm font-medium text-primary">
+              Forgot Password?
+            </span>
+          </div>
         )}
 
         {state.error && (
@@ -145,18 +147,45 @@ export function LoginForm() {
           size="lg"
           disabled={pending}
           className={cn(
-            "h-11 w-full rounded-2xl",
-            mode === "signup" &&
-              "bg-gold text-gold-foreground hover:bg-gold/90",
+            "h-12 w-full rounded-xl bg-primary text-sm font-medium shadow-lg shadow-primary/10 hover:bg-primary/90",
           )}
         >
           {pending
             ? "Please wait…"
             : mode === "signup"
               ? "Create account"
-              : "Sign in"}
+              : "Sign In"}
+          <span className="material-symbols-outlined text-[18px]">
+            arrow_forward
+          </span>
         </Button>
       </form>
+
+      <div className="mt-10 text-center">
+        <p className="text-muted-foreground">
+          {mode === "signup" ? (
+            <>
+              Already have an account?{" "}
+              <Link
+                href={`/login?next=${encodeURIComponent(next)}`}
+                className="font-bold text-primary hover:underline"
+              >
+                Sign in
+              </Link>
+            </>
+          ) : (
+            <>
+              Don&apos;t have an account?{" "}
+              <Link
+                href={`/login?mode=signup&next=${encodeURIComponent(next)}`}
+                className="ml-1 font-bold text-primary hover:underline"
+              >
+                Join the Community
+              </Link>
+            </>
+          )}
+        </p>
+      </div>
     </div>
   );
 }

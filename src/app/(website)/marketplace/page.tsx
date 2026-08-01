@@ -1,20 +1,59 @@
 import type { Metadata } from "next";
+import { PageShell } from "@/components/website/page-shell";
+import { FEATURED_BOOKS } from "@/lib/constants";
 
 export const metadata: Metadata = { title: "Marketplace" };
 
 export default function MarketplacePage() {
   return (
-    <div className="mx-auto max-w-3xl px-6 pt-32 pb-24 lg:px-8">
-      <p className="font-heading text-sm font-medium tracking-[0.18em] text-primary uppercase">
-        Marketplace
-      </p>
-      <h1 className="mt-3 font-heading text-4xl font-semibold">
-        Community Publishing
-      </h1>
-      <p className="mt-6 text-lg text-muted-foreground">
-        Books, poetry, articles, research, and essays from the community —
-        curated and approved by admins.
-      </p>
-    </div>
+    <PageShell
+      eyebrow="Marketplace"
+      title="Featured Books"
+      description="Community publishing — books, poetry, articles, and research curated for education and empowerment."
+      wide
+    >
+      <div className="grid gap-6 md:grid-cols-3">
+        {FEATURED_BOOKS.map((book) => (
+          <div
+            key={book.title}
+            className="rounded-2xl border border-border/30 bg-white p-6 transition-shadow hover:shadow-2xl"
+          >
+            <div className="mb-4 flex h-64 items-center justify-center rounded-xl bg-surface-low">
+              <span className="material-symbols-outlined text-6xl text-primary/40">
+                menu_book
+              </span>
+            </div>
+            <h2 className="font-heading text-lg font-semibold">{book.title}</h2>
+            <div className="mt-2 flex items-center gap-1 text-tertiary">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <span
+                  key={i}
+                  className="material-symbols-outlined text-base"
+                  style={{
+                    fontVariationSettings: `'FILL' ${i < book.rating ? 1 : 0}`,
+                  }}
+                >
+                  star
+                </span>
+              ))}
+              <span className="ml-1 text-xs text-muted-foreground">
+                ({book.reviews} Reviews)
+              </span>
+            </div>
+            <div className="mt-6 flex items-center justify-between">
+              <span className="font-heading text-2xl font-semibold text-primary">
+                {book.price}
+              </span>
+              <button
+                type="button"
+                className="rounded-lg bg-primary px-5 py-2 text-sm font-bold text-white"
+              >
+                Buy Now
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </PageShell>
   );
 }

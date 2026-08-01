@@ -1,7 +1,11 @@
 import {
   AboutSection,
   CommunitySection,
+  EventsSection,
+  LeadershipSection,
+  MarketplaceSection,
   MembershipCta,
+  ResourcesSection,
   StatsSection,
 } from "@/components/website/home-sections";
 import { HeroSection } from "@/components/website/hero-section";
@@ -21,14 +25,18 @@ export default async function HomePage() {
         secondaryLabel={content.hero_cta_secondary_label}
         secondaryHref={content.hero_cta_secondary_href}
       />
+      <StatsSection stats={content.stats} />
       <AboutSection
         eyebrow={content.about_eyebrow}
         headline={content.about_headline}
         body={content.about_body}
         values={content.core_values}
       />
-      <StatsSection stats={content.stats} />
+      <LeadershipSection />
       <CommunitySection items={content.community_work} />
+      <EventsSection />
+      <ResourcesSection />
+      <MarketplaceSection />
       <MembershipCta
         headline={content.membership_headline}
         body={content.membership_body}

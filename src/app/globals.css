@@ -41,6 +41,12 @@
   --color-primary: var(--primary);
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
+  --color-surface: var(--surface);
+  --color-surface-low: var(--surface-low);
+  --color-surface-high: var(--surface-high);
+  --color-surface-highest: var(--surface-highest);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-foreground: var(--tertiary-foreground);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -54,85 +60,92 @@
 }
 
 :root {
-  /* Aligned to official Brass Foundation logo */
+  /* Stitch / Material Design tokens for Brass Foundation */
   --brand: #11b5c9;
-  --brand-foreground: #ffffff;
-  --primary: #002b5b;
+  --brand-foreground: #004149;
+  --primary: #006875;
   --primary-foreground: #ffffff;
-  --secondary: #0b1c28;
-  --secondary-foreground: #f4f6f8;
-  --gold: #f2b233;
-  --gold-foreground: #14181f;
-  --background: #f4f6f8;
-  --foreground: #14181f;
+  --secondary: #2d609d;
+  --secondary-foreground: #ffffff;
+  --tertiary: #7d5700;
+  --tertiary-foreground: #ffffff;
+  --gold: #d69a17;
+  --gold-foreground: #271900;
+  --background: #fcf9f8;
+  --foreground: #1b1b1b;
+  --surface: #fcf9f8;
+  --surface-low: #f6f3f2;
+  --surface-high: #eae7e7;
+  --surface-highest: #e5e2e1;
   --card: #ffffff;
-  --card-foreground: #14181f;
+  --card-foreground: #1b1b1b;
   --popover: #ffffff;
-  --popover-foreground: #14181f;
-  --muted: #e8ecf0;
-  --muted-foreground: #5c6670;
+  --popover-foreground: #1b1b1b;
+  --muted: #f0eded;
+  --muted-foreground: #3c494b;
   --accent: #e6f7f9;
-  --accent-foreground: #002b5b;
-  --destructive: #b42318;
+  --accent-foreground: #006875;
+  --destructive: #ba1a1a;
   --success: #1f7a4d;
-  --border: #d5dde5;
-  --input: #d5dde5;
-  --ring: #11b5c9;
-  --chart-1: #002b5b;
-  --chart-2: #11b5c9;
-  --chart-3: #f2b233;
-  --chart-4: #1f7a4d;
-  --chart-5: #5c6670;
-  --radius: 1rem;
-  --shadow-soft: 0 10px 40px rgba(0, 43, 91, 0.08);
+  --border: #bbc9cc;
+  --input: #bbc9cc;
+  --ring: #006875;
+  --chart-1: #006875;
+  --chart-2: #2d609d;
+  --chart-3: #d69a17;
+  --chart-4: #11b5c9;
+  --chart-5: #6c797c;
+  --radius: 0.75rem;
+  --shadow-soft: 0 4px 20px rgba(17, 76, 136, 0.04);
   --sidebar: #ffffff;
-  --sidebar-foreground: #14181f;
-  --sidebar-primary: #002b5b;
+  --sidebar-foreground: #1b1b1b;
+  --sidebar-primary: #006875;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #e6f7f9;
-  --sidebar-accent-foreground: #002b5b;
-  --sidebar-border: #d5dde5;
-  --sidebar-ring: #11b5c9;
+  --sidebar-accent-foreground: #006875;
+  --sidebar-border: #bbc9cc;
+  --sidebar-ring: #006875;
 }
 
 .dark {
-  --brand: #33c5cd;
-  --brand-foreground: #0b1c28;
-  --primary: #7eb6e8;
-  --primary-foreground: #0b1c28;
-  --secondary: #122433;
-  --secondary-foreground: #f4f6f8;
-  --gold: #f2b233;
-  --gold-foreground: #0b1c28;
-  --background: #0b1c28;
-  --foreground: #f4f6f8;
-  --card: #122433;
-  --card-foreground: #f4f6f8;
-  --popover: #122433;
-  --popover-foreground: #f4f6f8;
-  --muted: #1a2d3f;
-  --muted-foreground: #9aa3ad;
-  --accent: #1a3348;
-  --accent-foreground: #f4f6f8;
-  --destructive: #f04438;
+  --brand: #50d8ec;
+  --brand-foreground: #001f24;
+  --primary: #50d8ec;
+  --primary-foreground: #00363d;
+  --secondary: #a5c8ff;
+  --secondary-foreground: #001c3a;
+  --tertiary: #fcbb3c;
+  --tertiary-foreground: #271900;
+  --gold: #fcbb3c;
+  --gold-foreground: #271900;
+  --background: #1b1b1b;
+  --foreground: #f3f0ef;
+  --surface: #1b1b1b;
+  --surface-low: #262525;
+  --surface-high: #313030;
+  --surface-highest: #3c3b3b;
+  --card: #262525;
+  --card-foreground: #f3f0ef;
+  --popover: #262525;
+  --popover-foreground: #f3f0ef;
+  --muted: #313030;
+  --muted-foreground: #bbc9cc;
+  --accent: #004f58;
+  --accent-foreground: #9af0ff;
+  --destructive: #ffb4ab;
   --success: #3db87a;
-  --border: rgba(244, 246, 248, 0.12);
-  --input: rgba(244, 246, 248, 0.15);
-  --ring: #33c5cd;
-  --chart-1: #7eb6e8;
-  --chart-2: #33c5cd;
-  --chart-3: #f2b233;
-  --chart-4: #3db87a;
-  --chart-5: #9aa3ad;
+  --border: rgba(243, 240, 239, 0.14);
+  --input: rgba(243, 240, 239, 0.16);
+  --ring: #50d8ec;
   --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.4);
-  --sidebar: #122433;
-  --sidebar-foreground: #f4f6f8;
-  --sidebar-primary: #33c5cd;
-  --sidebar-primary-foreground: #0b1c28;
-  --sidebar-accent: #1a3348;
-  --sidebar-accent-foreground: #f4f6f8;
-  --sidebar-border: rgba(244, 246, 248, 0.12);
-  --sidebar-ring: #33c5cd;
+  --sidebar: #262525;
+  --sidebar-foreground: #f3f0ef;
+  --sidebar-primary: #50d8ec;
+  --sidebar-primary-foreground: #00363d;
+  --sidebar-accent: #004f58;
+  --sidebar-accent-foreground: #9af0ff;
+  --sidebar-border: rgba(243, 240, 239, 0.14);
+  --sidebar-ring: #50d8ec;
 }
 
 @layer base {
@@ -142,7 +155,6 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-feature-settings: "kern" 1, "liga" 1;
   }
 
   html {
@@ -155,15 +167,19 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-heading), ui-serif, Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
     @apply tracking-tight text-balance;
-    font-feature-settings: "kern" 1;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--brand) 35%, white);
+    color: #004149;
   }
 }
 
 @layer utilities {
   .font-heading {
-    font-family: var(--font-heading), ui-serif, Georgia, "Times New Roman", serif;
+    font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
   }
 
   .font-quote {
@@ -174,9 +190,34 @@
     box-shadow: var(--shadow-soft);
   }
 
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(17, 76, 136, 0.04);
+  }
+
   .glass {
-    background: rgba(244, 246, 248, 0.1);
-    backdrop-filter: blur(18px);
-    border: 1px solid rgba(244, 246, 248, 0.16);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .floating-animation {
+    animation: floating 3s ease-in-out infinite;
+  }
+
+  @keyframes floating {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
+  }
+
+  .auth-bg-gradient {
+    background: linear-gradient(135deg, #001c3a 0%, #004f58 100%);
   }
 }

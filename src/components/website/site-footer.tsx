@@ -1,31 +1,40 @@
+import Image from "next/image";
 import Link from "next/link";
-import { BrandLogo } from "@/components/brand/logo";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-secondary text-secondary-foreground">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
-        <div className="sm:col-span-2 lg:col-span-1">
-          <BrandLogo size="lg" className="brightness-110" />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/70">
-            {SITE.description}
-          </p>
-          <p className="font-quote mt-3 text-sm italic text-white/50">
-            Education to Prosperity
+    <footer className="w-full bg-surface-highest">
+      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-4 py-16 sm:px-6 md:grid-cols-4 lg:px-20">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <Image
+              src="/brand/logo.png"
+              alt=""
+              width={40}
+              height={40}
+              className="rounded-full bg-white p-0.5"
+            />
+            <span className="font-heading text-lg font-bold text-foreground">
+              {SITE.name}
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Empowering the marginalized through the light of knowledge and
+            unity.
           </p>
         </div>
 
         <div>
-          <p className="font-heading text-sm font-semibold tracking-wide uppercase">
+          <h4 className="mb-4 text-xs font-semibold tracking-wide text-primary uppercase">
             Quick Links
-          </p>
-          <ul className="mt-4 space-y-2">
-            {NAV_LINKS.map((link) => (
+          </h4>
+          <ul className="space-y-2">
+            {NAV_LINKS.slice(0, 4).map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-sm text-white/70 transition-colors hover:text-white"
+                  className="text-xs font-semibold text-muted-foreground transition hover:text-secondary"
                 >
                   {link.label}
                 </Link>
@@ -35,38 +44,67 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <p className="font-heading text-sm font-semibold tracking-wide uppercase">
-            Contact
-          </p>
-          <ul className="mt-4 space-y-2 text-sm text-white/70">
-            <li>contact@brassfoundation.org</li>
-            <li>Emergency: +91 XXXXX XXXXX</li>
-            <li>India</li>
+          <h4 className="mb-4 text-xs font-semibold tracking-wide text-primary uppercase">
+            Community
+          </h4>
+          <ul className="space-y-2">
+            <li>
+              <Link
+                href="/membership"
+                className="text-xs font-semibold text-muted-foreground hover:text-secondary"
+              >
+                Volunteer Portal
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/community"
+                className="text-xs font-semibold text-muted-foreground hover:text-secondary"
+              >
+                Success Stories
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/marketplace"
+                className="text-xs font-semibold text-muted-foreground hover:text-secondary"
+              >
+                Marketplace
+              </Link>
+            </li>
           </ul>
         </div>
 
         <div>
-          <p className="font-heading text-sm font-semibold tracking-wide uppercase">
-            Newsletter
+          <h4 className="mb-4 text-xs font-semibold tracking-wide text-primary uppercase">
+            Contact Us
+          </h4>
+          <p className="mb-4 text-xs font-semibold text-muted-foreground">
+            India
           </p>
-          <p className="mt-4 text-sm text-white/70">
-            Stay updated on events, resources, and community initiatives.
+          <p className="text-xs font-semibold text-muted-foreground">
+            contact@brassfoundation.org
           </p>
-          <Link
-            href="/contact"
-            className="mt-4 inline-block text-sm font-medium text-gold transition-colors hover:text-gold/80"
-          >
-            Subscribe →
-          </Link>
         </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-          <p>
-            © {new Date().getFullYear()} {SITE.name}. All rights reserved.
-          </p>
-          <p className="font-quote italic text-white/40">{SITE.tagline}</p>
+      <div className="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-4 border-t border-border/20 px-4 py-6 sm:flex-row sm:px-6 lg:px-20">
+        <span className="text-xs font-semibold text-muted-foreground">
+          © {new Date().getFullYear()} {SITE.name}. All rights reserved.
+        </span>
+        <div className="flex gap-6">
+          <Link
+            href="/contact"
+            className="text-xs font-semibold text-muted-foreground hover:text-primary"
+          >
+            Terms
+          </Link>
+          <Link
+            href="/contact"
+            className="text-xs font-semibold text-muted-foreground hover:text-primary"
+          >
+            Sitemap
+          </Link>
         </div>
       </div>
     </footer>

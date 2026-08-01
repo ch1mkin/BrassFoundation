@@ -21,14 +21,12 @@ export async function POST(request: Request) {
     }
 
     if (!isSmtpConfigured()) {
-      return NextResponse.json(
-        {
-          ok: false,
-          skipped: true,
-          message: "Email is not configured yet. Your message was not sent.",
-        },
-        { status: 503 },
-      );
+      return NextResponse.json({
+        ok: false,
+        skipped: true,
+        message:
+          "Thanks — email delivery is not configured yet. Please try again later or email us directly.",
+      });
     }
 
     const { name, email, message } = parsed.data;

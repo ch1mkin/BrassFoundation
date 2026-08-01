@@ -68,7 +68,7 @@ export default async function MemberDashboardPage() {
       </p>
 
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
-        <div className="relative overflow-hidden rounded-2xl bg-secondary p-6 text-secondary-foreground shadow-soft sm:p-8">
+        <div className="relative overflow-hidden rounded-2xl bg-secondary p-6 text-white sm:p-8">
           <div
             className="pointer-events-none absolute inset-0 opacity-60"
             style={{
@@ -82,7 +82,7 @@ export default async function MemberDashboardPage() {
               <p className="text-xs tracking-[0.18em] text-white/55 uppercase">
                 Brass Foundation
               </p>
-              <p className="font-heading mt-3 text-2xl font-normal">
+              <p className="font-heading mt-3 text-2xl font-semibold">
                 {displayName}
               </p>
               <p className="mt-1 text-sm text-white/70">
@@ -99,7 +99,7 @@ export default async function MemberDashboardPage() {
           <div className="relative z-10 mt-8 flex items-end justify-between gap-4">
             <div>
               <p className="text-xs text-white/50 uppercase">Membership ID</p>
-              <p className="mt-1 font-mono text-lg tracking-wide text-gold">
+              <p className="mt-1 font-mono text-lg tracking-wide text-brand">
                 {application?.membership_id || "Not issued"}
               </p>
               <p className="mt-3 text-xs text-white/50">
@@ -123,8 +123,8 @@ export default async function MemberDashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-card p-6 shadow-soft sm:p-8">
-          <h2 className="font-heading text-xl font-normal">Next steps</h2>
+        <div className="glass-card rounded-2xl p-6 sm:p-8">
+          <h2 className="font-heading text-xl font-semibold">Next steps</h2>
           {!application ? (
             <>
               <p className="mt-3 text-sm text-muted-foreground">
@@ -134,7 +134,7 @@ export default async function MemberDashboardPage() {
                 href="/membership"
                 className={cn(
                   buttonVariants(),
-                  "mt-6 inline-flex rounded-2xl bg-gold text-gold-foreground hover:bg-gold/90",
+                  "mt-6 inline-flex rounded-xl bg-primary shadow-lg shadow-primary/20",
                 )}
               >
                 Apply for membership
