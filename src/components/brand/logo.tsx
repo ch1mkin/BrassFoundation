@@ -1,14 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
+import { SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const LOGO_SRC = "/brand/logo.png";
 
 const SIZES = {
   sm: 36,
-  md: 48,
-  lg: 72,
-  xl: 112,
+  md: 44,
+  lg: 64,
+  xl: 96,
 } as const;
 
 type BrandLogoProps = {
@@ -17,6 +18,10 @@ type BrandLogoProps = {
   priority?: boolean;
   href?: string | null;
   alt?: string;
+  /** White plate behind logo for contrast on dark/busy backgrounds */
+  plate?: boolean;
+  showWordmark?: boolean;
+  wordmarkClassName?: string;
 };
 
 export function BrandLogo({
@@ -25,22 +30,49 @@ export function BrandLogo({
   priority = false,
   href = "/",
   alt = "Brass Foundation",
+  plate = true,
+  showWordmark = false,
+  wordmarkClassName,
 }: BrandLogoProps) {
   const px = SIZES[size];
 
-  const image = (
-    <Image
-      src={LOGO_SRC}
-      alt={alt}
-      width={px}
-      height={px}
-      priority={priority}
-      className={cn("object-contain", className)}
-    />
+  const mark = (
+    <span
+      className={cn(
+        "inline-flex shrink-0 items-center justify-center",
+        plate && "rounded-full bg-white p-1 shadow-sm ring-1 ring-black/5",
+        className,
+      )}
+    >
+      <Image
+        src={LOGO_SRC}
+        alt={alt}
+        width={px}
+        height={px}
+        priority={priority}
+        className="object-contain"
+      />
+    </span>
+  );
+
+  const content = showWordmark ? (
+    <span className="inline-flex items-center gap-3">
+      {mark}
+      <span
+        className={cn(
+          "font-heading text-lg font-semibold tracking-tight sm:text-xl",
+          wordmarkClassName,
+        )}
+      >
+        {SITE.name}
+      </span>
+    </span>
+  ) : (
+    mark
   );
 
   if (href === null) {
-    return image;
+    return content;
   }
 
   return (
@@ -49,7 +81,7 @@ export function BrandLogo({
       aria-label="Brass Foundation home"
       className="inline-flex shrink-0 items-center"
     >
-      {image}
+      {content}
     </Link>
   );
 }

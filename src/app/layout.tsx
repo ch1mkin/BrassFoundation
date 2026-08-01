@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Fraunces, Source_Sans_3 } from "next/font/google";
+import { Cormorant_Garamond, Libre_Baskerville, Public_Sans } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const libreBaskerville = Libre_Baskerville({
   variable: "--font-heading",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
-const sourceSans = Source_Sans_3({
+const publicSans = Public_Sans({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -50,7 +50,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fraunces.variable} ${sourceSans.variable} ${cormorant.variable} antialiased`}
+        className={`${libreBaskerville.variable} ${publicSans.variable} ${cormorant.variable} antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

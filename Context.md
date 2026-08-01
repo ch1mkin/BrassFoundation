@@ -110,8 +110,8 @@ Logo asset: `/public/brand/logo.png` (slogan: Education to Prosperity)
 
 | Role | Font |
 |------|------|
-| Heading | Fraunces |
-| Body | Source Sans 3 |
+| Heading | Libre Baskerville |
+| Body | Public Sans |
 | Quotes | Cormorant Garamond |
 
 ## Theme

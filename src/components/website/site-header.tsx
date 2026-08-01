@@ -47,7 +47,12 @@ export function SiteHeader() {
       )}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6 lg:h-[4.5rem] lg:px-8">
-        <BrandLogo size="md" priority className="drop-shadow-sm" />
+        <BrandLogo
+          size="md"
+          priority
+          showWordmark
+          wordmarkClassName={isHome ? "text-white" : "text-foreground"}
+        />
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
           {NAV_ITEMS.map((item) =>
@@ -145,7 +150,12 @@ export function SiteHeader() {
             <SheetHeader className="border-b border-border/70 px-2 py-4">
               <div className="flex items-center justify-between pr-2">
                 <div className="px-2">
-                  <BrandLogo size="sm" href={null} />
+                  <BrandLogo
+                    size="sm"
+                    href={null}
+                    showWordmark
+                    wordmarkClassName="text-foreground text-base"
+                  />
                   <SheetTitle className="sr-only">{SITE.name}</SheetTitle>
                 </div>
                 <HamburgerButton open onClick={() => setOpen(false)} />

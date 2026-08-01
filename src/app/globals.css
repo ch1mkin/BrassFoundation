@@ -155,15 +155,15 @@
   h4,
   h5,
   h6 {
-    font-family: var(--font-heading), ui-serif, Georgia, serif;
+    font-family: var(--font-heading), ui-serif, Georgia, "Times New Roman", serif;
     @apply tracking-tight text-balance;
-    font-feature-settings: "ss01" 1, "kern" 1;
+    font-feature-settings: "kern" 1;
   }
 }
 
 @layer utilities {
   .font-heading {
-    font-family: var(--font-heading), ui-serif, Georgia, serif;
+    font-family: var(--font-heading), ui-serif, Georgia, "Times New Roman", serif;
   }
 
   .font-quote {

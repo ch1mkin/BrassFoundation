@@ -40,11 +40,12 @@ This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS,
 
 ## 3. Auth settings (Supabase Dashboard)
 
-- Authentication → Providers → **Phone**: enable
-- Configure an SMS provider (Twilio, MessageBird, etc.) under Phone settings
-- Disable **Confirm email** under Authentication → Providers → Email (we use phone OTP, not email verification)
+- Authentication → Providers → **Email**: enable (used internally for phone-based accounts)
+- Disable **Confirm email** so users stay signed in immediately after register
 - Site URL: your Vercel URL
 - Redirect URLs: `https://your-app.vercel.app/auth/callback` and `http://localhost:3000/auth/callback`
+
+Phone OTP is disabled for now. Users register/sign in with mobile number + password (mapped to a secure internal email identity).
 
 Sessions stay signed in via long-lived auth cookies (~400 days) with automatic refresh.
 

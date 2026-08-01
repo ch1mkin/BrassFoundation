@@ -1,3 +1,9 @@
+/** Map a phone number to a stable Supabase email identity (no OTP required). */
+export function phoneToAuthEmail(phoneE164: string) {
+  const digits = phoneE164.replace(/\D/g, "");
+  return `${digits}@phone.brassfoundation.local`;
+}
+
 /** Normalize to E.164. Defaults to India (+91) for 10-digit local numbers. */
 export function normalizePhone(input: string): string | null {
   const trimmed = input.trim().replace(/[\s()-]/g, "");
