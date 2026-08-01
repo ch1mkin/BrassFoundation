@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { updatePasswordAction, type AuthActionState } from "@/lib/auth/actions";
 
 const initial: AuthActionState = {};
@@ -23,6 +24,7 @@ export function UpdatePasswordForm() {
       </div>
 
       <form action={action} className="space-y-5">
+        <FormLock pending={pending} className="space-y-5">
         <label className="block space-y-2">
           <span className="ml-1 text-sm font-medium text-muted-foreground">
             New password
@@ -68,6 +70,7 @@ export function UpdatePasswordForm() {
         >
           {pending ? "Updating…" : "Update password"}
         </Button>
+        </FormLock>
       </form>
     </div>
   );

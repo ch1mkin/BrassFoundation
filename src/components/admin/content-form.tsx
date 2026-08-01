@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import type { ContentActionState } from "@/lib/content/utils";
 
@@ -37,6 +38,7 @@ export function AdminContentForm({
       action={formAction}
       className="glass-card space-y-4 rounded-2xl p-6"
     >
+      <FormLock pending={pending} className="space-y-4">
       <h2 className="font-heading text-lg font-semibold">{title}</h2>
       {hidden
         ? Object.entries(hidden).map(([k, v]) => (
@@ -101,6 +103,7 @@ export function AdminContentForm({
       <Button type="submit" disabled={pending} className="rounded-xl bg-primary">
         {pending ? "Saving…" : submitLabel}
       </Button>
+      </FormLock>
     </form>
   );
 }

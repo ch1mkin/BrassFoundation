@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { FormLock } from "@/components/ui/form-lock";
 import { setMemberStatusAction } from "@/lib/content/gallery-org-actions";
 import type { ContentActionState } from "@/lib/content/utils";
 
@@ -18,6 +19,7 @@ export function MemberStatusForm({
 
   return (
     <form action={action} className="mt-2 flex flex-wrap items-center gap-2">
+      <FormLock pending={pending} className="flex flex-wrap items-center gap-2">
       <input type="hidden" name="application_id" value={applicationId} />
       <select
         name="member_status"
@@ -42,6 +44,7 @@ export function MemberStatusForm({
       {state.error ? (
         <span className="text-xs text-destructive">{state.error}</span>
       ) : null}
+      </FormLock>
     </form>
   );
 }

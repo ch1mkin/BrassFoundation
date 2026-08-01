@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import {
   approveMembershipAction,
   rejectMembershipAction,
@@ -35,32 +36,37 @@ export function MembershipReviewActions({
   }
 
   const message = approveState.success || approveState.error || rejectState.success || rejectState.error;
+  const busy = approvePending || rejectPending;
 
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
         <form action={approve}>
-          <input type="hidden" name="application_id" value={applicationId} />
-          <Button
-            type="submit"
-            size="sm"
-            disabled={approvePending || rejectPending}
-            className="rounded-xl"
-          >
-            {approvePending ? "…" : "Approve"}
-          </Button>
+          <FormLock pending={busy}>
+            <input type="hidden" name="application_id" value={applicationId} />
+            <Button
+              type="submit"
+              size="sm"
+              disabled={busy}
+              className="rounded-xl"
+            >
+              {approvePending ? "…" : "Approve"}
+            </Button>
+          </FormLock>
         </form>
         <form action={reject}>
-          <input type="hidden" name="application_id" value={applicationId} />
-          <Button
-            type="submit"
-            size="sm"
-            variant="outline"
-            disabled={approvePending || rejectPending}
-            className="rounded-xl"
-          >
-            {rejectPending ? "…" : "Reject"}
-          </Button>
+          <FormLock pending={busy}>
+            <input type="hidden" name="application_id" value={applicationId} />
+            <Button
+              type="submit"
+              size="sm"
+              variant="outline"
+              disabled={busy}
+              className="rounded-xl"
+            >
+              {rejectPending ? "…" : "Reject"}
+            </Button>
+          </FormLock>
         </form>
       </div>
       {message && (

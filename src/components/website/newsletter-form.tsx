@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { subscribeNewsletterAction } from "@/lib/content/actions";
 import type { ContentActionState } from "@/lib/content/utils";
@@ -16,6 +17,7 @@ export function NewsletterForm() {
 
   return (
     <form action={action} className="mt-4 space-y-2">
+      <FormLock pending={pending} className="space-y-2">
       <div className="flex gap-2">
         <Input
           name="email"
@@ -38,6 +40,7 @@ export function NewsletterForm() {
       {state.success ? (
         <p className="text-xs text-success">{state.success}</p>
       ) : null}
+      </FormLock>
     </form>
   );
 }

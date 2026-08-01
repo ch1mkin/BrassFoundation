@@ -2,6 +2,7 @@
 
 import { useActionState, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { upsertResourceAction } from "@/lib/content/actions";
@@ -34,6 +35,7 @@ export function ResourceCreateForm() {
 
   return (
     <form action={action} className="glass-card space-y-4 rounded-2xl p-6">
+      <FormLock pending={pending || uploading} className="space-y-4">
       <h2 className="font-heading text-lg font-semibold">Add resource</h2>
       <Input name="title" required placeholder="Title" className="h-10 rounded-xl" />
       <Input name="subtitle" placeholder="Subtitle" className="h-10 rounded-xl" />
@@ -113,6 +115,7 @@ export function ResourceCreateForm() {
       >
         {pending ? "Saving…" : "Create resource"}
       </Button>
+      </FormLock>
     </form>
   );
 }

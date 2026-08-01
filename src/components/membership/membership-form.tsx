@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import {
   submitMembershipApplicationAction,
@@ -83,6 +84,7 @@ export function MembershipForm() {
 
   return (
     <form action={action} className="space-y-6">
+      <FormLock pending={pending} className="space-y-6">
       <section className="glass-card space-y-4 rounded-2xl p-6 sm:p-8">
         <h2 className="font-heading text-xl font-semibold">Personal details</h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -148,6 +150,7 @@ export function MembershipForm() {
         {pending ? "Submitting…" : "Submit application"}
         <span className="material-symbols-outlined text-[18px]">person_add</span>
       </Button>
+      </FormLock>
     </form>
   );
 }

@@ -43,13 +43,13 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
   }, [pathname]);
 
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-border/30 bg-surface/80 shadow-sm backdrop-blur-md">
+    <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#0B1C28]/95 shadow-md backdrop-blur-md">
       <nav className="mx-auto flex h-20 max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-20">
         <BrandLogo
           size="md"
           priority
           showWordmark
-          wordmarkClassName="font-heading text-xl font-bold text-primary"
+          wordmarkClassName="font-heading text-xl font-bold text-white"
         />
 
         <div className="hidden items-center gap-8 md:flex">
@@ -64,8 +64,8 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                 className={cn(
                   "text-sm font-medium transition-colors",
                   active
-                    ? "border-b-2 border-primary font-bold text-primary"
-                    : "text-muted-foreground hover:text-primary",
+                    ? "border-b-2 border-brand font-bold text-brand"
+                    : "text-white/75 hover:text-white",
                 )}
               >
                 {item.label}
@@ -78,7 +78,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger
-                className="inline-flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground outline-none transition hover:bg-primary/90"
+                className="inline-flex size-10 items-center justify-center rounded-full bg-brand text-[#004149] outline-none transition hover:bg-brand/90"
                 aria-label="Open profile menu"
               >
                 <span className="font-heading text-sm font-semibold">
@@ -128,7 +128,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
             <>
               <Link
                 href="/login"
-                className="hidden text-sm font-medium text-muted-foreground transition hover:text-primary lg:block"
+                className="hidden text-sm font-medium text-white/80 transition hover:text-white lg:block"
               >
                 Login
               </Link>
@@ -136,7 +136,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                 href="/membership"
                 className={cn(
                   buttonVariants(),
-                  "rounded-lg bg-primary px-6 py-2.5 text-sm font-bold shadow-lg shadow-primary/20 active:scale-95",
+                  "rounded-lg bg-brand px-6 py-2.5 text-sm font-bold text-[#004149] shadow-lg shadow-black/20 hover:bg-brand/90 active:scale-95",
                 )}
               >
                 Become Member
@@ -147,7 +147,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
 
         <button
           type="button"
-          className="inline-flex size-10 items-center justify-center rounded-lg text-foreground hover:bg-muted md:hidden"
+          className="inline-flex size-10 items-center justify-center rounded-lg text-white hover:bg-white/10 md:hidden"
           aria-label="Open menu"
           onClick={() => setOpen(true)}
         >
@@ -155,10 +155,15 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
         </button>
 
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetContent side="right" className="w-[min(100%,20rem)]">
+          <SheetContent side="right" className="w-[min(100%,20rem)] bg-[#0B1C28] text-white">
             <SheetHeader>
               <SheetTitle className="sr-only">{SITE.name}</SheetTitle>
-              <BrandLogo size="sm" href={null} showWordmark />
+              <BrandLogo
+                size="sm"
+                href={null}
+                showWordmark
+                wordmarkClassName="text-white"
+              />
             </SheetHeader>
             <nav className="mt-6 flex flex-col gap-2 px-2">
               {NAV_ITEMS.map((item) => (
@@ -166,23 +171,23 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                   key={item.label}
                   href={item.href || "/"}
                   onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium hover:bg-muted"
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white"
                 >
                   {item.label}
                 </Link>
               ))}
-              <div className="mt-4 border-t border-border pt-4">
+              <div className="mt-4 border-t border-white/15 pt-4">
                 {user ? (
                   <>
                     <div className="mb-3 flex items-center gap-3 px-2">
-                      <span className="flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                      <span className="flex size-9 items-center justify-center rounded-full bg-brand text-[#004149]">
                         <UserRound className="size-4" />
                       </span>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">
+                        <p className="truncate text-sm font-medium text-white">
                           {user.fullName || "Member"}
                         </p>
-                        <p className="truncate text-xs text-muted-foreground">
+                        <p className="truncate text-xs text-white/60">
                           {user.email}
                         </p>
                       </div>
@@ -192,7 +197,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                       onClick={() => setOpen(false)}
                       className={cn(
                         buttonVariants(),
-                        "mb-2 w-full justify-center rounded-lg",
+                        "mb-2 w-full justify-center rounded-lg bg-brand text-[#004149] hover:bg-brand/90",
                       )}
                     >
                       Member portal
@@ -201,7 +206,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                       <Button
                         type="submit"
                         variant="ghost"
-                        className="w-full text-destructive"
+                        className="w-full text-red-300 hover:bg-white/10 hover:text-red-200"
                       >
                         Sign out
                       </Button>
@@ -214,7 +219,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                       onClick={() => setOpen(false)}
                       className={cn(
                         buttonVariants({ variant: "outline" }),
-                        "mb-2 w-full justify-center rounded-lg",
+                        "mb-2 w-full justify-center rounded-lg border-white/30 bg-transparent text-white hover:bg-white/10",
                       )}
                     >
                       Login
@@ -224,7 +229,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                       onClick={() => setOpen(false)}
                       className={cn(
                         buttonVariants(),
-                        "w-full justify-center rounded-lg",
+                        "w-full justify-center rounded-lg bg-brand text-[#004149] hover:bg-brand/90",
                       )}
                     >
                       Become Member

@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { upsertMarketplaceAction } from "@/lib/content/actions";
@@ -15,6 +16,7 @@ export function MarketplaceCreateForm() {
 
   return (
     <form action={action} className="glass-card space-y-4 rounded-2xl p-6">
+      <FormLock pending={pending} className="space-y-4">
       <h2 className="font-heading text-lg font-semibold">Add marketplace item</h2>
       <Input name="title" required placeholder="Title" className="h-10 rounded-xl" />
       <Input name="author" placeholder="Author" className="h-10 rounded-xl" />
@@ -50,6 +52,7 @@ export function MarketplaceCreateForm() {
       <Button type="submit" disabled={pending} className="rounded-xl bg-primary">
         {pending ? "Saving…" : "Create item"}
       </Button>
+      </FormLock>
     </form>
   );
 }

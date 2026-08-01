@@ -44,6 +44,8 @@ export async function updateHomepageAction(
     hero_cta_secondary_href: String(
       formData.get("hero_cta_secondary_href") || "",
     ).trim(),
+    hero_background_url:
+      String(formData.get("hero_background_url") || "").trim() || null,
     about_eyebrow: String(formData.get("about_eyebrow") || "").trim(),
     about_headline: String(formData.get("about_headline") || "").trim(),
     about_body: String(formData.get("about_body") || "").trim(),

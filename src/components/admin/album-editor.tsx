@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { upsertGalleryAlbumAction } from "@/lib/content/gallery-org-actions";
 import type { ContentActionState } from "@/lib/content/utils";
@@ -50,6 +51,7 @@ export function AlbumEditor({ album }: { album: Album | null }) {
       </div>
 
       <form action={action} className="glass-card space-y-3 rounded-2xl p-5">
+        <FormLock pending={pending} className="space-y-3">
         <h2 className="font-heading text-lg font-semibold">
           {editing ? "Edit album" : "New album / event heading"}
         </h2>
@@ -119,6 +121,7 @@ export function AlbumEditor({ album }: { album: Album | null }) {
         <Button type="submit" disabled={pending} className="rounded-xl bg-primary">
           {pending ? "Saving…" : editing ? "Save album changes" : "Create album"}
         </Button>
+        </FormLock>
       </form>
     </div>
   );

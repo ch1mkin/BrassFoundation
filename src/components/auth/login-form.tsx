@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import {
   signInAction,
@@ -49,6 +50,7 @@ export function LoginForm() {
         action={mode === "signup" ? signUp : signIn}
         className="space-y-5"
       >
+        <FormLock pending={pending} className="space-y-5">
         <input type="hidden" name="next" value={next} />
 
         {mode === "signup" && (
@@ -162,6 +164,7 @@ export function LoginForm() {
             arrow_forward
           </span>
         </Button>
+        </FormLock>
       </form>
 
       <div className="mt-10 text-center">

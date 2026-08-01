@@ -21,6 +21,7 @@ type HeroSectionProps = {
   primaryHref: string;
   secondaryLabel: string;
   secondaryHref: string;
+  backgroundUrl?: string | null;
   floatingStats?: Array<{ label: string; value: number; suffix?: string }>;
 };
 
@@ -31,15 +32,29 @@ export function HeroSection({
   primaryHref,
   secondaryLabel,
   secondaryHref,
+  backgroundUrl,
   floatingStats,
 }: HeroSectionProps) {
   const lines = headline.split("\n").filter(Boolean);
   const left = floatingStats?.[0];
   const right = floatingStats?.[1];
+  const hasBg = Boolean(backgroundUrl);
 
   return (
     <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-surface pt-20">
-      <HeroParticles />
+      {hasBg ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={backgroundUrl!}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#001c3a]/75 via-[#004f58]/55 to-surface" />
+        </>
+      ) : (
+        <HeroParticles />
+      )}
 
       <div className="relative z-10 mx-auto max-w-[1280px] px-4 py-16 text-center sm:px-6 lg:px-20">
         <div className="mb-12 flex justify-center">
@@ -56,7 +71,7 @@ export function HeroSection({
                 width={192}
                 height={192}
                 priority
-                className="h-40 w-40 object-contain drop-shadow-2xl sm:h-48 sm:w-48"
+                className="h-40 w-40 rounded-full bg-white/95 object-contain p-2 drop-shadow-2xl sm:h-48 sm:w-48"
               />
             </motion.div>
 
@@ -92,7 +107,10 @@ export function HeroSection({
         </div>
 
         <motion.h1
-          className="font-heading mx-auto mb-6 max-w-4xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-[48px] lg:leading-[1.1]"
+          className={cn(
+            "font-heading mx-auto mb-6 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-[48px] lg:leading-[1.1]",
+            hasBg ? "text-white drop-shadow-md" : "text-foreground",
+          )}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.6 }}
@@ -100,7 +118,9 @@ export function HeroSection({
           {lines.map((line, i) => (
             <span key={line} className="block">
               {i === lines.length - 1 ? (
-                <span className="text-primary">{line}</span>
+                <span className={hasBg ? "text-brand" : "text-primary"}>
+                  {line}
+                </span>
               ) : (
                 line
               )}
@@ -109,7 +129,10 @@ export function HeroSection({
         </motion.h1>
 
         <motion.p
-          className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-muted-foreground"
+          className={cn(
+            "mx-auto mb-10 max-w-2xl text-lg leading-relaxed",
+            hasBg ? "text-white/85" : "text-muted-foreground",
+          )}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
@@ -139,7 +162,7 @@ export function HeroSection({
             href={secondaryHref}
             className={cn(
               buttonVariants({ variant: "secondary", size: "lg" }),
-              "h-14 rounded-lg bg-surface-highest px-8 text-base font-bold text-primary hover:bg-surface-high",
+              "h-14 rounded-lg bg-white px-8 text-base font-bold text-primary hover:bg-white/90",
             )}
           >
             {secondaryLabel}

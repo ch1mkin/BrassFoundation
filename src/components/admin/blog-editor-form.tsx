@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
@@ -28,6 +29,7 @@ export function BlogEditorForm({
 
   return (
     <form action={action} className="glass-card space-y-4 rounded-2xl p-6">
+      <FormLock pending={pending} className="space-y-4">
       <h2 className="font-heading text-lg font-semibold">
         {initial ? "Edit blog" : "Write a blog"}
       </h2>
@@ -81,6 +83,7 @@ export function BlogEditorForm({
       <Button type="submit" disabled={pending} className="rounded-xl bg-primary">
         {pending ? "Saving…" : initial ? "Update blog" : "Save blog"}
       </Button>
+      </FormLock>
     </form>
   );
 }

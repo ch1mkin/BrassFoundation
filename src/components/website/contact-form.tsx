@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 
 export function ContactForm() {
@@ -59,8 +60,11 @@ export function ContactForm() {
     }
   }
 
+  const pending = status === "pending";
+
   return (
     <form onSubmit={onSubmit} className="glass-card space-y-5 rounded-2xl p-6 sm:p-8">
+      <FormLock pending={pending} className="space-y-5">
       <label className="block space-y-2">
         <span className="ml-1 text-sm font-medium text-muted-foreground">
           Full name
@@ -111,12 +115,13 @@ export function ContactForm() {
       <Button
         type="submit"
         size="lg"
-        disabled={status === "pending"}
+        disabled={pending}
         className="h-12 rounded-xl bg-primary px-8 shadow-lg shadow-primary/15"
       >
-        {status === "pending" ? "Sending…" : "Send message"}
+        {pending ? "Sending…" : "Send message"}
         <span className="material-symbols-outlined text-[18px]">send</span>
       </Button>
+      </FormLock>
     </form>
   );
 }

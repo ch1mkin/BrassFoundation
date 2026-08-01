@@ -31,6 +31,7 @@ export type HomepageContent = {
   hero_cta_primary_href: string;
   hero_cta_secondary_label: string;
   hero_cta_secondary_href: string;
+  hero_background_url: string | null;
   about_eyebrow: string;
   about_headline: string;
   about_body: string;
@@ -44,6 +45,7 @@ export type HomepageContent = {
 function fallbackHomepage(): HomepageContent {
   return {
     ...DEFAULT_HOMEPAGE,
+    hero_background_url: null,
     stats: STATS.map((s) => ({ ...s })),
     core_values: CORE_VALUES.map((v) => ({ ...v })),
     community_work: COMMUNITY_WORK.map((c) => ({ ...c })),
@@ -77,6 +79,7 @@ export async function getPublishedHomepage(): Promise<HomepageContent> {
         DEFAULT_HOMEPAGE.hero_cta_secondary_label,
       hero_cta_secondary_href:
         data.hero_cta_secondary_href ?? DEFAULT_HOMEPAGE.hero_cta_secondary_href,
+      hero_background_url: data.hero_background_url ?? null,
       about_eyebrow: data.about_eyebrow ?? DEFAULT_HOMEPAGE.about_eyebrow,
       about_headline: data.about_headline ?? DEFAULT_HOMEPAGE.about_headline,
       about_body: data.about_body ?? DEFAULT_HOMEPAGE.about_body,

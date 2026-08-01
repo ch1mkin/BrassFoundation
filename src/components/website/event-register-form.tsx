@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { registerForEventAction } from "@/lib/content/actions";
 import type { ContentActionState } from "@/lib/content/utils";
@@ -54,6 +55,7 @@ export function EventRegisterForm({
 
   return (
     <form action={action} className="glass-card space-y-4 rounded-2xl p-6">
+      <FormLock pending={pending} className="space-y-4">
       <input type="hidden" name="event_id" value={eventId} />
       <h3 className="font-heading text-lg font-semibold">Quick register</h3>
       <p className="text-xs text-muted-foreground">
@@ -89,6 +91,7 @@ export function EventRegisterForm({
       >
         {pending ? "Registering…" : "Confirm registration"}
       </Button>
+      </FormLock>
     </form>
   );
 }

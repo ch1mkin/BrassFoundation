@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { requestPasswordResetAction } from "@/lib/auth/actions";
 import type { AuthActionState } from "@/lib/auth/actions";
@@ -27,6 +28,7 @@ export function ForgotPasswordForm() {
       </div>
 
       <form action={action} className="space-y-5">
+        <FormLock pending={pending} className="space-y-5">
         <label className="block space-y-2">
           <span className="ml-1 text-sm font-medium text-muted-foreground">
             Email Address
@@ -59,6 +61,7 @@ export function ForgotPasswordForm() {
         >
           {pending ? "Sending…" : "Send reset link"}
         </Button>
+        </FormLock>
       </form>
 
       <p className="mt-8 text-center text-muted-foreground">
