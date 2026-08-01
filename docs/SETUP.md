@@ -40,8 +40,11 @@ This way all email leaves through your Hostinger mailbox.
    - `supabase/migrations/20260801050000_uploads_org_gallery.sql`
    - `supabase/migrations/20260801060000_blogs_stats_thumbnails.sql`
    - `supabase/migrations/20260801070000_hero_background.sql`
+   - `supabase/migrations/20260801080000_i18n_payments.sql`
 
-This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS (including hero background image URL), membership applications, a **role dropdown** on `profiles.role_id`, public content modules (events, news, resources, community, gallery, marketplace, contact messages, newsletter), **storage buckets**, gallery layout fields, org family tree, membership leave statuses, **blogs**, and resource PDF thumbnails.
+This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS (including hero background + Punjabi fields), membership applications, payments/mandates/transactions, UI translations, a **role dropdown** on `profiles.role_id`, public content modules, **storage buckets**, gallery, org tree, blogs, and resource PDF thumbnails.
+
+See [RAZORPAY.md](./RAZORPAY.md) for ₹10 registration + monthly contribution mandate setup.
 
 See [ROLE_DROPDOWN.sql.md](./ROLE_DROPDOWN.sql.md) for copy-paste SQL and how to promote yourself to Super Admin.
 
@@ -58,7 +61,7 @@ Sessions stay signed in via long-lived auth cookies (~400 days) with automatic r
 
 ## 4. First Super Admin
 
-After signing up once via `/login?mode=signup`:
+After signing up once via `/membership` (or an existing account):
 
 ```sql
 -- Replace with your user email

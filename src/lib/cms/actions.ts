@@ -46,13 +46,32 @@ export async function updateHomepageAction(
     ).trim(),
     hero_background_url:
       String(formData.get("hero_background_url") || "").trim() || null,
+    hero_eyebrow_pa:
+      String(formData.get("hero_eyebrow_pa") || "").trim() || null,
+    hero_headline_pa:
+      String(formData.get("hero_headline_pa") || "").trim() || null,
+    hero_subheadline_pa:
+      String(formData.get("hero_subheadline_pa") || "").trim() || null,
+    hero_cta_primary_label_pa:
+      String(formData.get("hero_cta_primary_label_pa") || "").trim() || null,
+    hero_cta_secondary_label_pa:
+      String(formData.get("hero_cta_secondary_label_pa") || "").trim() || null,
     about_eyebrow: String(formData.get("about_eyebrow") || "").trim(),
     about_headline: String(formData.get("about_headline") || "").trim(),
     about_body: String(formData.get("about_body") || "").trim(),
+    about_eyebrow_pa:
+      String(formData.get("about_eyebrow_pa") || "").trim() || null,
+    about_headline_pa:
+      String(formData.get("about_headline_pa") || "").trim() || null,
+    about_body_pa: String(formData.get("about_body_pa") || "").trim() || null,
     membership_headline: String(
       formData.get("membership_headline") || "",
     ).trim(),
     membership_body: String(formData.get("membership_body") || "").trim(),
+    membership_headline_pa:
+      String(formData.get("membership_headline_pa") || "").trim() || null,
+    membership_body_pa:
+      String(formData.get("membership_body_pa") || "").trim() || null,
     ...(stats ? { stats } : {}),
     updated_by: context.userId,
     is_published: true,

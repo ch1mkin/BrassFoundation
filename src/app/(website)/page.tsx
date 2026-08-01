@@ -26,6 +26,10 @@ export default async function HomePage() {
         secondaryHref={content.hero_cta_secondary_href}
         floatingStats={content.stats.slice(0, 2)}
         backgroundUrl={content.hero_background_url}
+        headlinePa={content.hero_headline_pa}
+        subheadlinePa={content.hero_subheadline_pa}
+        primaryLabelPa={content.hero_cta_primary_label_pa}
+        secondaryLabelPa={content.hero_cta_secondary_label_pa}
       />
       <StatsSection stats={content.stats} />
       <AboutSection

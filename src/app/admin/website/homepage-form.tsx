@@ -104,6 +104,38 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
               defaultValue={content.hero_cta_secondary_href}
             />
           </div>
+          <h3 className="pt-2 text-sm font-semibold text-muted-foreground">
+            Punjabi (optional — instant switch; else Google Translate)
+          </h3>
+          <Field
+            label="ਪੰਜਾਬੀ eyebrow"
+            name="hero_eyebrow_pa"
+            defaultValue={content.hero_eyebrow_pa || ""}
+          />
+          <Field
+            label="ਪੰਜਾਬੀ headline"
+            name="hero_headline_pa"
+            defaultValue={content.hero_headline_pa || ""}
+            multiline
+          />
+          <Field
+            label="ਪੰਜਾਬੀ subheadline"
+            name="hero_subheadline_pa"
+            defaultValue={content.hero_subheadline_pa || ""}
+            multiline
+          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              label="ਪੰਜਾਬੀ primary CTA"
+              name="hero_cta_primary_label_pa"
+              defaultValue={content.hero_cta_primary_label_pa || ""}
+            />
+            <Field
+              label="ਪੰਜਾਬੀ secondary CTA"
+              name="hero_cta_secondary_label_pa"
+              defaultValue={content.hero_cta_secondary_label_pa || ""}
+            />
+          </div>
         </section>
 
         <section className="space-y-4 rounded-2xl bg-card p-6 shadow-soft">
@@ -136,6 +168,18 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
             defaultValue={content.about_body}
             multiline
           />
+          <Field
+            label="ਪੰਜਾਬੀ about headline"
+            name="about_headline_pa"
+            defaultValue={content.about_headline_pa || ""}
+            multiline
+          />
+          <Field
+            label="ਪੰਜਾਬੀ about body"
+            name="about_body_pa"
+            defaultValue={content.about_body_pa || ""}
+            multiline
+          />
         </section>
 
         <section className="space-y-4 rounded-2xl bg-card p-6 shadow-soft">
@@ -149,6 +193,17 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
             label="Body"
             name="membership_body"
             defaultValue={content.membership_body}
+            multiline
+          />
+          <Field
+            label="ਪੰਜਾਬੀ membership headline"
+            name="membership_headline_pa"
+            defaultValue={content.membership_headline_pa || ""}
+          />
+          <Field
+            label="ਪੰਜਾਬੀ membership body"
+            name="membership_body_pa"
+            defaultValue={content.membership_body_pa || ""}
             multiline
           />
         </section>

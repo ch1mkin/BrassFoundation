@@ -251,7 +251,18 @@ html.locale-pa .font-quote {
   line-height: 1.6;
 }
 
-/* Hide Google Translate chrome; we use a custom EN / ਪੰ switcher */
+.material-symbols-outlined,
+.material-symbols-rounded,
+.material-symbols-sharp {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  /* Keep icon ligature names out of Google Translate */
+  speak: never;
+}
+
+.material-symbols-outlined.notranslate,
+.material-symbols-outlined {
+  /* class also set at runtime */
+}
 .goog-te-banner-frame,
 .goog-te-balloon-frame,
 #goog-gt-tt,

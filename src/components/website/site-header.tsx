@@ -156,7 +156,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
-          <LanguageSwitcher compact />
+          <LanguageSwitcher />
           <button
             type="button"
             className="inline-flex size-10 items-center justify-center rounded-lg text-white hover:bg-white/10 md:hidden"
@@ -183,7 +183,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
             </SheetHeader>
             <nav className="mt-6 flex flex-col gap-2 px-2">
               <div className="mb-2 px-1">
-                <LanguageSwitcher className="w-full justify-between" />
+                <LanguageSwitcher className="w-full justify-center" />
               </div>
               {NAV_ITEMS.map((item) => (
                 <Link

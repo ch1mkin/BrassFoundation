@@ -46,6 +46,11 @@ export const metadata: Metadata = {
   },
   description:
     "Empowering communities through education, equality, leadership and community development inspired by Dr. B. R. Ambedkar.",
+  icons: {
+    icon: [{ url: "/brand/logo.png", type: "image/png" }],
+    apple: [{ url: "/brand/logo.png", type: "image/png" }],
+    shortcut: "/brand/logo.png",
+  },
 };
 
 export default async function RootLayout({

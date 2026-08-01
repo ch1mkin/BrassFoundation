@@ -91,8 +91,10 @@ const pa: Record<MessageKey, string> = {
 
 const catalogs: Record<Locale, Record<MessageKey, string>> = { en, pa };
 
-export function t(locale: Locale, key: MessageKey): string {
-  return catalogs[locale][key] ?? catalogs.en[key] ?? key;
+export function t(locale: Locale, key: MessageKey | string): string {
+  const catalog = catalogs[locale] as Record<string, string>;
+  const enCatalog = catalogs.en as Record<string, string>;
+  return catalog[key] ?? enCatalog[key] ?? String(key);
 }
 
 export const NAV_MESSAGE_KEYS: Record<string, MessageKey> = {

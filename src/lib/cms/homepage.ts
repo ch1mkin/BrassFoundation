@@ -32,11 +32,21 @@ export type HomepageContent = {
   hero_cta_secondary_label: string;
   hero_cta_secondary_href: string;
   hero_background_url: string | null;
+  hero_eyebrow_pa: string | null;
+  hero_headline_pa: string | null;
+  hero_subheadline_pa: string | null;
+  hero_cta_primary_label_pa: string | null;
+  hero_cta_secondary_label_pa: string | null;
   about_eyebrow: string;
   about_headline: string;
   about_body: string;
+  about_eyebrow_pa: string | null;
+  about_headline_pa: string | null;
+  about_body_pa: string | null;
   membership_headline: string;
   membership_body: string;
+  membership_headline_pa: string | null;
+  membership_body_pa: string | null;
   stats: HomepageStat[];
   core_values: HomepageValue[];
   community_work: HomepageCommunityItem[];
@@ -46,6 +56,16 @@ function fallbackHomepage(): HomepageContent {
   return {
     ...DEFAULT_HOMEPAGE,
     hero_background_url: null,
+    hero_eyebrow_pa: null,
+    hero_headline_pa: null,
+    hero_subheadline_pa: null,
+    hero_cta_primary_label_pa: null,
+    hero_cta_secondary_label_pa: null,
+    about_eyebrow_pa: null,
+    about_headline_pa: null,
+    about_body_pa: null,
+    membership_headline_pa: null,
+    membership_body_pa: null,
     stats: STATS.map((s) => ({ ...s })),
     core_values: CORE_VALUES.map((v) => ({ ...v })),
     community_work: COMMUNITY_WORK.map((c) => ({ ...c })),
@@ -80,13 +100,23 @@ export async function getPublishedHomepage(): Promise<HomepageContent> {
       hero_cta_secondary_href:
         data.hero_cta_secondary_href ?? DEFAULT_HOMEPAGE.hero_cta_secondary_href,
       hero_background_url: data.hero_background_url ?? null,
+      hero_eyebrow_pa: data.hero_eyebrow_pa ?? null,
+      hero_headline_pa: data.hero_headline_pa ?? null,
+      hero_subheadline_pa: data.hero_subheadline_pa ?? null,
+      hero_cta_primary_label_pa: data.hero_cta_primary_label_pa ?? null,
+      hero_cta_secondary_label_pa: data.hero_cta_secondary_label_pa ?? null,
       about_eyebrow: data.about_eyebrow ?? DEFAULT_HOMEPAGE.about_eyebrow,
       about_headline: data.about_headline ?? DEFAULT_HOMEPAGE.about_headline,
       about_body: data.about_body ?? DEFAULT_HOMEPAGE.about_body,
+      about_eyebrow_pa: data.about_eyebrow_pa ?? null,
+      about_headline_pa: data.about_headline_pa ?? null,
+      about_body_pa: data.about_body_pa ?? null,
       membership_headline:
         data.membership_headline ?? DEFAULT_HOMEPAGE.membership_headline,
       membership_body:
         data.membership_body ?? DEFAULT_HOMEPAGE.membership_body,
+      membership_headline_pa: data.membership_headline_pa ?? null,
+      membership_body_pa: data.membership_body_pa ?? null,
       stats: Array.isArray(data.stats) && data.stats.length
         ? data.stats
         : STATS.map((s) => ({ ...s })),

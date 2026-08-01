@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { buttonVariants } from "@/components/ui/button";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { cn } from "@/lib/utils";
 
 const HeroParticles = dynamic(
@@ -22,6 +23,10 @@ type HeroSectionProps = {
   secondaryLabel: string;
   secondaryHref: string;
   backgroundUrl?: string | null;
+  headlinePa?: string | null;
+  subheadlinePa?: string | null;
+  primaryLabelPa?: string | null;
+  secondaryLabelPa?: string | null;
   floatingStats?: Array<{ label: string; value: number; suffix?: string }>;
 };
 
@@ -33,12 +38,31 @@ export function HeroSection({
   secondaryLabel,
   secondaryHref,
   backgroundUrl,
+  headlinePa,
+  subheadlinePa,
+  primaryLabelPa,
+  secondaryLabelPa,
   floatingStats,
 }: HeroSectionProps) {
-  const lines = headline.split("\n").filter(Boolean);
+  const { locale } = useLocale();
+  const displayHeadline =
+    locale === "pa" && headlinePa?.trim() ? headlinePa : headline;
+  const displaySub =
+    locale === "pa" && subheadlinePa?.trim() ? subheadlinePa : subheadline;
+  const displayPrimary =
+    locale === "pa" && primaryLabelPa?.trim() ? primaryLabelPa : primaryLabel;
+  const displaySecondary =
+    locale === "pa" && secondaryLabelPa?.trim()
+      ? secondaryLabelPa
+      : secondaryLabel;
+  const lines = displayHeadline.split("\n").filter(Boolean);
   const left = floatingStats?.[0];
   const right = floatingStats?.[1];
   const hasBg = Boolean(backgroundUrl);
+  const adminPa = Boolean(
+    locale === "pa" &&
+      (headlinePa?.trim() || subheadlinePa?.trim()),
+  );
 
   return (
     <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-surface pt-20">
@@ -110,10 +134,12 @@ export function HeroSection({
           className={cn(
             "font-heading mx-auto mb-6 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-[48px] lg:leading-[1.1]",
             hasBg ? "text-white drop-shadow-md" : "text-foreground",
+            adminPa && "notranslate",
           )}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.6 }}
+          lang={adminPa ? "pa" : undefined}
         >
           {lines.map((line, i) => (
             <span key={line} className="block">
@@ -132,12 +158,14 @@ export function HeroSection({
           className={cn(
             "mx-auto mb-10 max-w-2xl text-lg leading-relaxed",
             hasBg ? "text-white/85" : "text-muted-foreground",
+            adminPa && "notranslate",
           )}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
+          lang={adminPa ? "pa" : undefined}
         >
-          {subheadline}
+          {displaySub}
         </motion.p>
 
         <motion.div
@@ -153,8 +181,8 @@ export function HeroSection({
               "h-14 rounded-lg bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90",
             )}
           >
-            {primaryLabel}
-            <span className="material-symbols-outlined text-[20px]">
+            {displayPrimary}
+            <span className="material-symbols-outlined notranslate text-[20px]">
               person_add
             </span>
           </Link>
@@ -165,8 +193,8 @@ export function HeroSection({
               "h-14 rounded-lg bg-white px-8 text-base font-bold text-primary hover:bg-white/90",
             )}
           >
-            {secondaryLabel}
-            <span className="material-symbols-outlined text-[20px]">
+            {displaySecondary}
+            <span className="material-symbols-outlined notranslate text-[20px]">
               auto_stories
             </span>
           </Link>

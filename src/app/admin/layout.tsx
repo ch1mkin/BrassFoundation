@@ -6,8 +6,10 @@ import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 const NAV = [
   { label: "Overview", href: "/admin", icon: "dashboard" },
   { label: "Members", href: "/admin/members", icon: "group" },
+  { label: "Payments", href: "/admin/payments", icon: "payments" },
   { label: "Messages", href: "/admin/messages", icon: "mail" },
   { label: "Website CMS", href: "/admin/website", icon: "web" },
+  { label: "Translations", href: "/admin/translations", icon: "translate" },
   { label: "Stats & Homepage", href: "/admin/website", icon: "bar_chart" },
   { label: "Events", href: "/admin/events", icon: "event" },
   { label: "News", href: "/admin/news", icon: "newspaper" },
