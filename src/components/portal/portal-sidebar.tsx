@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand/logo";
@@ -39,6 +38,15 @@ export function PortalSidebar({
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileOpen]);
 
   function toggle() {
     setCollapsed((prev) => {
@@ -95,8 +103,8 @@ export function PortalSidebar({
               ? pathname === item.href
               : pathname.startsWith(item.href);
           return (
-            <Link
-              key={item.label}
+            <a
+              key={`${item.label}-${item.href}`}
               href={item.href}
               title={item.label}
               className={cn(
@@ -106,10 +114,11 @@ export function PortalSidebar({
                   ? "bg-primary/10 font-semibold text-primary"
                   : "text-muted-foreground hover:bg-surface-low hover:text-foreground",
               )}
+              onClick={() => setMobileOpen(false)}
             >
               <MaterialIcon name={item.icon} className="text-[18px]" />
               {!collapsed ? <span className="truncate">{item.label}</span> : null}
-            </Link>
+            </a>
           );
         })}
       </nav>
@@ -136,7 +145,7 @@ export function PortalSidebar({
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          className="rounded-xl border border-border bg-white p-2 shadow-sm"
+          className="inline-flex size-11 items-center justify-center rounded-xl border border-border bg-white p-2 shadow-sm"
           aria-label="Open menu"
         >
           <MaterialIcon name="menu" />
@@ -153,7 +162,9 @@ export function PortalSidebar({
             aria-label="Close menu"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 w-72 shadow-xl">{aside}</div>
+          <div className="absolute inset-y-0 left-0 w-[min(100%,18rem)] shadow-xl">
+            {aside}
+          </div>
         </div>
       ) : null}
     </>

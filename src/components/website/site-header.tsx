@@ -12,7 +12,7 @@ import { NAV_ITEMS, SITE, type NavItem } from "@/lib/constants";
 import { NAV_MESSAGE_KEYS } from "@/lib/i18n/messages";
 import { cn } from "@/lib/utils";
 
-/** Plain anchors — full navigation always works (no client-router soft-nav failures). */
+/** Plain anchors — full navigation always works. */
 function NavLink({
   href,
   className,
@@ -106,19 +106,20 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
 
   return (
     <header className="pointer-events-auto fixed top-0 z-[200] w-full border-b border-white/10 bg-[#0B1C28]/95 shadow-md backdrop-blur-md">
-      <div className="mx-auto flex h-20 max-w-[1280px] items-center gap-4 px-4 sm:px-6 lg:px-20">
-        <BrandLogo
-          size="md"
-          priority
-          showWordmark
-          wordmarkClassName="notranslate font-heading text-xl font-bold text-white"
-        />
-
-        <div className="hidden min-w-8 flex-1 md:block" aria-hidden />
+      {/* Compact bar: logo + hamburger on small screens; full nav from lg up */}
+      <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-2 px-3 sm:h-20 sm:gap-4 sm:px-6 lg:px-20">
+        <div className="min-w-0 flex-1 overflow-hidden">
+          <BrandLogo
+            size="sm"
+            priority
+            showWordmark
+            wordmarkClassName="notranslate font-heading truncate text-base font-bold text-white sm:text-xl"
+          />
+        </div>
 
         <nav
           ref={menuRef}
-          className="notranslate relative hidden items-center gap-1 md:flex"
+          className="notranslate relative hidden shrink-0 items-center gap-1 lg:flex"
           aria-label="Primary"
         >
           {NAV_ITEMS.map((item) => {
@@ -186,7 +187,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
           })}
         </nav>
 
-        <div className="ml-auto hidden items-center gap-3 md:flex">
+        <div className="ml-3 hidden items-center gap-3 lg:flex">
           <LanguageSwitcher />
           {user ? (
             <div className="relative">
@@ -239,7 +240,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
             <>
               <NavLink
                 href="/login"
-                className="hidden text-sm font-medium text-white/80 transition hover:text-white lg:inline"
+                className="hidden text-sm font-medium text-white/80 transition hover:text-white xl:inline"
               >
                 {t("nav.login")}
               </NavLink>
@@ -256,30 +257,32 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
           )}
         </div>
 
-        <div className="ml-auto flex items-center gap-2 md:hidden">
-          <LanguageSwitcher />
-          <button
-            type="button"
-            className="inline-flex size-10 items-center justify-center rounded-lg text-white hover:bg-white/10"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen((v) => !v)}
-          >
-            {mobileOpen ? (
-              <X className="size-5" />
-            ) : (
-              <Menu className="size-5" />
-            )}
-          </button>
-        </div>
+        {/* Mobile / tablet: only hamburger in the bar — rest lives in the panel */}
+        <button
+          type="button"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-white hover:bg-white/10 lg:hidden"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          onClick={() => setMobileOpen((v) => !v)}
+        >
+          {mobileOpen ? (
+            <X className="size-6" strokeWidth={2} />
+          ) : (
+            <Menu className="size-6" strokeWidth={2} />
+          )}
+        </button>
       </div>
 
       {mobileOpen ? (
-        <div className="border-t border-white/10 bg-[#0B1C28] md:hidden">
+        <div className="border-t border-white/10 bg-[#0B1C28] lg:hidden">
           <nav
-            className="mx-auto flex max-h-[calc(100svh-5rem)] max-w-[1280px] flex-col gap-1 overflow-y-auto px-4 py-4 sm:px-6"
+            className="mx-auto flex max-h-[calc(100svh-4rem)] max-w-[1280px] flex-col gap-1 overflow-y-auto px-3 py-4 sm:px-6"
             aria-label="Mobile"
           >
+            <div className="mb-3 px-1">
+              <LanguageSwitcher className="w-full justify-center" />
+            </div>
+
             {NAV_ITEMS.map((item) => {
               if (item.children?.length) {
                 return (

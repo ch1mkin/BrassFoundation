@@ -55,11 +55,11 @@ export function BrandLogo({
   );
 
   const content = showWordmark ? (
-    <span className="inline-flex items-center gap-3">
+    <span className="inline-flex min-w-0 max-w-full items-center gap-2 sm:gap-3">
       {mark}
       <span
         className={cn(
-          "font-heading text-lg font-semibold tracking-tight sm:text-xl",
+          "font-heading min-w-0 truncate text-lg font-semibold tracking-tight sm:text-xl",
           wordmarkClassName,
         )}
       >
@@ -78,7 +78,7 @@ export function BrandLogo({
     <a
       href={href}
       aria-label="Brass Foundation home"
-      className="inline-flex shrink-0 items-center"
+      className="inline-flex min-w-0 max-w-full items-center"
     >
       {content}
     </a>
