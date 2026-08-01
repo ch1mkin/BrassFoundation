@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { PageShell } from "@/components/website/page-shell";
 import { getPublishedResources } from "@/lib/content/queries";
 import { cn } from "@/lib/utils";
@@ -45,9 +46,7 @@ export default async function ResourcesPage() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <span className="material-symbols-outlined text-5xl">
-                    {item.icon}
-                  </span>
+                  <MaterialIcon name={item.icon || "menu_book"} className="text-5xl" />
                 )}
               </div>
               <h2 className="font-heading text-lg font-semibold">{item.title}</h2>
@@ -58,7 +57,10 @@ export default async function ResourcesPage() {
               ) : null}
               <div className="mt-4 flex items-center justify-between">
                 {item.file_size_label ? (
-                  <span className="rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+                  <span
+                    className="notranslate rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary"
+                    translate="no"
+                  >
                     {item.file_size_label}
                   </span>
                 ) : (
@@ -69,15 +71,12 @@ export default async function ResourcesPage() {
                     href={href}
                     target="_blank"
                     rel="noreferrer"
-                    className="material-symbols-outlined text-primary"
                     aria-label={`Open ${item.title}`}
                   >
-                    download
+                    <MaterialIcon name="download" className="text-primary" />
                   </a>
                 ) : (
-                  <span className="material-symbols-outlined text-muted-foreground">
-                    lock
-                  </span>
+                  <MaterialIcon name="lock" className="text-muted-foreground" />
                 )}
               </div>
             </div>

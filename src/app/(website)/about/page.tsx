@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "@/components/website/page-shell";
 import { buttonVariants } from "@/components/ui/button";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { CORE_VALUES, LEADERSHIP, SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +23,7 @@ export default function AboutPage() {
           {CORE_VALUES.map((item) => (
             <div key={item.title} className="flex gap-4">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <span className="material-symbols-outlined">{item.icon}</span>
+                <MaterialIcon name={item.icon} />
               </div>
               <div>
                 <h2 className="font-heading text-xl font-semibold">

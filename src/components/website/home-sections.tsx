@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import {
   COMMUNITY_WORK,
   CORE_VALUES,
@@ -40,22 +41,10 @@ function AnimatedCounter({
   }, [inView, value]);
 
   return (
-    <span ref={ref}>
+    <span ref={ref} className="notranslate" translate="no">
       {count.toLocaleString()}
       {suffix}
     </span>
-  );
-}
-
-function MaterialIcon({
-  name,
-  className,
-}: {
-  name: string;
-  className?: string;
-}) {
-  return (
-    <span className={cn("material-symbols-outlined", className)}>{name}</span>
   );
 }
 
@@ -95,7 +84,10 @@ export function StatsSection({
             <div className="font-heading text-2xl font-semibold text-foreground sm:text-3xl">
               <AnimatedCounter value={stat.value} suffix={stat.suffix} />
             </div>
-            <div className="mt-1 text-sm font-medium text-muted-foreground">
+            <div
+              className="mt-1 text-sm font-medium text-muted-foreground"
+              data-i18n="content"
+            >
               {stat.label}
             </div>
           </div>
@@ -331,7 +323,7 @@ export function EventsSection() {
                     name={event.locationIcon}
                     className="text-[18px]"
                   />
-                  {event.location}
+                  <span data-i18n="content">{event.location}</span>
                 </p>
               </div>
               <Link
@@ -383,10 +375,13 @@ export function ResourcesSection() {
             </h4>
             <p className="mb-4 text-sm text-muted-foreground">{item.subtitle}</p>
             <div className="flex items-center justify-between">
-              <span className="rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+              <span
+                className="notranslate rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary"
+                translate="no"
+              >
                 {item.size}
               </span>
-              <Link href="/resources" className="text-primary">
+              <Link href="/resources" className="text-primary" aria-label="Download">
                 <MaterialIcon name="download" />
               </Link>
             </div>

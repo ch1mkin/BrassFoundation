@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { usePathname } from "next/navigation";
 import {
   DEFAULT_LOCALE,
   GOOGTRANS_COOKIE,
@@ -16,6 +17,11 @@ import {
   parseLocale,
 } from "@/lib/i18n/config";
 import { t as translateBuiltin, type MessageKey } from "@/lib/i18n/messages";
+import {
+  lockNonContentFromTranslate,
+  restoreWritingContent,
+  translateWritingContent,
+} from "@/lib/i18n/content-translate";
 
 type LocaleContextValue = {
   locale: Locale;
@@ -35,85 +41,21 @@ function clearCookie(name: string) {
   document.cookie = `${name}=; path=/; max-age=0; domain=${window.location.hostname}; SameSite=Lax`;
 }
 
+function clearGoogleTranslateArtifacts() {
+  clearCookie(GOOGTRANS_COOKIE);
+  clearCookie("googtrans");
+  // Remove leftover GT DOM chrome if any old session injected it
+  document
+    .querySelectorAll(".goog-te-banner-frame, .skiptranslate, #goog-gt-tt")
+    .forEach((el) => el.remove());
+  document.body.style.top = "";
+  document.documentElement.classList.remove("translated-ltr", "translated-rtl");
+}
+
 function applyDocumentLocale(locale: Locale) {
   document.documentElement.lang = locale === "pa" ? "pa" : "en";
   document.documentElement.classList.toggle("locale-pa", locale === "pa");
   document.documentElement.classList.toggle("locale-en", locale === "en");
-}
-
-function syncGoogleTranslate(locale: Locale) {
-  if (locale === "pa") {
-    writeCookie(GOOGTRANS_COOKIE, "/en/pa");
-  } else {
-    clearCookie(GOOGTRANS_COOKIE);
-    clearCookie("googtrans");
-  }
-}
-
-declare global {
-  interface Window {
-    googleTranslateElementInit?: () => void;
-    google?: {
-      translate?: {
-        TranslateElement: new (
-          options: {
-            pageLanguage: string;
-            includedLanguages: string;
-            autoDisplay: boolean;
-          },
-          elementId: string,
-        ) => void;
-      };
-    };
-  }
-}
-
-/** Prevent Google Translate from mangling icon ligatures (person_add → underscores). */
-function protectIconsFromTranslate() {
-  document
-    .querySelectorAll(
-      ".material-symbols-outlined, .material-symbols-rounded, .material-symbols-sharp",
-    )
-    .forEach((el) => {
-      el.classList.add("notranslate");
-      el.setAttribute("translate", "no");
-    });
-}
-
-function ensureGoogleTranslateScript() {
-  if (document.getElementById("google-translate-script")) return;
-
-  window.googleTranslateElementInit = () => {
-    if (!window.google?.translate?.TranslateElement) return;
-    void new window.google.translate.TranslateElement(
-      {
-        pageLanguage: "en",
-        includedLanguages: "en,pa",
-        autoDisplay: false,
-      },
-      "google_translate_element",
-    );
-  };
-
-  const script = document.createElement("script");
-  script.id = "google-translate-script";
-  script.src =
-    "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-  script.async = true;
-  document.body.appendChild(script);
-}
-
-function forceGoogleCombo(locale: Locale) {
-  const select = document.querySelector(
-    ".goog-te-combo",
-  ) as HTMLSelectElement | null;
-  if (!select) return false;
-  const value = locale === "pa" ? "pa" : "en";
-  if (select.value !== value) {
-    select.value = value;
-    select.dispatchEvent(new Event("change"));
-  }
-  return true;
 }
 
 export function LocaleProvider({
@@ -127,6 +69,7 @@ export function LocaleProvider({
 }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
   const [translations, setTranslations] = useState(initialTranslations);
+  const pathname = usePathname();
 
   useEffect(() => {
     setTranslations(initialTranslations);
@@ -148,38 +91,49 @@ export function LocaleProvider({
   }, []);
 
   useEffect(() => {
+    // Never use full-page Google Translate — it breaks icon fonts.
+    clearGoogleTranslateArtifacts();
     applyDocumentLocale(locale);
-    protectIconsFromTranslate();
+    lockNonContentFromTranslate();
 
-    const observer = new MutationObserver(() => protectIconsFromTranslate());
+    const observer = new MutationObserver(() => lockNonContentFromTranslate());
     observer.observe(document.body, { childList: true, subtree: true });
 
-    // Only load Google Translate when Punjabi is active AND we need fallback
-    if (locale === "pa") {
-      syncGoogleTranslate("pa");
-      ensureGoogleTranslateScript();
-      const tryForce = () => {
-        protectIconsFromTranslate();
-        return forceGoogleCombo("pa");
-      };
-      if (!tryForce()) {
-        const id = window.setInterval(() => {
-          if (tryForce()) window.clearInterval(id);
-        }, 400);
-        window.setTimeout(() => window.clearInterval(id), 10000);
+    let cancelled = false;
+
+    async function run() {
+      if (locale === "pa") {
+        await translateWritingContent();
+      } else {
+        restoreWritingContent();
       }
     }
 
-    return () => observer.disconnect();
-  }, [locale]);
+    // Wait a tick for page content to paint (and on route changes)
+    const timer = window.setTimeout(() => {
+      if (!cancelled) void run();
+    }, 80);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [locale, pathname]);
 
   const setLocale = useCallback((next: Locale) => {
     const resolved = parseLocale(next);
     writeCookie(LOCALE_COOKIE, resolved);
-    syncGoogleTranslate(resolved);
+    clearGoogleTranslateArtifacts();
     applyDocumentLocale(resolved);
     setLocaleState(resolved);
-    window.location.reload();
+    // Soft switch without full reload when possible
+    if (resolved === "pa") {
+      void translateWritingContent();
+    } else {
+      restoreWritingContent();
+      window.location.reload();
+    }
   }, []);
 
   const t = useCallback(
@@ -200,10 +154,7 @@ export function LocaleProvider({
   );
 
   return (
-    <LocaleContext.Provider value={value}>
-      <div id="google_translate_element" className="sr-only" aria-hidden />
-      {children}
-    </LocaleContext.Provider>
+    <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
   );
 }
 
@@ -215,7 +166,6 @@ export function useLocale() {
   return ctx;
 }
 
-/** Pick English or admin Punjabi string; Google handles unmarked body text. */
 export function pickLocalized(
   locale: Locale,
   en: string,

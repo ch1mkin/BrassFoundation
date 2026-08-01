@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { buttonVariants } from "@/components/ui/button";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { cn } from "@/lib/utils";
 
@@ -182,9 +183,7 @@ export function HeroSection({
             )}
           >
             {displayPrimary}
-            <span className="material-symbols-outlined notranslate text-[20px]">
-              person_add
-            </span>
+            <MaterialIcon name="person_add" className="text-[20px]" />
           </Link>
           <Link
             href={secondaryHref}
@@ -194,9 +193,7 @@ export function HeroSection({
             )}
           >
             {displaySecondary}
-            <span className="material-symbols-outlined notranslate text-[20px]">
-              auto_stories
-            </span>
+            <MaterialIcon name="auto_stories" className="text-[20px]" />
           </Link>
         </motion.div>
       </div>
