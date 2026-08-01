@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -35,6 +35,7 @@ export type HeaderUser = {
 export function SiteHeader({ user }: { user: HeaderUser | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useLocale();
   const initials = (
     user?.fullName?.trim()?.[0] ||
@@ -49,6 +50,11 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
   function navLabel(label: string) {
     const key = NAV_MESSAGE_KEYS[label];
     return key ? t(key) : label;
+  }
+
+  function go(href: string) {
+    setOpen(false);
+    router.push(href);
   }
 
   return (
@@ -83,7 +89,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
           })}
         </div>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-3 md:flex">
           <LanguageSwitcher />
           {user ? (
             <DropdownMenu>
@@ -98,7 +104,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
               <DropdownMenuContent
                 align="end"
                 sideOffset={10}
-                className="min-w-52 rounded-xl p-2 shadow-soft"
+                className="z-[80] min-w-52 rounded-xl p-2 shadow-soft"
               >
                 <div className="px-2 py-2">
                   <p className="truncate text-sm font-medium">
@@ -111,18 +117,18 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer rounded-lg"
-                  render={<Link href="/member" />}
+                  onClick={() => go("/member")}
                 >
                   {t("nav.memberPortal")}
                 </DropdownMenuItem>
-                {user.isAdmin && (
+                {user.isAdmin ? (
                   <DropdownMenuItem
                     className="cursor-pointer rounded-lg"
-                    render={<Link href="/admin" />}
+                    onClick={() => go("/admin")}
                   >
                     {t("nav.adminPortal")}
                   </DropdownMenuItem>
-                )}
+                ) : null}
                 <DropdownMenuSeparator />
                 <form action={signOutAction}>
                   <button
@@ -138,7 +144,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
             <>
               <Link
                 href="/login"
-                className="hidden text-sm font-medium text-white/80 transition hover:text-white xl:block"
+                className="hidden text-sm font-medium text-white/80 transition hover:text-white lg:block"
               >
                 {t("nav.login")}
               </Link>
@@ -155,11 +161,11 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
           )}
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 md:hidden">
           <LanguageSwitcher />
           <button
             type="button"
-            className="inline-flex size-10 items-center justify-center rounded-lg text-white hover:bg-white/10 md:hidden"
+            className="inline-flex size-10 items-center justify-center rounded-lg text-white hover:bg-white/10"
             aria-label="Open menu"
             onClick={() => setOpen(true)}
           >
@@ -190,7 +196,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                   key={item.label}
                   href={item.href || "/"}
                   onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white notranslate"
+                  className="notranslate rounded-lg px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white"
                 >
                   {navLabel(item.label)}
                 </Link>
@@ -221,6 +227,18 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                     >
                       {t("nav.memberPortal")}
                     </Link>
+                    {user.isAdmin ? (
+                      <Link
+                        href="/admin"
+                        onClick={() => setOpen(false)}
+                        className={cn(
+                          buttonVariants({ variant: "outline" }),
+                          "mb-2 w-full justify-center rounded-lg border-white/30 bg-transparent text-white hover:bg-white/10",
+                        )}
+                      >
+                        {t("nav.adminPortal")}
+                      </Link>
+                    ) : null}
                     <form action={signOutAction}>
                       <Button
                         type="submit"
