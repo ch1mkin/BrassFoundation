@@ -474,12 +474,12 @@ export function MembershipCta({
                   </div>
                 ))}
               </div>
-              <Link
-                href="/membership"
+              <a
+                href="/membership#register"
                 className="inline-flex rounded-xl bg-white px-10 py-4 text-lg font-bold text-secondary shadow-2xl transition hover:scale-105 active:scale-95"
               >
                 Start Your Membership
-              </Link>
+              </a>
             </div>
             <div className="flex justify-center lg:w-1/3">
               {/* eslint-disable-next-line @next/next/no-img-element */}

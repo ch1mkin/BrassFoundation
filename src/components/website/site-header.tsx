@@ -255,7 +255,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                 {t("nav.login")}
               </NavLink>
               <NavLink
-                href="/membership"
+                href="/membership#register"
                 className={cn(
                   buttonVariants(),
                   "rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-[#004149] shadow-lg shadow-black/20 hover:bg-brand/90 active:scale-95",
@@ -396,7 +396,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                     {t("nav.login")}
                   </NavLink>
                   <NavLink
-                    href="/membership"
+                    href="/membership#register"
                     onClick={() => setMobileOpen(false)}
                     className={cn(
                       buttonVariants(),

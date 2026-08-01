@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { BrandLogo } from "@/components/brand/logo";
 import { MembershipQr } from "@/components/membership/membership-qr";
 import { buttonVariants } from "@/components/ui/button";
@@ -68,7 +67,10 @@ export default async function MemberDashboardPage() {
       </p>
 
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
-        <div className="relative overflow-hidden rounded-2xl bg-secondary p-6 text-white sm:p-8">
+        <div
+          id="membership-card"
+          className="relative scroll-mt-8 overflow-hidden rounded-2xl bg-secondary p-6 text-white sm:p-8"
+        >
           <div
             className="pointer-events-none absolute inset-0 opacity-60"
             style={{
@@ -137,15 +139,15 @@ export default async function MemberDashboardPage() {
               <p className="mt-3 text-sm text-muted-foreground">
                 You have not submitted a membership application yet.
               </p>
-              <Link
-                href="/membership"
+              <a
+                href="/membership#register"
                 className={cn(
                   buttonVariants(),
                   "mt-6 inline-flex rounded-xl bg-primary shadow-lg shadow-primary/20",
                 )}
               >
                 Apply for membership
-              </Link>
+              </a>
             </>
           ) : application.status === "pending" ||
             application.status === "under_review" ? (
@@ -159,15 +161,15 @@ export default async function MemberDashboardPage() {
                 Your previous application was not approved. You may submit again
                 with updated details.
               </p>
-              <Link
-                href="/membership"
+              <a
+                href="/membership#register"
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "mt-6 inline-flex rounded-2xl",
                 )}
               >
                 Apply again
-              </Link>
+              </a>
             </>
           ) : (
             <p className="mt-3 text-sm text-muted-foreground">

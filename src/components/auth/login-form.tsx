@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { PasswordInput } from "@/components/auth/password-input";
@@ -101,12 +100,12 @@ export function LoginForm() {
           </label>
 
           <div className="flex items-center justify-between pt-1">
-            <Link
+            <a
               href="/login?mode=forgot"
               className="text-sm font-medium text-primary hover:underline"
             >
               Forgot Password?
-            </Link>
+            </a>
           </div>
 
           {error ? (
@@ -132,12 +131,12 @@ export function LoginForm() {
       <div className="mt-10 text-center">
         <p className="text-muted-foreground">
           New here?{" "}
-          <Link
-            href="/membership"
+          <a
+            href="/membership#register"
             className="font-bold text-primary hover:underline"
           >
             Become a member
-          </Link>
+          </a>
         </p>
       </div>
     </div>

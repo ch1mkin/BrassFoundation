@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageShell } from "@/components/website/page-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
@@ -33,15 +32,15 @@ export default function AboutPage() {
               </div>
             </div>
           ))}
-          <Link
-            href="/membership"
+          <a
+            href="/membership#register"
             className={cn(
               buttonVariants(),
               "mt-2 inline-flex rounded-xl bg-primary shadow-lg shadow-primary/20",
             )}
           >
             Become a Member
-          </Link>
+          </a>
         </div>
 
         <div>

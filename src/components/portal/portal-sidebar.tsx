@@ -13,6 +13,31 @@ type NavItem = {
   icon: string;
 };
 
+/** Path only — ignore hash fragments used for in-page anchors. */
+function navPath(href: string) {
+  return href.split("#")[0] || href;
+}
+
+function pathMatches(pathname: string, href: string) {
+  const base = navPath(href);
+  return pathname === base || pathname.startsWith(`${base}/`);
+}
+
+/** Exactly one active item: longest matching href; ties keep the first. */
+function getActiveNavIndex(pathname: string, nav: readonly NavItem[]) {
+  let bestIdx = -1;
+  let bestLen = -1;
+  nav.forEach((item, idx) => {
+    if (!pathMatches(pathname, item.href)) return;
+    const len = navPath(item.href).length;
+    if (len > bestLen) {
+      bestLen = len;
+      bestIdx = idx;
+    }
+  });
+  return bestIdx;
+}
+
 export function PortalSidebar({
   title,
   subtitle,
@@ -29,6 +54,7 @@ export function PortalSidebar({
   storageKey: string;
 }) {
   const pathname = usePathname();
+  const activeIndex = getActiveNavIndex(pathname, nav);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -120,11 +146,8 @@ export function PortalSidebar({
       </div>
 
       <nav className="mt-6 max-h-[calc(100svh-12rem)] flex-1 space-y-0.5 overflow-y-auto">
-        {nav.map((item) => {
-          const active =
-            item.href === "/admin" || item.href === "/member"
-              ? pathname === item.href
-              : pathname.startsWith(item.href);
+        {nav.map((item, index) => {
+          const active = index === activeIndex;
           return (
             <a
               key={`${item.label}-${item.href}`}

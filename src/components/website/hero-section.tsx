@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
@@ -164,7 +163,7 @@ export function HeroSection({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.6 }}
         >
-          <Link
+          <a
             href={primaryHref}
             className={cn(
               buttonVariants({ size: "lg" }),
@@ -173,8 +172,8 @@ export function HeroSection({
           >
             {displayPrimary}
             <MaterialIcon name="person_add" className="text-[20px]" />
-          </Link>
-          <Link
+          </a>
+          <a
             href={secondaryHref}
             className={cn(
               buttonVariants({ variant: "secondary", size: "lg" }),
@@ -183,7 +182,7 @@ export function HeroSection({
           >
             {displaySecondary}
             <MaterialIcon name="auto_stories" className="text-[20px]" />
-          </Link>
+          </a>
         </motion.div>
       </div>
     </section>

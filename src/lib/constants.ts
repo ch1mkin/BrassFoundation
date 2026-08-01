@@ -212,7 +212,7 @@ export const DEFAULT_HOMEPAGE = {
   hero_subheadline:
     "Brass Foundation is dedicated to education, equality, leadership and community development inspired by the vision of Dr. B. R. Ambedkar.",
   hero_cta_primary_label: "Become a Member",
-  hero_cta_primary_href: "/membership",
+  hero_cta_primary_href: "/membership#register",
   hero_cta_secondary_label: "Explore Resources",
   hero_cta_secondary_href: "/resources",
   about_eyebrow: "Our Mission & Vision",

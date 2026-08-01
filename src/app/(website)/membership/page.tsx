@@ -66,7 +66,9 @@ export default async function MembershipPage() {
           />
         </div>
       ) : (
-        <MembershipRegistrationForm />
+        <div id="register" className="scroll-mt-28">
+          <MembershipRegistrationForm />
+        </div>
       )}
     </div>
   );

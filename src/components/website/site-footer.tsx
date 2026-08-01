@@ -79,12 +79,12 @@ export function SiteFooter() {
           </h4>
           <ul className="notranslate space-y-2">
             <li>
-              <Link
-                href="/membership"
+              <a
+                href="/membership#register"
                 className="text-xs font-semibold text-white/70 hover:text-brand"
               >
                 {t("footer.becomeMember")}
-              </Link>
+              </a>
             </li>
             <li>
               <Link
