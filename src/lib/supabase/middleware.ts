@@ -45,8 +45,11 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/login") ||
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/auth/");
+  // Do NOT use startsWith("/member") — that also matches "/membership".
   const isProtected =
-    pathname.startsWith("/admin") || pathname.startsWith("/member");
+    pathname.startsWith("/admin") ||
+    pathname === "/member" ||
+    pathname.startsWith("/member/");
 
   if (!user && isProtected) {
     const redirectUrl = request.nextUrl.clone();
@@ -58,8 +61,15 @@ export async function updateSession(request: NextRequest) {
   if (user && pathname === "/login") {
     const next = request.nextUrl.searchParams.get("next");
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname =
-      next && next.startsWith("/") ? next : "/member";
+    // Never bounce membership join back through a protected-only path check.
+    const safeNext =
+      next &&
+      next.startsWith("/") &&
+      !next.startsWith("//") &&
+      next !== "/login"
+        ? next
+        : "/member";
+    redirectUrl.pathname = safeNext;
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }

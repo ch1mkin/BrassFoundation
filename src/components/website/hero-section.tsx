@@ -75,27 +75,27 @@ export function HeroSection({
         <>
           {/* Mobile: full-bleed cover across the hero viewport */}
           {mobileBg ? (
-            <div className="absolute inset-0 md:hidden">
+            <div className="pointer-events-none absolute inset-0 md:hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={mobileBg}
                 alt=""
                 className="h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#001c3a]/75 via-[#004f58]/55 to-surface" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#001c3a]/75 via-[#004f58]/55 to-surface" />
             </div>
           ) : null}
 
           {/* Desktop: edge-to-edge cover */}
           {desktopBg ? (
-            <div className="absolute inset-0 hidden md:block">
+            <div className="pointer-events-none absolute inset-0 hidden md:block">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={desktopBg}
                 alt=""
                 className="h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#001c3a]/75 via-[#004f58]/55 to-surface" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#001c3a]/75 via-[#004f58]/55 to-surface" />
             </div>
           ) : null}
         </>

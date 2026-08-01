@@ -2,7 +2,10 @@
 
 import { cn } from "@/lib/utils";
 
-/** Hard navigation to the membership registration page. */
+/**
+ * Native link to the public membership registration page.
+ * No preventDefault — browser navigation must always work.
+ */
 export function MembershipLink({
   className,
   children,
@@ -13,16 +16,7 @@ export function MembershipLink({
   onClick?: () => void;
 }) {
   return (
-    <a
-      href="/membership"
-      className={cn(className)}
-      onClick={(e) => {
-        onClick?.();
-        // Full page load avoids soft-nav / hash quirks that can leave the form unreachable.
-        e.preventDefault();
-        window.location.assign("/membership");
-      }}
-    >
+    <a href="/membership" className={cn(className)} onClick={onClick}>
       {children}
     </a>
   );
