@@ -38,8 +38,9 @@ This way all email leaves through your Hostinger mailbox.
    - `supabase/migrations/20260801030000_profiles_role_dropdown.sql`
    - `supabase/migrations/20260801040000_website_content.sql`
    - `supabase/migrations/20260801050000_uploads_org_gallery.sql`
+   - `supabase/migrations/20260801060000_blogs_stats_thumbnails.sql`
 
-This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS, membership applications, a **role dropdown** on `profiles.role_id`, public content modules (events, news, resources, community, gallery, marketplace, contact messages, newsletter), **storage buckets** (gallery/resources/marketplace/avatars), gallery layout fields, org family tree, and membership leave statuses.
+This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS, membership applications, a **role dropdown** on `profiles.role_id`, public content modules (events, news, resources, community, gallery, marketplace, contact messages, newsletter), **storage buckets**, gallery layout fields, org family tree, membership leave statuses, **blogs**, and resource PDF thumbnails.
 
 See [ROLE_DROPDOWN.sql.md](./ROLE_DROPDOWN.sql.md) for copy-paste SQL and how to promote yourself to Super Admin.
 

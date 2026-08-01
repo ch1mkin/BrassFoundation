@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { AdminContentForm } from "@/components/admin/content-form";
+import { AlbumEditor } from "@/components/admin/album-editor";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { GallerySortableGrid } from "@/components/admin/gallery-sortable";
 import {
   addGalleryImageFormAction,
   deleteGalleryAlbumAction,
-  upsertGalleryAlbumAction,
 } from "@/lib/content/gallery-org-actions";
 import { createClient } from "@/lib/supabase/server";
 
@@ -22,11 +21,12 @@ export default async function AdminGalleryPage({
   const { data: albums, error } = await supabase
     .from("gallery_albums")
     .select(
-      "id, title, heading, slug, display_mode, event_date, is_published, sort_order",
+      "id, title, heading, description, slug, display_mode, event_date, is_published, sort_order",
     )
     .order("sort_order", { ascending: true });
 
   const selectedId = albumParam || albums?.[0]?.id || null;
+  const selected = albums?.find((a) => a.id === selectedId) || null;
 
   const { data: media } = selectedId
     ? await supabase
@@ -47,40 +47,34 @@ export default async function AdminGalleryPage({
       <div>
         <h1 className="font-heading text-3xl font-semibold">Gallery</h1>
         <p className="mt-2 text-muted-foreground">
-          Create an album heading, upload images, choose slider or grid, then
-          drag to organize how it appears on the website.
+          Create and edit album headings, upload images, choose slider or grid,
+          then drag to organize how it appears on the website.
         </p>
       </div>
 
       {error ? (
         <p className="glass-card rounded-2xl p-6 text-sm text-destructive">
-          Run <code>20260801050000_uploads_org_gallery.sql</code> (and website
-          content migration). ({error.message})
+          Run gallery migrations in Supabase. ({error.message})
         </p>
       ) : null}
 
-      <div className="grid gap-8 xl:grid-cols-[320px_1fr]">
+      <div className="grid gap-8 xl:grid-cols-[340px_1fr]">
         <div className="space-y-4">
-          <AdminContentForm
-            title="New album / event heading"
-            action={upsertGalleryAlbumAction}
-            fields={[
-              { name: "title", label: "Album title", required: true },
-              { name: "heading", label: "Public heading" },
-              { name: "description", label: "Description", type: "textarea" },
-              {
-                name: "display_mode",
-                label: "Layout (slider / grid / both)",
-                defaultValue: "both",
-              },
-              { name: "event_date", label: "Event date", type: "text", placeholder: "YYYY-MM-DD" },
-              {
-                name: "is_published",
-                label: "Published",
-                type: "checkbox",
-                defaultValue: true,
-              },
-            ]}
+          <AlbumEditor
+            album={
+              selected
+                ? {
+                    id: selected.id,
+                    title: selected.title,
+                    heading: selected.heading,
+                    description: selected.description,
+                    display_mode: selected.display_mode || "grid",
+                    event_date: selected.event_date,
+                    is_published: selected.is_published,
+                    sort_order: selected.sort_order,
+                  }
+                : null
+            }
           />
 
           <div className="space-y-2">

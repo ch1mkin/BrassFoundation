@@ -1,17 +1,36 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { upsertResourceAction } from "@/lib/content/actions";
 import type { ContentActionState } from "@/lib/content/utils";
+import { uploadPdfWithThumbnail } from "@/lib/storage/pdf-thumbnail";
 
 export function ResourceCreateForm() {
   const [state, action, pending] = useActionState(
     upsertResourceAction,
     {} as ContentActionState,
   );
+  const [fileUrl, setFileUrl] = useState("");
+  const [thumbUrl, setThumbUrl] = useState("");
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploading, startUpload] = useTransition();
+
+  function onPdf(file: File | null) {
+    if (!file) return;
+    setUploadError(null);
+    startUpload(async () => {
+      const result = await uploadPdfWithThumbnail(file, "library");
+      if (!result.ok) {
+        setUploadError(result.error);
+        return;
+      }
+      setFileUrl(result.url);
+      if (result.thumbnailUrl) setThumbUrl(result.thumbnailUrl);
+    });
+  }
 
   return (
     <form action={action} className="glass-card space-y-4 rounded-2xl p-6">
@@ -30,17 +49,44 @@ export function ResourceCreateForm() {
         placeholder="Type (pdf/video/audio/link)"
         className="h-10 rounded-xl"
       />
+
+      <div className="space-y-2">
+        <span className="text-sm font-medium text-muted-foreground">
+          PDF upload (first page becomes thumbnail)
+        </span>
+        <input
+          type="file"
+          accept="application/pdf"
+          className="block w-full text-xs"
+          onChange={(e) => onPdf(e.target.files?.[0] || null)}
+        />
+        {uploading ? (
+          <p className="text-xs text-muted-foreground">
+            Uploading PDF + generating thumbnail…
+          </p>
+        ) : null}
+        {uploadError ? (
+          <p className="text-xs text-destructive">{uploadError}</p>
+        ) : null}
+        {thumbUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={thumbUrl}
+            alt="PDF thumbnail"
+            className="mt-2 h-40 w-auto rounded-lg border border-border object-contain"
+          />
+        ) : null}
+      </div>
+
+      <input type="hidden" name="file_url" value={fileUrl} />
+      <input type="hidden" name="thumbnail_url" value={thumbUrl} />
+
       <FileOrUrlField
-        name="file_url"
-        label="PDF / file upload or URL"
-        bucket="resources"
-        accept="application/pdf,image/*,audio/*,video/*"
-        folder="library"
-      />
-      <Input
         name="external_url"
-        placeholder="External URL (optional)"
-        className="h-10 rounded-xl"
+        label="Or paste external URL"
+        bucket="resources"
+        accept="application/pdf,image/*"
+        folder="library"
       />
       <Input
         name="file_size_label"
@@ -50,12 +96,21 @@ export function ResourceCreateForm() {
       <Input name="icon" defaultValue="menu_book" className="h-10 rounded-xl" />
       <Input name="tone" defaultValue="primary" className="h-10 rounded-xl" />
       <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" name="is_published" defaultChecked className="size-4" />
+        <input
+          type="checkbox"
+          name="is_published"
+          defaultChecked
+          className="size-4"
+        />
         Published
       </label>
       {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
       {state.success ? <p className="text-sm text-success">{state.success}</p> : null}
-      <Button type="submit" disabled={pending} className="rounded-xl bg-primary">
+      <Button
+        type="submit"
+        disabled={pending || uploading}
+        className="rounded-xl bg-primary"
+      >
         {pending ? "Saving…" : "Create resource"}
       </Button>
     </form>

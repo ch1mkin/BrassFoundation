@@ -18,6 +18,16 @@ export async function updateHomepageAction(
     return { error: "Unauthorized." };
   }
 
+  const statsRaw = String(formData.get("stats_json") || "").trim();
+  let stats: unknown = undefined;
+  if (statsRaw) {
+    try {
+      stats = JSON.parse(statsRaw);
+    } catch {
+      return { error: "Invalid stats JSON." };
+    }
+  }
+
   const payload = {
     hero_eyebrow: String(formData.get("hero_eyebrow") || "").trim(),
     hero_headline: String(formData.get("hero_headline") || "").trim(),
@@ -41,6 +51,7 @@ export async function updateHomepageAction(
       formData.get("membership_headline") || "",
     ).trim(),
     membership_body: String(formData.get("membership_body") || "").trim(),
+    ...(stats ? { stats } : {}),
     updated_by: context.userId,
     is_published: true,
   };

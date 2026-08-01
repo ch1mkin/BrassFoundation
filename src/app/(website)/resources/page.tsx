@@ -33,13 +33,22 @@ export default async function ResourcesPage() {
             <div key={item.id} className="glass-card group rounded-2xl p-5">
               <div
                 className={cn(
-                  "mb-4 flex aspect-[3/4] items-center justify-center rounded-xl bg-surface-highest transition-all duration-300",
-                  toneClass[tone],
+                  "mb-4 flex aspect-[3/4] items-center justify-center overflow-hidden rounded-xl bg-surface-highest transition-all duration-300",
+                  !item.thumbnail_url && toneClass[tone],
                 )}
               >
-                <span className="material-symbols-outlined text-5xl">
-                  {item.icon}
-                </span>
+                {item.thumbnail_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={item.thumbnail_url}
+                    alt={item.title}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="material-symbols-outlined text-5xl">
+                    {item.icon}
+                  </span>
+                )}
               </div>
               <h2 className="font-heading text-lg font-semibold">{item.title}</h2>
               {item.subtitle ? (

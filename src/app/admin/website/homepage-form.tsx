@@ -8,6 +8,7 @@ import {
   type CmsActionState,
 } from "@/lib/cms/actions";
 import type { HomepageContent } from "@/lib/cms/homepage";
+import { StatsEditor } from "@/components/admin/stats-editor";
 
 const initial: CmsActionState = {};
 
@@ -92,6 +93,17 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
             defaultValue={content.hero_cta_secondary_href}
           />
         </div>
+      </section>
+
+      <section className="space-y-4 rounded-2xl bg-card p-6 shadow-soft">
+        <StatsEditor
+          initial={content.stats.map((s) => ({
+            label: s.label,
+            value: s.value,
+            suffix: s.suffix || "+",
+            icon: s.icon || "groups",
+          }))}
+        />
       </section>
 
       <section className="space-y-4 rounded-2xl bg-card p-6 shadow-soft">

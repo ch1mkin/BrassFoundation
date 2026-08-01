@@ -21,6 +21,7 @@ type HeroSectionProps = {
   primaryHref: string;
   secondaryLabel: string;
   secondaryHref: string;
+  floatingStats?: Array<{ label: string; value: number; suffix?: string }>;
 };
 
 export function HeroSection({
@@ -30,8 +31,11 @@ export function HeroSection({
   primaryHref,
   secondaryLabel,
   secondaryHref,
+  floatingStats,
 }: HeroSectionProps) {
-  const lines = headline.split("\n");
+  const lines = headline.split("\n").filter(Boolean);
+  const left = floatingStats?.[0];
+  const right = floatingStats?.[1];
 
   return (
     <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-surface pt-20">
@@ -56,28 +60,34 @@ export function HeroSection({
               />
             </motion.div>
 
-            <div
-              className="glass-card absolute -top-8 -left-16 hidden rounded-xl p-3 animate-bounce sm:block"
-              style={{ animationDuration: "4s" }}
-            >
-              <span className="font-heading block text-xl font-semibold text-primary">
-                10k+
-              </span>
-              <span className="text-xs font-semibold text-muted-foreground">
-                Active Members
-              </span>
-            </div>
-            <div
-              className="glass-card absolute top-16 -right-20 hidden rounded-xl p-3 animate-bounce sm:block"
-              style={{ animationDuration: "5s" }}
-            >
-              <span className="font-heading block text-xl font-semibold text-secondary">
-                25+
-              </span>
-              <span className="text-xs font-semibold text-muted-foreground">
-                Districts Covered
-              </span>
-            </div>
+            {left ? (
+              <div
+                className="glass-card absolute -top-8 -left-16 hidden rounded-xl p-3 animate-bounce sm:block"
+                style={{ animationDuration: "4s" }}
+              >
+                <span className="font-heading block text-xl font-semibold text-primary">
+                  {left.value.toLocaleString()}
+                  {left.suffix || ""}
+                </span>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {left.label}
+                </span>
+              </div>
+            ) : null}
+            {right ? (
+              <div
+                className="glass-card absolute top-16 -right-20 hidden rounded-xl p-3 animate-bounce sm:block"
+                style={{ animationDuration: "5s" }}
+              >
+                <span className="font-heading block text-xl font-semibold text-secondary">
+                  {right.value.toLocaleString()}
+                  {right.suffix || ""}
+                </span>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {right.label}
+                </span>
+              </div>
+            ) : null}
           </div>
         </div>
 

@@ -37,15 +37,14 @@ export const NAV_LINKS = [
   { href: "/gallery", label: "Gallery" },
   { href: "/marketplace", label: "Marketplace" },
   { href: "/news", label: "News" },
+  { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ] as const;
 
 export const STATS = [
   { label: "Members", value: 10000, suffix: "+", icon: "groups" },
-  { label: "Districts", value: 25, suffix: "+", icon: "map" },
-  { label: "Books Distributed", value: 5000, suffix: "+", icon: "library_books" },
   { label: "Events Held", value: 150, suffix: "+", icon: "event" },
-  { label: "Scholarships", value: 500, suffix: "+", icon: "school" },
+  { label: "Books Distributed", value: 5000, suffix: "+", icon: "library_books" },
 ] as const;
 
 export const CORE_VALUES = [

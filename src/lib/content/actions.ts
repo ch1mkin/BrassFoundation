@@ -311,6 +311,7 @@ export async function upsertResourceAction(
     resource_type: String(formData.get("resource_type") || "pdf").trim(),
     file_url: String(formData.get("file_url") || "").trim() || null,
     external_url: String(formData.get("external_url") || "").trim() || null,
+    thumbnail_url: String(formData.get("thumbnail_url") || "").trim() || null,
     file_size_label:
       String(formData.get("file_size_label") || "").trim() || null,
     icon: String(formData.get("icon") || "menu_book").trim(),

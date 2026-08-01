@@ -44,6 +44,7 @@ export type ResourceRow = {
   tone: string;
   file_url: string | null;
   external_url: string | null;
+  thumbnail_url?: string | null;
   resource_type: string;
 };
 
@@ -191,7 +192,7 @@ export async function getPublishedResources(
     const { data, error } = await supabase
       .from("resources")
       .select(
-        "id, slug, title, subtitle, description, file_size_label, icon, tone, file_url, external_url, resource_type",
+        "id, slug, title, subtitle, description, file_size_label, icon, tone, file_url, external_url, thumbnail_url, resource_type",
       )
       .eq("is_published", true)
       .order("sort_order", { ascending: true })

@@ -10,6 +10,7 @@ export type HomepageStat = {
   label: string;
   value: number;
   suffix?: string;
+  icon?: string;
 };
 
 export type HomepageValue = {

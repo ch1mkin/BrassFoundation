@@ -64,18 +64,27 @@ export function StatsSection({
 }: {
   stats: HomepageContent["stats"];
 }) {
-  const icons = ["groups", "map", "library_books", "event", "school"];
+  const cols =
+    stats.length <= 2
+      ? "md:grid-cols-2"
+      : stats.length === 3
+        ? "md:grid-cols-3"
+        : stats.length === 4
+          ? "md:grid-cols-4"
+          : "md:grid-cols-5";
 
   return (
     <section className="bg-surface-low py-16 lg:py-20">
-      <div className="mx-auto grid max-w-[1280px] grid-cols-2 gap-6 px-4 sm:px-6 md:grid-cols-5 lg:px-20">
-        {stats.slice(0, 5).map((stat, i) => (
+      <div
+        className={`mx-auto grid max-w-[1280px] grid-cols-2 gap-6 px-4 sm:px-6 lg:px-20 ${cols}`}
+      >
+        {stats.map((stat, i) => (
           <div
-            key={stat.label}
+            key={`${stat.label}-${i}`}
             className="glass-card rounded-xl p-6 text-center transition hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(17,76,136,0.08)]"
           >
             <MaterialIcon
-              name={icons[i] || "groups"}
+              name={stat.icon || "groups"}
               className={cn(
                 "mb-2 text-4xl",
                 i % 3 === 0 && "text-primary",
