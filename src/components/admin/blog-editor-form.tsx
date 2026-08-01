@@ -1,11 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { upsertBlogAction } from "@/lib/content/blog-actions";
 import type { ContentActionState } from "@/lib/content/utils";
 
@@ -22,7 +22,7 @@ export function BlogEditorForm({
     is_published: boolean;
   };
 }) {
-  const [state, action, pending] = useActionState(
+  const [state, action, pending] = useSafeFormAction(
     upsertBlogAction,
     {} as ContentActionState,
   );

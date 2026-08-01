@@ -134,7 +134,6 @@ export async function updateHomepageAction(
 
       if (!error) {
         revalidatePath("/");
-        revalidatePath("/admin/website");
         return {
           success:
             "Homepage saved. Run migrations 20260801070000 and 20260801080000 in Supabase so hero image + Punjabi fields persist.",
@@ -152,8 +151,9 @@ export async function updateHomepageAction(
       return { error: error.message };
     }
 
+    // Revalidate public site only — revalidating the current admin page
+    // can leave useActionState pending stuck in a refresh loop.
     revalidatePath("/");
-    revalidatePath("/admin/website");
     return { success: "Homepage content saved." };
   } catch (err) {
     return {

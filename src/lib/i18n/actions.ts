@@ -38,6 +38,5 @@ export async function upsertTranslationAction(
   if (error) return { error: error.message };
 
   revalidatePath("/");
-  revalidatePath("/admin/translations");
   return { success: `Saved ${key}` };
 }

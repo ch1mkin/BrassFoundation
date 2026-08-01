@@ -1,16 +1,17 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { upsertResourceAction } from "@/lib/content/actions";
 import type { ContentActionState } from "@/lib/content/utils";
 import { uploadPdfWithThumbnail } from "@/lib/storage/pdf-thumbnail";
 
 export function ResourceCreateForm() {
-  const [state, action, pending] = useActionState(
+  const [state, action, pending] = useSafeFormAction(
     upsertResourceAction,
     {} as ContentActionState,
   );

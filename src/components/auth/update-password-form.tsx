@@ -1,16 +1,19 @@
 "use client";
 
-import { useActionState } from "react";
 import Link from "next/link";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { updatePasswordAction, type AuthActionState } from "@/lib/auth/actions";
 
 const initial: AuthActionState = {};
 
 export function UpdatePasswordForm() {
-  const [state, action, pending] = useActionState(updatePasswordAction, initial);
+  const [state, action, pending] = useSafeFormAction(
+    updatePasswordAction,
+    initial,
+  );
 
   return (
     <div className="w-full">

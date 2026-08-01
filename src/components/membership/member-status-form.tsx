@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
 import { FormLock } from "@/components/ui/form-lock";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { setMemberStatusAction } from "@/lib/content/gallery-org-actions";
 import type { ContentActionState } from "@/lib/content/utils";
 
@@ -12,7 +12,7 @@ export function MemberStatusForm({
   applicationId: string;
   currentStatus?: string | null;
 }) {
-  const [state, action, pending] = useActionState(
+  const [state, action, pending] = useSafeFormAction(
     setMemberStatusAction,
     {} as ContentActionState,
   );

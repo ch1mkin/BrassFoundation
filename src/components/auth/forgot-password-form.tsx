@@ -1,17 +1,17 @@
 "use client";
 
-import { useActionState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { requestPasswordResetAction } from "@/lib/auth/actions";
 import type { AuthActionState } from "@/lib/auth/actions";
 
 const initial: AuthActionState = {};
 
 export function ForgotPasswordForm() {
-  const [state, action, pending] = useActionState(
+  const [state, action, pending] = useSafeFormAction(
     requestPasswordResetAction,
     initial,
   );

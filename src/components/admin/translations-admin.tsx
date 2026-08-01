@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import {
   upsertTranslationAction,
   type TranslationActionState,
@@ -16,7 +16,7 @@ export function TranslationsAdmin({
 }: {
   rows: Array<{ key: string; en: string; pa: string | null }>;
 }) {
-  const [state, action, pending] = useActionState(
+  const [state, action, pending] = useSafeFormAction(
     upsertTranslationAction,
     initial,
   );

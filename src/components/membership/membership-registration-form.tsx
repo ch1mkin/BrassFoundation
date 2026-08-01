@@ -19,12 +19,12 @@ import {
 } from "@/lib/membership/register-action";
 import { SITE } from "@/lib/constants";
 import { REGISTRATION_FEE_PAISE } from "@/lib/payments/constants";
-import { useActionState } from "react";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 
 const initial: RegisterMembershipState = {};
 
 export function MembershipRegistrationForm() {
-  const [state, action, pending] = useActionState(
+  const [state, action, pending] = useSafeFormAction(
     registerMembershipAction,
     initial,
   );

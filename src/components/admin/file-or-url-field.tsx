@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,19 +25,24 @@ export function FileOrUrlField({
 }) {
   const [url, setUrl] = useState(defaultUrl || "");
   const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
 
-  function onFile(file: File | null) {
+  async function onFile(file: File | null) {
     if (!file) return;
     setError(null);
-    startTransition(async () => {
+    setPending(true);
+    try {
       const result = await uploadFileClient(bucket, file, folder);
       if (!result.ok) {
         setError(result.error);
         return;
       }
       setUrl(result.url);
-    });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
@@ -54,9 +59,10 @@ export function FileOrUrlField({
         <input
           type="file"
           accept={accept}
+          disabled={pending}
           className="max-w-full text-xs"
           onChange={(e) => {
-            onFile(e.target.files?.[0] || null);
+            void onFile(e.target.files?.[0] || null);
             e.target.value = "";
           }}
         />

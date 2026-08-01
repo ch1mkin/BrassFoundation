@@ -1,10 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { useLocale } from "@/components/i18n/locale-provider";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { subscribeNewsletterAction } from "@/lib/content/actions";
 import type { ContentActionState } from "@/lib/content/utils";
 
@@ -12,7 +12,7 @@ const initial: ContentActionState = {};
 
 export function NewsletterForm() {
   const { t } = useLocale();
-  const [state, action, pending] = useActionState(
+  const [state, action, pending] = useSafeFormAction(
     subscribeNewsletterAction,
     initial,
   );

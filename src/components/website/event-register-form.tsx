@@ -1,10 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { registerForEventAction } from "@/lib/content/actions";
 import type { ContentActionState } from "@/lib/content/utils";
 
@@ -23,7 +23,7 @@ export function EventRegisterForm({
   defaultName?: string;
   defaultEmail?: string;
 }) {
-  const [state, action, pending] = useActionState(
+  const [state, action, pending] = useSafeFormAction(
     registerForEventAction,
     initial,
   );

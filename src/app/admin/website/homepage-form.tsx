@@ -1,11 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { StatsEditor } from "@/components/admin/stats-editor";
 import { FormLock } from "@/components/ui/form-lock";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import {
   updateHomepageAction,
   type CmsActionState,
@@ -47,10 +49,15 @@ function Field({
 }
 
 export function HomepageCmsForm({ content }: { content: HomepageContent }) {
-  const [state, action, pending] = useActionState(
+  const router = useRouter();
+  const [state, action, pending] = useSafeFormAction(
     updateHomepageAction,
     initial,
   );
+
+  useEffect(() => {
+    if (state.success) router.refresh();
+  }, [state.success, router]);
 
   return (
     <form action={action} className="mx-auto max-w-3xl space-y-8">

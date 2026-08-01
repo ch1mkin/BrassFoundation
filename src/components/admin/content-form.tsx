@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import type { ContentActionState } from "@/lib/content/utils";
 
 type Field = {
@@ -31,7 +31,7 @@ export function AdminContentForm({
   submitLabel?: string;
   hidden?: Record<string, string>;
 }) {
-  const [state, formAction, pending] = useActionState(action, {});
+  const [state, formAction, pending] = useSafeFormAction(action, {});
 
   return (
     <form

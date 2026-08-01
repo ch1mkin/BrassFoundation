@@ -3,8 +3,8 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Disables all form controls while a server action is pending
- * to prevent duplicate submissions.
+ * Soft-locks form UI while saving without using fieldset disabled,
+ * which can interrupt server actions and leave buttons stuck on "Saving…".
  */
 export function FormLock({
   pending,
@@ -16,16 +16,16 @@ export function FormLock({
   className?: string;
 }) {
   return (
-    <fieldset
-      disabled={pending}
+    <div
       aria-busy={pending}
+      data-pending={pending ? "true" : "false"}
       className={cn(
-        "min-w-0 border-0 p-0 disabled:pointer-events-none",
-        pending && "opacity-70",
+        "min-w-0",
+        pending && "pointer-events-none opacity-70",
         className,
       )}
     >
       {children}
-    </fieldset>
+    </div>
   );
 }

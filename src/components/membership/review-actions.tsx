@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import {
   approveMembershipAction,
   rejectMembershipAction,
@@ -18,11 +18,11 @@ export function MembershipReviewActions({
   applicationId: string;
   status: string;
 }) {
-  const [approveState, approve, approvePending] = useActionState(
+  const [approveState, approve, approvePending] = useSafeFormAction(
     approveMembershipAction,
     initial,
   );
-  const [rejectState, reject, rejectPending] = useActionState(
+  const [rejectState, reject, rejectPending] = useSafeFormAction(
     rejectMembershipAction,
     initial,
   );

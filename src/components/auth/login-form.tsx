@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useActionState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import {
   signInAction,
   type AuthActionState,
@@ -26,13 +27,12 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const next = safeNext(searchParams.get("next"));
   const urlError = searchParams.get("error");
-  const [state, formAction, pending] = useActionState(signInAction, initial);
+  const [state, formAction, pending] = useSafeFormAction(signInAction, initial);
   const navigated = useRef(false);
 
   useEffect(() => {
     if (!state.redirectTo || navigated.current) return;
     navigated.current = true;
-    // Full reload so middleware sees the session cookies from the server action.
     window.location.assign(state.redirectTo);
   }, [state.redirectTo]);
 
