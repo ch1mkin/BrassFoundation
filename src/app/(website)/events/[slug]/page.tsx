@@ -52,6 +52,8 @@ export default async function EventDetailPage({ params }: Props) {
         {canRegister ? (
           <EventRegisterForm
             eventId={event.id}
+            eventSlug={event.slug}
+            isLoggedIn={Boolean(context)}
             defaultName={context?.profile?.full_name || undefined}
             defaultEmail={context?.email || undefined}
           />

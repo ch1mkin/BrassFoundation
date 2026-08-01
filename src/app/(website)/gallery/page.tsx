@@ -1,43 +1,49 @@
 import type { Metadata } from "next";
+import { PublicGallery } from "@/components/website/public-gallery";
 import { PageShell } from "@/components/website/page-shell";
-import { getFeaturedGallery } from "@/lib/content/queries";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Gallery" };
 
 export default async function GalleryPage() {
-  const media = await getFeaturedGallery(24);
+  const supabase = await createClient();
+  const { data: albums } = await supabase
+    .from("gallery_albums")
+    .select("id, heading, title, description, display_mode")
+    .eq("is_published", true)
+    .order("sort_order", { ascending: true });
+
+  const { data: media } = await supabase
+    .from("gallery_media")
+    .select(
+      "id, album_id, media_url, title, caption, display_target, sort_order",
+    )
+    .eq("is_published", true)
+    .order("sort_order", { ascending: true });
 
   return (
     <PageShell
       eyebrow="Gallery"
       title="Moments of Impact"
-      description="Community programs, camps, and celebrations — add images from the admin gallery."
+      description="Event albums organized exactly as configured by the foundation team."
       wide
     >
-      {media.length === 0 ? (
+      {!albums?.length ? (
         <div className="glass-card rounded-2xl p-10 text-center text-muted-foreground">
-          No gallery images yet. Add media URLs from{" "}
-          <span className="font-medium text-foreground">Admin → Gallery</span>{" "}
-          after running the website content migration.
+          No gallery albums yet. Admins can create headings and upload images
+          from Admin → Gallery.
         </div>
       ) : (
-        <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
-          {media.map((item) => (
-            <figure key={item.id} className="mb-6 break-inside-avoid">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.media_url}
-                alt={item.title || item.caption || "Gallery image"}
-                className="w-full rounded-2xl object-cover"
-              />
-              {item.caption || item.title ? (
-                <figcaption className="mt-2 text-sm text-muted-foreground">
-                  {item.caption || item.title}
-                </figcaption>
-              ) : null}
-            </figure>
-          ))}
-        </div>
+        <PublicGallery
+          albums={albums.map((a) => ({
+            ...a,
+            display_mode: a.display_mode || "grid",
+          }))}
+          media={(media || []).map((m) => ({
+            ...m,
+            display_target: m.display_target || "grid",
+          }))}
+        />
       )}
     </PageShell>
   );

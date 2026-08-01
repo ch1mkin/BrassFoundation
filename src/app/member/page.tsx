@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand/logo";
+import { MembershipQr } from "@/components/membership/membership-qr";
 import { buttonVariants } from "@/components/ui/button";
 import { getUserContext } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -111,12 +111,9 @@ export default async function MemberDashboardPage() {
             </div>
             {isApproved && application?.membership_id ? (
               <div className="rounded-xl bg-white p-2">
-                <Image
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=96x96&data=${encodeURIComponent(application.membership_id)}`}
-                  alt="Membership QR"
-                  width={96}
-                  height={96}
-                  unoptimized
+                <MembershipQr
+                  membershipId={application.membership_id}
+                  size={112}
                 />
               </div>
             ) : null}

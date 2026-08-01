@@ -17,6 +17,7 @@ const NAV = [
   { label: "Community Work", href: "/admin/community", icon: "diversity_3" },
   { label: "Marketplace", href: "/admin/marketplace", icon: "storefront" },
   { label: "Gallery", href: "/admin/gallery", icon: "photo_library" },
+  { label: "Family Tree", href: "/admin/family", icon: "account_tree" },
   { label: "Users", href: "/admin", icon: "manage_accounts" },
   { label: "Roles", href: "/admin", icon: "admin_panel_settings" },
   { label: "Analytics", href: "/admin", icon: "analytics" },

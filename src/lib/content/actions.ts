@@ -31,15 +31,23 @@ export async function registerForEventAction(
   _prev: ContentActionState,
   formData: FormData,
 ): Promise<ContentActionState> {
-  const eventId = String(formData.get("event_id") || "");
-  const fullName = String(formData.get("full_name") || "").trim();
-  const email = String(formData.get("email") || "")
-    .trim()
-    .toLowerCase();
-  const phone = String(formData.get("phone") || "").trim() || null;
+  const context = await getUserContext();
+  if (!context) {
+    return { error: "Please sign in to register for this event." };
+  }
 
-  if (!eventId || !fullName || !email) {
-    return { error: "Name and email are required." };
+  const eventId = String(formData.get("event_id") || "");
+  const phone = String(formData.get("phone") || "").trim() || null;
+  const notes = String(formData.get("notes") || "").trim() || null;
+  const fullName =
+    String(formData.get("full_name") || "").trim() ||
+    context.profile?.full_name ||
+    context.email ||
+    "Member";
+  const email = (context.email || "").toLowerCase();
+
+  if (!eventId || !email) {
+    return { error: "Your account email is required to register." };
   }
 
   const supabase = await createClient();
@@ -61,13 +69,13 @@ export async function registerForEventAction(
     return { error: "Registration is closed for this event." };
   }
 
-  const context = await getUserContext();
   const { error } = await supabase.from("event_registrations").insert({
     event_id: event.id,
-    user_id: context?.userId ?? null,
+    user_id: context.userId,
     full_name: fullName,
     email,
     phone,
+    notes,
   });
 
   if (error) {
@@ -92,6 +100,7 @@ export async function registerForEventAction(
 
   revalidatePath(`/events/${event.slug}`);
   revalidatePath("/events");
+  revalidatePath("/admin/events");
   return { success: "You are registered. Check your email for confirmation." };
 }
 
@@ -409,6 +418,9 @@ export async function upsertMarketplaceAction(
     review_count: Number(formData.get("review_count") || 0),
     cover_image_url:
       String(formData.get("cover_image_url") || "").trim() || null,
+    file_url: String(formData.get("file_url") || "").trim() || null,
+    file_size_label:
+      String(formData.get("file_size_label") || "").trim() || null,
     buy_url: String(formData.get("buy_url") || "").trim() || null,
     is_published: boolFromForm(formData, "is_published"),
     is_featured: boolFromForm(formData, "is_featured"),
