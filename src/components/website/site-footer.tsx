@@ -106,7 +106,7 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h4 className="mb-4 text-xs font-semibold tracking-wide text-brand uppercase">
+          <h4 className="notranslate mb-4 text-xs font-semibold tracking-wide text-brand uppercase">
             {t("footer.contactUs")}
           </h4>
           <p className="mb-4 text-xs font-semibold text-white/70">India</p>
