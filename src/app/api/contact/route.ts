@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { sendEmail } from "@/lib/email/smtp";
+import { isSmtpConfigured, sendEmail } from "@/lib/email/smtp";
 
 const schema = z.object({
   name: z.string().min(1).max(120),
@@ -20,17 +20,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, email, message } = parsed.data;
-    const inbox = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER;
-
-    if (!inbox) {
+    if (!isSmtpConfigured()) {
       return NextResponse.json(
-        { error: "Email inbox is not configured." },
-        { status: 500 },
+        {
+          ok: false,
+          skipped: true,
+          message: "Email is not configured yet. Your message was not sent.",
+        },
+        { status: 503 },
       );
     }
 
-    await sendEmail({
+    const { name, email, message } = parsed.data;
+    const inbox = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER!;
+
+    const result = await sendEmail({
       to: inbox,
       replyTo: email,
       subject: `Contact form — ${name}`,
@@ -40,7 +44,7 @@ export async function POST(request: Request) {
       `,
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: result.sent, ...result });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to send email.";

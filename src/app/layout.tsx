@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Inter, Poppins } from "next/font/google";
+import { Cormorant_Garamond, Fraunces, Source_Sans_3 } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-const poppins = Poppins({
+const fraunces = Fraunces({
   variable: "--font-heading",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const inter = Inter({
+const sourceSans = Source_Sans_3({
   variable: "--font-body",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -49,7 +50,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${poppins.variable} ${inter.variable} ${cormorant.variable} antialiased`}
+        className={`${fraunces.variable} ${sourceSans.variable} ${cormorant.variable} antialiased`}
       >
         <Providers>{children}</Providers>
       </body>

@@ -5,22 +5,20 @@ import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
 
 const NAV = [
-  "Overview",
-  "Members",
-  "Users",
-  "Roles",
-  "Website CMS",
-  "Gallery",
-  "Marketplace",
-  "Resources",
-  "Events",
-  "Community Work",
-  "News",
-  "Messages",
-  "Membership Requests",
-  "Analytics",
-  "Audit Logs",
-  "Settings",
+  { label: "Overview", href: "/admin" },
+  { label: "Website CMS", href: "/admin/website" },
+  { label: "Members", href: "/admin" },
+  { label: "Users", href: "/admin" },
+  { label: "Roles", href: "/admin" },
+  { label: "Gallery", href: "/admin" },
+  { label: "Marketplace", href: "/admin" },
+  { label: "Resources", href: "/admin" },
+  { label: "Events", href: "/admin" },
+  { label: "Community Work", href: "/admin" },
+  { label: "News", href: "/admin" },
+  { label: "Analytics", href: "/admin" },
+  { label: "Audit Logs", href: "/admin" },
+  { label: "Settings", href: "/admin" },
 ] as const;
 
 export default async function AdminLayout({
@@ -56,12 +54,13 @@ export default async function AdminLayout({
         </p>
         <nav className="mt-8 space-y-1">
           {NAV.map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl px-3 py-2 text-sm text-muted-foreground"
+            <Link
+              key={item.label}
+              href={item.href}
+              className="block rounded-2xl px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
-              {item}
-            </div>
+              {item.label}
+            </Link>
           ))}
         </nav>
         <form action={signOutAction} className="mt-8">

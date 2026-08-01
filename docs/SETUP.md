@@ -30,11 +30,12 @@ This way all email leaves through your Hostinger mailbox.
 
 ## 2. Database
 
-1. Create a Supabase project
-2. Open **SQL Editor**
-3. Paste and run `supabase/migrations/20260801000000_core_rbac.sql`
+1. Open Supabase → **SQL Editor**
+2. Run these files in order:
+   - `supabase/migrations/20260801000000_core_rbac.sql`
+   - `supabase/migrations/20260801010000_homepage_cms.sql`
 
-This creates profiles, dynamic roles/permissions, audit logs, RLS, and seeds system roles.
+This creates profiles, dynamic roles/permissions, audit logs, RLS, and the homepage CMS.
 
 ## 3. Auth settings (Supabase Dashboard)
 

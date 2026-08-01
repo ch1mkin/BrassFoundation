@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
-import { COMMUNITY_WORK, CORE_VALUES, STATS } from "@/lib/constants";
+import type { HomepageContent } from "@/lib/cms/homepage";
 import { cn } from "@/lib/utils";
 
 function AnimatedCounter({
@@ -41,25 +41,33 @@ function AnimatedCounter({
   );
 }
 
-export function AboutSection() {
+export function AboutSection({
+  eyebrow,
+  headline,
+  body,
+  values,
+}: {
+  eyebrow: string;
+  headline: string;
+  body: string;
+  values: HomepageContent["core_values"];
+}) {
   return (
     <section className="mx-auto max-w-6xl px-6 py-24 lg:px-8">
       <div className="max-w-2xl">
-        <p className="font-heading text-sm font-medium tracking-[0.18em] text-primary uppercase">
-          Who We Are
+        <p className="font-heading text-sm font-medium tracking-[0.18em] text-brand uppercase">
+          {eyebrow}
         </p>
-        <h2 className="mt-3 font-heading text-3xl font-semibold text-foreground sm:text-4xl">
-          Building a platform for dignity, learning, and collective progress.
+        <h2 className="mt-3 font-heading text-3xl font-medium text-foreground sm:text-4xl">
+          {headline}
         </h2>
         <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Brass Foundation exists to advance Ambedkarite values through
-          education, community service, and leadership development — with
-          professionalism that matches our purpose.
+          {body}
         </p>
       </div>
 
       <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-        {CORE_VALUES.map((value, i) => (
+        {values.map((value, i) => (
           <motion.div
             key={value.title}
             initial={{ opacity: 0, y: 20 }}
@@ -67,7 +75,7 @@ export function AboutSection() {
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.5, delay: i * 0.08 }}
           >
-            <p className="font-heading text-lg font-semibold text-secondary">
+            <p className="font-heading text-lg font-medium text-primary">
               {value.title}
             </p>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -80,10 +88,7 @@ export function AboutSection() {
       <div className="mt-10">
         <Link
           href="/about"
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "rounded-2xl",
-          )}
+          className={cn(buttonVariants({ variant: "outline" }), "rounded-2xl")}
         >
           Read More
         </Link>
@@ -92,13 +97,17 @@ export function AboutSection() {
   );
 }
 
-export function StatsSection() {
+export function StatsSection({
+  stats,
+}: {
+  stats: HomepageContent["stats"];
+}) {
   return (
     <section className="bg-secondary py-20 text-secondary-foreground">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-6 sm:grid-cols-3 lg:grid-cols-6 lg:px-8">
-        {STATS.map((stat) => (
+        {stats.map((stat) => (
           <div key={stat.label} className="text-center">
-            <p className="font-heading text-3xl font-semibold text-brand sm:text-4xl">
+            <p className="font-heading text-3xl font-medium text-brand sm:text-4xl">
               <AnimatedCounter value={stat.value} suffix={stat.suffix} />
             </p>
             <p className="mt-2 text-xs tracking-wide text-white/65 uppercase">
@@ -111,14 +120,18 @@ export function StatsSection() {
   );
 }
 
-export function CommunitySection() {
+export function CommunitySection({
+  items,
+}: {
+  items: HomepageContent["community_work"];
+}) {
   return (
     <section className="mx-auto max-w-6xl px-6 py-24 lg:px-8">
       <div className="max-w-2xl">
-        <p className="font-heading text-sm font-medium tracking-[0.18em] text-primary uppercase">
+        <p className="font-heading text-sm font-medium tracking-[0.18em] text-brand uppercase">
           Community Work
         </p>
-        <h2 className="mt-3 font-heading text-3xl font-semibold sm:text-4xl">
+        <h2 className="mt-3 font-heading text-3xl font-medium sm:text-4xl">
           Service that strengthens society.
         </h2>
         <p className="mt-4 text-muted-foreground">
@@ -128,7 +141,7 @@ export function CommunitySection() {
       </div>
 
       <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {COMMUNITY_WORK.map((item, i) => (
+        {items.map((item, i) => (
           <motion.div
             key={item.slug}
             initial={{ opacity: 0, y: 16 }}
@@ -147,17 +160,20 @@ export function CommunitySection() {
   );
 }
 
-export function MembershipCta() {
+export function MembershipCta({
+  headline,
+  body,
+}: {
+  headline: string;
+  body: string;
+}) {
   return (
     <section className="mx-auto max-w-6xl px-6 pb-24 lg:px-8">
       <div className="rounded-2xl bg-primary px-8 py-14 text-primary-foreground sm:px-12">
-        <h2 className="font-heading max-w-xl text-3xl font-semibold sm:text-4xl">
-          Join Brass Foundation.
+        <h2 className="font-heading max-w-xl text-3xl font-medium sm:text-4xl">
+          {headline}
         </h2>
-        <p className="mt-4 max-w-lg text-primary-foreground/85">
-          Register online, receive your digital membership card, and take part
-          in programs that advance education and equality.
-        </p>
+        <p className="mt-4 max-w-lg text-primary-foreground/85">{body}</p>
         <Link
           href="/membership"
           className={cn(

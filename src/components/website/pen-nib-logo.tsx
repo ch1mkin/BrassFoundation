@@ -36,7 +36,7 @@ export function PenNibLogo({ className }: { className?: string }) {
         cx="32"
         cy="18"
         r="2.5"
-        fill="#F2B233"
+        fill="#C4A35A"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.4, delay: 0.9 }}

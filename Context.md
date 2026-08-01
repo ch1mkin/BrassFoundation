@@ -94,22 +94,22 @@ Brass Foundation OMS
 
 | Token | Value |
 |-------|-------|
-| Primary Color | `#11B5C9` |
-| Secondary | `#114C88` |
-| Accent Gold | `#F2B233` |
-| Background | `#F7FBFC` |
-| Dark Background | `#0E1F2F` |
-| Text | `#1B1B1B` |
-| Secondary Text | `#6B7280` |
-| Success | `#16A34A` |
-| Error | `#DC2626` |
+| Primary (Ink) | `#163A5F` |
+| Brand Teal | `#1F6F78` |
+| Secondary / Dark | `#0B1C28` |
+| Accent Brass | `#C4A35A` |
+| Background | `#F4F6F8` |
+| Text | `#14181F` |
+| Secondary Text | `#5C6670` |
+| Success | `#1F7A4D` |
+| Error | `#B42318` |
 
 ## Typography
 
 | Role | Font |
 |------|------|
-| Heading | Poppins |
-| Body | Inter |
+| Heading | Fraunces |
+| Body | Source Sans 3 |
 | Quotes | Cormorant Garamond |
 
 ## Theme
