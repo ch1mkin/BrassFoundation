@@ -46,6 +46,7 @@ export default async function AdminLayout({
       <PortalSidebar
         title="Admin Portal"
         subtitle={`${context.email || ""} · ${context.roles.map((r) => r.name).join(", ") || "No roles"}`}
+        avatarUrl={context.profile?.avatar_url}
         nav={NAV}
         signOutAction={signOutAction}
         storageKey="bf-admin-sidebar-collapsed"

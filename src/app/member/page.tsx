@@ -78,20 +78,30 @@ export default async function MemberDashboardPage() {
             aria-hidden
           />
           <div className="relative z-10 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs tracking-[0.18em] text-white/55 uppercase">
-                Brass Foundation
-              </p>
-              <p className="font-heading mt-3 text-2xl font-semibold">
-                {displayName}
-              </p>
-              <p className="mt-1 text-sm text-white/70">
-                {isApproved
-                  ? membershipTypeLabels[
-                      application!.membership_type as keyof typeof membershipTypeLabels
-                    ] ?? application!.membership_type
-                  : "Membership pending"}
-              </p>
+            <div className="flex min-w-0 items-start gap-3">
+              {context?.profile?.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={context.profile.avatar_url}
+                  alt=""
+                  className="size-14 shrink-0 rounded-full object-cover ring-2 ring-white/30"
+                />
+              ) : null}
+              <div className="min-w-0">
+                <p className="text-xs tracking-[0.18em] text-white/55 uppercase">
+                  Brass Foundation
+                </p>
+                <p className="font-heading mt-3 text-2xl font-semibold">
+                  {displayName}
+                </p>
+                <p className="mt-1 text-sm text-white/70">
+                  {isApproved
+                    ? membershipTypeLabels[
+                        application!.membership_type as keyof typeof membershipTypeLabels
+                      ] ?? application!.membership_type
+                    : "Membership pending"}
+                </p>
+              </div>
             </div>
             <BrandLogo size="sm" href={null} />
           </div>

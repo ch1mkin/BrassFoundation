@@ -12,6 +12,7 @@ export default async function WebsiteLayout({
     ? {
         email: context.email,
         fullName: context.profile?.full_name ?? null,
+        avatarUrl: context.profile?.avatar_url ?? null,
         isAdmin: canAccessAdmin(context),
       }
     : null;

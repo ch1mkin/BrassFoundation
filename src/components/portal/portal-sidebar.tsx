@@ -16,12 +16,14 @@ type NavItem = {
 export function PortalSidebar({
   title,
   subtitle,
+  avatarUrl,
   nav,
   signOutAction,
   storageKey,
 }: {
   title: string;
   subtitle?: string | null;
+  avatarUrl?: string | null;
   nav: readonly NavItem[];
   signOutAction: (formData: FormData) => void | Promise<void>;
   storageKey: string;
@@ -75,12 +77,33 @@ export function PortalSidebar({
               <p className="mt-3 text-xs font-semibold tracking-wide text-primary uppercase">
                 {title}
               </p>
-              {subtitle ? (
-                <p className="mt-2 truncate text-xs text-muted-foreground">
-                  {subtitle}
-                </p>
+              {(subtitle || avatarUrl) ? (
+                <div className="mt-2 flex min-w-0 items-center gap-2">
+                  {avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={avatarUrl}
+                      alt=""
+                      className="size-7 shrink-0 rounded-full object-cover bg-surface-low"
+                    />
+                  ) : null}
+                  {subtitle ? (
+                    <p className="truncate text-xs text-muted-foreground">
+                      {subtitle}
+                    </p>
+                  ) : null}
+                </div>
               ) : null}
             </>
+          ) : avatarUrl ? (
+            <div className="mt-3 flex justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={avatarUrl}
+                alt=""
+                className="size-8 rounded-full object-cover bg-surface-low"
+              />
+            </div>
           ) : null}
         </div>
         <button

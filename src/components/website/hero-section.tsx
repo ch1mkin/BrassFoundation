@@ -29,7 +29,6 @@ type HeroSectionProps = {
   subheadlinePa?: string | null;
   primaryLabelPa?: string | null;
   secondaryLabelPa?: string | null;
-  floatingStats?: Array<{ label: string; value: number; suffix?: string }>;
 };
 
 export function HeroSection({
@@ -45,7 +44,6 @@ export function HeroSection({
   subheadlinePa,
   primaryLabelPa,
   secondaryLabelPa,
-  floatingStats,
 }: HeroSectionProps) {
   const { locale } = useLocale();
   const displayHeadline =
@@ -59,15 +57,11 @@ export function HeroSection({
       ? secondaryLabelPa
       : secondaryLabel;
   const lines = displayHeadline.split("\n").filter(Boolean);
-  const left = floatingStats?.[0];
-  const right = floatingStats?.[1];
   const desktopBg = backgroundUrl?.trim() || null;
-  const mobileBg =
-    backgroundMobileUrl?.trim() || desktopBg;
+  const mobileBg = backgroundMobileUrl?.trim() || desktopBg;
   const hasBg = Boolean(desktopBg || mobileBg);
   const adminPa = Boolean(
-    locale === "pa" &&
-      (headlinePa?.trim() || subheadlinePa?.trim()),
+    locale === "pa" && (headlinePa?.trim() || subheadlinePa?.trim()),
   );
 
   return (
@@ -106,45 +100,20 @@ export function HeroSection({
 
       <div className="relative z-10 mx-auto max-w-[1280px] px-4 py-16 text-center sm:px-6 lg:px-20">
         <div className="mb-10 flex justify-center sm:mb-12">
-          <div className="relative">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.55 }}
-            >
-              <Image
-                src="/brand/logo.png"
-                alt="Brass Foundation"
-                width={192}
-                height={192}
-                priority
-                className="h-36 w-36 rounded-full bg-white/95 object-contain p-2 drop-shadow-2xl sm:h-48 sm:w-48"
-              />
-            </motion.div>
-
-            {left ? (
-              <div className="glass-card absolute -top-8 -left-16 hidden rounded-xl p-3 sm:block">
-                <span className="font-heading block text-xl font-semibold text-primary">
-                  {left.value.toLocaleString()}
-                  {left.suffix || ""}
-                </span>
-                <span className="text-xs font-semibold text-muted-foreground">
-                  {left.label}
-                </span>
-              </div>
-            ) : null}
-            {right ? (
-              <div className="glass-card absolute top-16 -right-20 hidden rounded-xl p-3 sm:block">
-                <span className="font-heading block text-xl font-semibold text-secondary">
-                  {right.value.toLocaleString()}
-                  {right.suffix || ""}
-                </span>
-                <span className="text-xs font-semibold text-muted-foreground">
-                  {right.label}
-                </span>
-              </div>
-            ) : null}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.55 }}
+          >
+            <Image
+              src="/brand/logo.png"
+              alt="Brass Foundation"
+              width={192}
+              height={192}
+              priority
+              className="h-36 w-36 object-contain drop-shadow-2xl sm:h-48 sm:w-48"
+            />
+          </motion.div>
         </div>
 
         <motion.h1

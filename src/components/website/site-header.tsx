@@ -34,6 +34,7 @@ function NavLink({
 export type HeaderUser = {
   email: string | null;
   fullName: string | null;
+  avatarUrl: string | null;
   isAdmin: boolean;
 };
 
@@ -193,12 +194,21 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
             <div className="relative">
               <details className="group">
                 <summary
-                  className="flex size-10 cursor-pointer list-none items-center justify-center rounded-full bg-brand text-[#004149] outline-none transition hover:bg-brand/90 [&::-webkit-details-marker]:hidden"
+                  className="flex size-10 cursor-pointer list-none items-center justify-center overflow-hidden rounded-full bg-brand text-[#004149] outline-none transition hover:bg-brand/90 [&::-webkit-details-marker]:hidden"
                   aria-label="Open profile menu"
                 >
-                  <span className="font-heading text-sm font-semibold">
-                    {initials}
-                  </span>
+                  {user.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={user.avatarUrl}
+                      alt=""
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <span className="font-heading text-sm font-semibold">
+                      {initials}
+                    </span>
+                  )}
                 </summary>
                 <div className="absolute top-full right-0 z-[210] mt-2 min-w-52 rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-soft">
                   <div className="px-2 py-2">
@@ -319,10 +329,19 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
             <div className="mt-4 border-t border-white/15 pt-4">
               {user ? (
                 <>
-                  <div className="mb-3 flex items-center gap-3 px-2">
-                    <span className="flex size-9 items-center justify-center rounded-full bg-brand text-[#004149]">
-                      <UserRound className="size-4" />
-                    </span>
+                    <div className="mb-3 flex items-center gap-3 px-2">
+                      <span className="flex size-9 items-center justify-center overflow-hidden rounded-full bg-brand text-[#004149]">
+                        {user.avatarUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={user.avatarUrl}
+                            alt=""
+                            className="size-full object-cover"
+                          />
+                        ) : (
+                          <UserRound className="size-4" />
+                        )}
+                      </span>
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-white">
                         {user.fullName || "Member"}

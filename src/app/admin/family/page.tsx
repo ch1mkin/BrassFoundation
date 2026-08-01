@@ -11,12 +11,31 @@ export const metadata: Metadata = { title: "Admin · Family" };
 
 export default async function AdminFamilyPage() {
   const supabase = await createClient();
-  const { data: nodes, error } = await supabase
+  const { data: rawNodes, error } = await supabase
     .from("org_nodes")
     .select(
-      "id, parent_id, full_name, role_title, avatar_url, sort_order, is_active",
+      "id, parent_id, full_name, role_title, avatar_url, sort_order, is_active, profile_id, profiles ( avatar_url )",
     )
     .order("sort_order", { ascending: true });
+
+  const nodes = (rawNodes || []).map((node) => {
+    const linked = node.profiles as
+      | { avatar_url: string | null }
+      | { avatar_url: string | null }[]
+      | null;
+    const profileAvatar = Array.isArray(linked)
+      ? linked[0]?.avatar_url
+      : linked?.avatar_url;
+    return {
+      id: node.id,
+      parent_id: node.parent_id,
+      full_name: node.full_name,
+      role_title: node.role_title,
+      avatar_url: profileAvatar || node.avatar_url,
+      sort_order: node.sort_order,
+      is_active: node.is_active,
+    };
+  });
 
   const { count } = await supabase
     .from("membership_applications")

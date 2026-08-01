@@ -24,7 +24,6 @@ export default async function HomePage() {
         primaryHref={content.hero_cta_primary_href}
         secondaryLabel={content.hero_cta_secondary_label}
         secondaryHref={content.hero_cta_secondary_href}
-        floatingStats={content.stats.slice(0, 2)}
         backgroundUrl={content.hero_background_url}
         backgroundMobileUrl={content.hero_background_mobile_url}
         headlinePa={content.hero_headline_pa}

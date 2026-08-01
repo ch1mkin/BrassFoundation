@@ -7,6 +7,7 @@ import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/auth/password-input";
 import { SignaturePad } from "@/components/membership/signature-pad";
+import { SelfieField } from "@/components/membership/selfie-field";
 import { openRazorpayCheckout } from "@/components/membership/razorpay-checkout";
 import { ContributionSection } from "@/components/membership/contribution-section";
 import {
@@ -245,6 +246,9 @@ export function MembershipRegistrationForm() {
               </span>
               <PasswordInput name="confirm_password" required minLength={8} />
             </label>
+            <div className="sm:col-span-2">
+              <SelfieField required />
+            </div>
           </div>
         </section>
 

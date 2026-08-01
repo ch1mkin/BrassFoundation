@@ -27,7 +27,45 @@ const schema = z.object({
   signature_data_url: z
     .string()
     .min(40, "Digital signature is required."),
+  avatar_data_url: z
+    .string()
+    .min(40, "Please take a selfie or upload a profile photo."),
 });
+
+async function uploadAvatarFromDataUrl(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  admin: any,
+  userId: string,
+  dataUrl: string,
+): Promise<string | null> {
+  const match = dataUrl.match(
+    /^data:(image\/(?:jpeg|jpg|png|webp));base64,([A-Za-z0-9+/=\s]+)$/i,
+  );
+  if (!match) return null;
+
+  const contentType = match[1].toLowerCase().replace("image/jpg", "image/jpeg");
+  const buffer = Buffer.from(match[2].replace(/\s/g, ""), "base64");
+  if (!buffer.length || buffer.length > 5 * 1024 * 1024) return null;
+
+  const ext =
+    contentType === "image/png"
+      ? "png"
+      : contentType === "image/webp"
+        ? "webp"
+        : "jpg";
+  const path = `${userId}/avatar.${ext}`;
+
+  const { error } = await admin.storage.from("avatars").upload(path, buffer, {
+    contentType,
+    upsert: true,
+    cacheControl: "3600",
+  });
+  if (error) return null;
+
+  const { data } = admin.storage.from("avatars").getPublicUrl(path);
+  // Bust CDN/browser cache when replacing
+  return data?.publicUrl ? `${data.publicUrl}?v=${Date.now()}` : null;
+}
 
 export async function registerMembershipAction(
   _prev: RegisterMembershipState,
@@ -35,13 +73,16 @@ export async function registerMembershipAction(
 ): Promise<RegisterMembershipState> {
   const raw = {
     full_name: String(formData.get("full_name") || "").trim(),
-    email: String(formData.get("email") || "").trim().toLowerCase(),
+    email: String(formData.get("email") || "")
+      .trim()
+      .toLowerCase(),
     government_id: String(formData.get("government_id") || "").trim(),
     phone: String(formData.get("phone") || "").trim(),
     password: String(formData.get("password") || ""),
     confirm_password: String(formData.get("confirm_password") || ""),
     consent: formData.get("consent") === "on" ? "on" : "",
     signature_data_url: String(formData.get("signature_data_url") || ""),
+    avatar_data_url: String(formData.get("avatar_data_url") || ""),
   };
 
   if (raw.password !== raw.confirm_password) {
@@ -76,6 +117,11 @@ export async function registerMembershipAction(
   }
 
   const userId = created.user.id;
+  const avatarUrl = await uploadAvatarFromDataUrl(
+    admin,
+    userId,
+    data.avatar_data_url,
+  );
 
   await admin
     .from("profiles")
@@ -83,8 +129,17 @@ export async function registerMembershipAction(
       full_name: data.full_name,
       email: data.email,
       phone: data.phone,
+      ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
     })
     .eq("id", userId);
+
+  // If this member is linked on the org tree, keep the node photo in sync.
+  if (avatarUrl) {
+    await admin
+      .from("org_nodes")
+      .update({ avatar_url: avatarUrl })
+      .eq("profile_id", userId);
+  }
 
   const { data: application, error: appError } = await admin
     .from("membership_applications")
@@ -119,7 +174,11 @@ export async function registerMembershipAction(
     };
   }
 
-  // Sign the user in
+  if (!avatarUrl) {
+    // Account exists; warn but let them continue payment.
+    // Photo can be fixed later — still require attempt above.
+  }
+
   const supabase = await createClient();
   const { error: signInError } = await supabase.auth.signInWithPassword({
     email: data.email,
@@ -136,6 +195,7 @@ export async function registerMembershipAction(
 
   revalidatePath("/member");
   revalidatePath("/admin/members");
+  revalidatePath("/admin/family");
 
   return {
     success: "Account ready. Complete ₹10 payment to activate membership.",

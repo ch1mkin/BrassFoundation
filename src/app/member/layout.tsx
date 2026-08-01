@@ -30,6 +30,7 @@ export default async function MemberLayout({
       <PortalSidebar
         title="Member Portal"
         subtitle={context.profile?.full_name || context.email}
+        avatarUrl={context.profile?.avatar_url}
         nav={NAV}
         signOutAction={signOutAction}
         storageKey="bf-member-sidebar-collapsed"
