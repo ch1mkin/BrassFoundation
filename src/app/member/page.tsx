@@ -140,7 +140,7 @@ export default async function MemberDashboardPage() {
                 You have not submitted a membership application yet.
               </p>
               <a
-                href="/membership#register"
+                href="/membership"
                 className={cn(
                   buttonVariants(),
                   "mt-6 inline-flex rounded-xl bg-primary shadow-lg shadow-primary/20",
@@ -162,7 +162,7 @@ export default async function MemberDashboardPage() {
                 with updated details.
               </p>
               <a
-                href="/membership#register"
+                href="/membership"
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "mt-6 inline-flex rounded-2xl",

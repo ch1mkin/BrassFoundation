@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { BrandLogo } from "@/components/brand/logo";
 import { MembershipRegistrationForm } from "@/components/membership/membership-registration-form";
+import { MembershipPayStep } from "@/components/membership/membership-pay-step";
 import { ContributionSection } from "@/components/membership/contribution-section";
 import { SITE } from "@/lib/constants";
 import { getSessionUser } from "@/lib/auth/session";
@@ -13,26 +14,45 @@ export const metadata: Metadata = {
 export default async function MembershipPage() {
   const user = await getSessionUser();
   let alreadyMember = false;
-  let profile: { full_name: string | null; email: string | null; phone?: string | null } | null =
-    null;
+  let pendingApplicationId: string | null = null;
+  let profile: {
+    full_name: string | null;
+    email: string | null;
+    phone?: string | null;
+  } | null = null;
 
   if (user) {
     const supabase = await createClient();
     const { data: app } = await supabase
       .from("membership_applications")
-      .select("status, payment_status, membership_id")
+      .select("id, status, payment_status, membership_id, full_name, email, phone")
       .eq("user_id", user.id)
-      .eq("status", "approved")
-      .eq("payment_status", "paid")
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
-    alreadyMember = Boolean(app);
+
+    if (app && (app.payment_status === "paid" || app.membership_id)) {
+      alreadyMember = true;
+    } else if (app && app.payment_status !== "paid") {
+      pendingApplicationId = app.id;
+    }
 
     const { data: p } = await supabase
       .from("profiles")
       .select("full_name, email, phone")
       .eq("id", user.id)
       .maybeSingle();
-    profile = p;
+    profile = p
+      ? {
+          full_name: p.full_name || app?.full_name || null,
+          email: p.email || app?.email || user.email || null,
+          phone: p.phone || app?.phone || null,
+        }
+      : {
+          full_name: app?.full_name || null,
+          email: app?.email || user.email || null,
+          phone: app?.phone || null,
+        };
   }
 
   return (
@@ -65,9 +85,24 @@ export default async function MembershipPage() {
             defaultPhone={profile?.phone || undefined}
           />
         </div>
+      ) : pendingApplicationId ? (
+        <div id="register" className="scroll-mt-28 space-y-6">
+          <MembershipPayStep
+            applicationId={pendingApplicationId}
+            fullName={profile?.full_name}
+            email={profile?.email}
+            phone={profile?.phone}
+          />
+        </div>
       ) : (
         <div id="register" className="scroll-mt-28">
-          <MembershipRegistrationForm />
+          <MembershipRegistrationForm
+            defaults={{
+              fullName: profile?.full_name || undefined,
+              email: profile?.email || undefined,
+              phone: profile?.phone || undefined,
+            }}
+          />
         </div>
       )}
     </div>

@@ -74,6 +74,22 @@ function fallbackHomepage(): HomepageContent {
   };
 }
 
+function resolveMembershipHref(href: string | null | undefined, label?: string | null) {
+  const raw = (href || "").trim();
+  const text = (label || "").toLowerCase();
+  if (
+    !raw ||
+    raw === "#" ||
+    raw.includes("membership") ||
+    raw.includes("register") ||
+    text.includes("member") ||
+    text.includes("join")
+  ) {
+    return "/membership";
+  }
+  return raw.split("#")[0] || raw;
+}
+
 export async function getPublishedHomepage(): Promise<HomepageContent> {
   try {
     const supabase = await createClient();
@@ -87,15 +103,19 @@ export async function getPublishedHomepage(): Promise<HomepageContent> {
 
     if (error || !data) return fallbackHomepage();
 
+    const primaryLabel =
+      data.hero_cta_primary_label ?? DEFAULT_HOMEPAGE.hero_cta_primary_label;
+
     return {
       hero_eyebrow: data.hero_eyebrow ?? DEFAULT_HOMEPAGE.hero_eyebrow,
       hero_headline: data.hero_headline ?? DEFAULT_HOMEPAGE.hero_headline,
       hero_subheadline:
         data.hero_subheadline ?? DEFAULT_HOMEPAGE.hero_subheadline,
-      hero_cta_primary_label:
-        data.hero_cta_primary_label ?? DEFAULT_HOMEPAGE.hero_cta_primary_label,
-      hero_cta_primary_href:
+      hero_cta_primary_label: primaryLabel,
+      hero_cta_primary_href: resolveMembershipHref(
         data.hero_cta_primary_href ?? DEFAULT_HOMEPAGE.hero_cta_primary_href,
+        primaryLabel,
+      ),
       hero_cta_secondary_label:
         data.hero_cta_secondary_label ??
         DEFAULT_HOMEPAGE.hero_cta_secondary_label,

@@ -24,7 +24,16 @@ import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 
 const initial: RegisterMembershipState = {};
 
-export function MembershipRegistrationForm() {
+export function MembershipRegistrationForm({
+  defaults,
+}: {
+  defaults?: {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+  };
+}) {
+  const loggedIn = Boolean(defaults?.email);
   const [state, action, pending] = useSafeFormAction(
     registerMembershipAction,
     initial,
@@ -198,6 +207,7 @@ export function MembershipRegistrationForm() {
               <Input
                 name="full_name"
                 required
+                defaultValue={defaults?.fullName || ""}
                 className="h-11 rounded-xl bg-white"
               />
             </label>
@@ -209,6 +219,7 @@ export function MembershipRegistrationForm() {
                 name="email"
                 type="email"
                 required
+                defaultValue={defaults?.email || ""}
                 className="h-11 rounded-xl bg-white"
               />
             </label>
@@ -220,6 +231,7 @@ export function MembershipRegistrationForm() {
                 name="phone"
                 type="tel"
                 required
+                defaultValue={defaults?.phone || ""}
                 className="h-11 rounded-xl bg-white"
               />
             </label>
@@ -236,15 +248,23 @@ export function MembershipRegistrationForm() {
             </label>
             <label className="block space-y-2">
               <span className="ml-1 text-sm font-medium text-muted-foreground">
-                Password *
+                Password {loggedIn ? "(optional)" : "*"}
               </span>
-              <PasswordInput name="password" required minLength={8} />
+              <PasswordInput
+                name="password"
+                required={!loggedIn}
+                minLength={loggedIn ? undefined : 8}
+              />
             </label>
             <label className="block space-y-2">
               <span className="ml-1 text-sm font-medium text-muted-foreground">
-                Confirm password *
+                Confirm password {loggedIn ? "(optional)" : "*"}
               </span>
-              <PasswordInput name="confirm_password" required minLength={8} />
+              <PasswordInput
+                name="confirm_password"
+                required={!loggedIn}
+                minLength={loggedIn ? undefined : 8}
+              />
             </label>
             <div className="sm:col-span-2">
               <SelfieField required />

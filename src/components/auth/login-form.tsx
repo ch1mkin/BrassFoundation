@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { PasswordInput } from "@/components/auth/password-input";
+import { MembershipLink } from "@/components/membership/membership-link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MaterialIcon } from "@/components/ui/material-icon";
@@ -131,12 +132,9 @@ export function LoginForm() {
       <div className="mt-10 text-center">
         <p className="text-muted-foreground">
           New here?{" "}
-          <a
-            href="/membership#register"
-            className="font-bold text-primary hover:underline"
-          >
+          <MembershipLink className="font-bold text-primary hover:underline">
             Become a member
-          </a>
+          </MembershipLink>
         </p>
       </div>
     </div>

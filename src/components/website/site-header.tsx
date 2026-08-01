@@ -7,6 +7,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand/logo";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useLocale } from "@/components/i18n/locale-provider";
+import { MembershipLink } from "@/components/membership/membership-link";
 import { signOutAction } from "@/lib/auth/actions";
 import { NAV_ITEMS, SITE, type NavItem } from "@/lib/constants";
 import { NAV_MESSAGE_KEYS } from "@/lib/i18n/messages";
@@ -254,15 +255,14 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
               >
                 {t("nav.login")}
               </NavLink>
-              <NavLink
-                href="/membership#register"
+              <MembershipLink
                 className={cn(
                   buttonVariants(),
                   "rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-[#004149] shadow-lg shadow-black/20 hover:bg-brand/90 active:scale-95",
                 )}
               >
                 {t("nav.becomeMember")}
-              </NavLink>
+              </MembershipLink>
             </>
           )}
         </div>
@@ -395,8 +395,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                   >
                     {t("nav.login")}
                   </NavLink>
-                  <NavLink
-                    href="/membership#register"
+                  <MembershipLink
                     onClick={() => setMobileOpen(false)}
                     className={cn(
                       buttonVariants(),
@@ -404,7 +403,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                     )}
                   >
                     {t("nav.becomeMember")}
-                  </NavLink>
+                  </MembershipLink>
                 </>
               )}
             </div>

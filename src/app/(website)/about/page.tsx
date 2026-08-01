@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageShell } from "@/components/website/page-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { MembershipLink } from "@/components/membership/membership-link";
 import { CORE_VALUES, SITE } from "@/lib/constants";
 import { getExecutiveCommittee } from "@/lib/content/committee";
 import { cn } from "@/lib/utils";
@@ -35,15 +36,14 @@ export default async function AboutPage() {
               </div>
             </div>
           ))}
-          <a
-            href="/membership#register"
+          <MembershipLink
             className={cn(
               buttonVariants(),
               "mt-2 inline-flex rounded-xl bg-primary shadow-lg shadow-primary/20",
             )}
           >
             Become a Member
-          </a>
+          </MembershipLink>
         </div>
 
         <div>

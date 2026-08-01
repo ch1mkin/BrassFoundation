@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useLocale } from "@/components/i18n/locale-provider";
+import { MembershipLink } from "@/components/membership/membership-link";
 import { NewsletterForm } from "@/components/website/newsletter-form";
 import { SITE } from "@/lib/constants";
 
@@ -79,12 +80,9 @@ export function SiteFooter() {
           </h4>
           <ul className="notranslate space-y-2">
             <li>
-              <a
-                href="/membership#register"
-                className="text-xs font-semibold text-white/70 hover:text-brand"
-              >
+              <MembershipLink className="text-xs font-semibold text-white/70 hover:text-brand">
                 {t("footer.becomeMember")}
-              </a>
+              </MembershipLink>
             </li>
             <li>
               <Link

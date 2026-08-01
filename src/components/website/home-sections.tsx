@@ -5,6 +5,7 @@ import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { MembershipLink } from "@/components/membership/membership-link";
 import {
   COMMUNITY_WORK,
   CORE_VALUES,
@@ -494,12 +495,9 @@ export function MembershipCta({
                   </div>
                 ))}
               </div>
-              <a
-                href="/membership#register"
-                className="inline-flex rounded-xl bg-white px-10 py-4 text-lg font-bold text-secondary shadow-2xl transition hover:scale-105 active:scale-95"
-              >
+              <MembershipLink className="inline-flex rounded-xl bg-white px-10 py-4 text-lg font-bold text-secondary shadow-2xl transition hover:scale-105 active:scale-95">
                 Start Your Membership
-              </a>
+              </MembershipLink>
             </div>
             <div className="flex justify-center lg:w-1/3">
               {/* eslint-disable-next-line @next/next/no-img-element */}

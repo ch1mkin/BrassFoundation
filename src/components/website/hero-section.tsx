@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { MembershipLink } from "@/components/membership/membership-link";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { cn } from "@/lib/utils";
 
@@ -62,6 +63,11 @@ export function HeroSection({
   const adminPa = Boolean(
     locale === "pa" && (headlinePa?.trim() || subheadlinePa?.trim()),
   );
+  const joinHref =
+    /membership|member|join|register/i.test(primaryHref) ||
+    /member|join/i.test(displayPrimary)
+      ? "/membership"
+      : primaryHref;
 
   return (
     <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-surface pt-20">
@@ -103,7 +109,7 @@ export function HeroSection({
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.55 }}
-            className="flex size-40 items-center justify-center rounded-full bg-white/30 p-3 shadow-lg ring-1 ring-white/40 sm:size-52 sm:p-4"
+            className="flex size-40 items-center justify-center rounded-full bg-white p-3 shadow-lg ring-1 ring-black/5 sm:size-52 sm:p-4"
           >
             <Image
               src="/brand/logo.png"
@@ -154,16 +160,28 @@ export function HeroSection({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.6 }}
         >
-          <a
-            href={primaryHref}
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "h-14 rounded-lg bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90",
-            )}
-          >
-            {displayPrimary}
-            <MaterialIcon name="person_add" className="text-[20px]" />
-          </a>
+          {joinHref === "/membership" ? (
+            <MembershipLink
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "h-14 rounded-lg bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90",
+              )}
+            >
+              {displayPrimary}
+              <MaterialIcon name="person_add" className="text-[20px]" />
+            </MembershipLink>
+          ) : (
+            <a
+              href={joinHref}
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "h-14 rounded-lg bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90",
+              )}
+            >
+              {displayPrimary}
+              <MaterialIcon name="person_add" className="text-[20px]" />
+            </a>
+          )}
           <a
             href={secondaryHref}
             className={cn(
