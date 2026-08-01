@@ -3,8 +3,8 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { BrandLogo } from "@/components/brand/logo";
 import { buttonVariants } from "@/components/ui/button";
-import { PenNibLogo } from "@/components/website/pen-nib-logo";
 import { cn } from "@/lib/utils";
 
 const HeroParticles = dynamic(
@@ -40,14 +40,14 @@ export function HeroSection({
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 72% 38%, rgba(31,111,120,0.35) 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 18% 82%, rgba(22,58,95,0.55) 0%, transparent 50%), linear-gradient(160deg, #0B1C28 0%, #163A5F 100%)",
+            "radial-gradient(ellipse 80% 60% at 72% 38%, rgba(17,181,201,0.32) 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 18% 82%, rgba(0,43,91,0.55) 0%, transparent 50%), linear-gradient(160deg, #0B1C28 0%, #002B5B 100%)",
         }}
       />
       <HeroParticles />
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-24 pb-20 lg:px-8">
         <div className="glass max-w-2xl rounded-2xl p-8 sm:p-10">
-          <PenNibLogo className="mb-6 size-14 text-brand" />
+          <BrandLogo size="xl" href={null} priority className="mb-6" />
 
           <motion.p
             className="font-heading text-sm font-medium tracking-[0.22em] text-brand uppercase"

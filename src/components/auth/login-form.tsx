@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { BrandLogo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -32,14 +33,12 @@ export function LoginForm() {
 
   return (
     <div className="w-full max-w-md rounded-2xl bg-card p-8 shadow-soft">
-      <Link href="/" className="font-heading text-sm font-medium text-primary">
-        ← Brass Foundation
-      </Link>
+      <BrandLogo size="lg" className="mx-auto" />
 
-      <h1 className="mt-6 font-heading text-2xl font-semibold">
+      <h1 className="mt-6 font-heading text-center text-2xl font-semibold">
         {mode === "signup" ? "Create your account" : "Welcome back"}
       </h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <p className="mt-2 text-center text-sm text-muted-foreground">
         {mode === "signup"
           ? "Join Brass Foundation to access member resources and events."
           : "Sign in with your email and password."}

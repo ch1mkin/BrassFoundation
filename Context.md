@@ -94,15 +94,17 @@ Brass Foundation OMS
 
 | Token | Value |
 |-------|-------|
-| Primary (Ink) | `#163A5F` |
-| Brand Teal | `#1F6F78` |
+| Primary (Ink Blue) | `#002B5B` |
+| Brand Teal | `#11B5C9` |
 | Secondary / Dark | `#0B1C28` |
-| Accent Brass | `#C4A35A` |
+| Accent Gold | `#F2B233` |
 | Background | `#F4F6F8` |
 | Text | `#14181F` |
 | Secondary Text | `#5C6670` |
 | Success | `#1F7A4D` |
 | Error | `#B42318` |
+
+Logo asset: `/public/brand/logo.png` (slogan: Education to Prosperity)
 
 ## Typography
 

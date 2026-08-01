@@ -1,13 +1,14 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand/logo";
 import { signOutAction } from "@/lib/auth/actions";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
 
 const NAV = [
   { label: "Overview", href: "/admin" },
+  { label: "Members", href: "/admin/members" },
   { label: "Website CMS", href: "/admin/website" },
-  { label: "Members", href: "/admin" },
   { label: "Users", href: "/admin" },
   { label: "Roles", href: "/admin" },
   { label: "Gallery", href: "/admin" },
@@ -39,13 +40,8 @@ export default async function AdminLayout({
   return (
     <div className="flex min-h-[100svh] bg-muted/40">
       <aside className="hidden w-64 shrink-0 border-r border-border bg-card p-6 md:block">
-        <Link
-          href="/"
-          className="font-heading text-sm font-semibold text-primary"
-        >
-          Brass Foundation
-        </Link>
-        <p className="mt-1 text-xs text-muted-foreground">Admin Portal</p>
+        <BrandLogo size="sm" />
+        <p className="mt-3 text-xs text-muted-foreground">Admin Portal</p>
         <p className="mt-4 truncate text-xs text-muted-foreground">
           {context.email}
         </p>

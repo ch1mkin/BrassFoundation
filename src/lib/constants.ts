@@ -1,8 +1,10 @@
 export const SITE = {
   name: "Brass Foundation",
   tagline: "Education · Empowerment · Equality",
+  slogan: "Education to Prosperity",
   description:
     "An Ambedkarite organization dedicated to education, empowerment, equality, leadership, and community development.",
+  logo: "/brand/logo.png",
 } as const;
 
 export type NavChild = {

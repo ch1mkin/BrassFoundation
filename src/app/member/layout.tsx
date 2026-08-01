@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
+import { BrandLogo } from "@/components/brand/logo";
 import { signOutAction } from "@/lib/auth/actions";
 import { getUserContext } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
@@ -31,13 +31,8 @@ export default async function MemberLayout({
   return (
     <div className="flex min-h-[100svh] bg-muted/40">
       <aside className="hidden w-64 shrink-0 border-r border-border bg-card p-6 md:block">
-        <Link
-          href="/"
-          className="font-heading text-sm font-semibold text-primary"
-        >
-          Brass Foundation
-        </Link>
-        <p className="mt-1 text-xs text-muted-foreground">Member Portal</p>
+        <BrandLogo size="sm" />
+        <p className="mt-3 text-xs text-muted-foreground">Member Portal</p>
         <p className="mt-4 truncate text-sm font-medium">
           {context.profile?.full_name || context.email}
         </p>

@@ -34,8 +34,9 @@ This way all email leaves through your Hostinger mailbox.
 2. Run these files in order:
    - `supabase/migrations/20260801000000_core_rbac.sql`
    - `supabase/migrations/20260801010000_homepage_cms.sql`
+   - `supabase/migrations/20260801020000_membership.sql`
 
-This creates profiles, dynamic roles/permissions, audit logs, RLS, and the homepage CMS.
+This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS, and membership applications.
 
 ## 3. Auth settings (Supabase Dashboard)
 

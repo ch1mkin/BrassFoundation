@@ -54,14 +54,14 @@
 }
 
 :root {
-  /* Premium educational palette — ink, slate, brass */
-  --brand: #1f6f78;
+  /* Aligned to official Brass Foundation logo */
+  --brand: #11b5c9;
   --brand-foreground: #ffffff;
-  --primary: #163a5f;
+  --primary: #002b5b;
   --primary-foreground: #ffffff;
   --secondary: #0b1c28;
   --secondary-foreground: #f4f6f8;
-  --gold: #c4a35a;
+  --gold: #f2b233;
   --gold-foreground: #14181f;
   --background: #f4f6f8;
   --foreground: #14181f;
@@ -71,38 +71,38 @@
   --popover-foreground: #14181f;
   --muted: #e8ecf0;
   --muted-foreground: #5c6670;
-  --accent: #e6eef1;
-  --accent-foreground: #163a5f;
+  --accent: #e6f7f9;
+  --accent-foreground: #002b5b;
   --destructive: #b42318;
   --success: #1f7a4d;
   --border: #d5dde5;
   --input: #d5dde5;
-  --ring: #1f6f78;
-  --chart-1: #163a5f;
-  --chart-2: #1f6f78;
-  --chart-3: #c4a35a;
+  --ring: #11b5c9;
+  --chart-1: #002b5b;
+  --chart-2: #11b5c9;
+  --chart-3: #f2b233;
   --chart-4: #1f7a4d;
   --chart-5: #5c6670;
   --radius: 1rem;
-  --shadow-soft: 0 10px 40px rgba(11, 28, 40, 0.08);
+  --shadow-soft: 0 10px 40px rgba(0, 43, 91, 0.08);
   --sidebar: #ffffff;
   --sidebar-foreground: #14181f;
-  --sidebar-primary: #163a5f;
+  --sidebar-primary: #002b5b;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e6eef1;
-  --sidebar-accent-foreground: #163a5f;
+  --sidebar-accent: #e6f7f9;
+  --sidebar-accent-foreground: #002b5b;
   --sidebar-border: #d5dde5;
-  --sidebar-ring: #1f6f78;
+  --sidebar-ring: #11b5c9;
 }
 
 .dark {
-  --brand: #3aa6b0;
+  --brand: #33c5cd;
   --brand-foreground: #0b1c28;
-  --primary: #8eb4d4;
+  --primary: #7eb6e8;
   --primary-foreground: #0b1c28;
-  --secondary: #152636;
+  --secondary: #122433;
   --secondary-foreground: #f4f6f8;
-  --gold: #d4b56a;
+  --gold: #f2b233;
   --gold-foreground: #0b1c28;
   --background: #0b1c28;
   --foreground: #f4f6f8;
@@ -118,21 +118,21 @@
   --success: #3db87a;
   --border: rgba(244, 246, 248, 0.12);
   --input: rgba(244, 246, 248, 0.15);
-  --ring: #3aa6b0;
-  --chart-1: #8eb4d4;
-  --chart-2: #3aa6b0;
-  --chart-3: #d4b56a;
+  --ring: #33c5cd;
+  --chart-1: #7eb6e8;
+  --chart-2: #33c5cd;
+  --chart-3: #f2b233;
   --chart-4: #3db87a;
   --chart-5: #9aa3ad;
   --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.4);
   --sidebar: #122433;
   --sidebar-foreground: #f4f6f8;
-  --sidebar-primary: #3aa6b0;
+  --sidebar-primary: #33c5cd;
   --sidebar-primary-foreground: #0b1c28;
   --sidebar-accent: #1a3348;
   --sidebar-accent-foreground: #f4f6f8;
   --sidebar-border: rgba(244, 246, 248, 0.12);
-  --sidebar-ring: #3aa6b0;
+  --sidebar-ring: #33c5cd;
 }
 
 @layer base {

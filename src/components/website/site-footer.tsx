@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandLogo } from "@/components/brand/logo";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 
 export function SiteFooter() {
@@ -6,9 +7,12 @@ export function SiteFooter() {
     <footer className="border-t border-border bg-secondary text-secondary-foreground">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div className="sm:col-span-2 lg:col-span-1">
-          <p className="font-heading text-xl font-semibold">{SITE.name}</p>
-          <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/70">
+          <BrandLogo size="lg" className="brightness-110" />
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/70">
             {SITE.description}
+          </p>
+          <p className="font-quote mt-3 text-sm italic text-white/50">
+            Education to Prosperity
           </p>
         </div>
 
