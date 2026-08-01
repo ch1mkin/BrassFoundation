@@ -1,5 +1,5 @@
 import { PageLoader } from "@/components/brand/page-loader";
 
 export default function Loading() {
-  return <PageLoader fullScreen label="Loading portal…" />;
+  return <PageLoader label="Loading portal…" />;
 }

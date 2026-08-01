@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -76,12 +75,12 @@ export function BrandLogo({
   }
 
   return (
-    <Link
+    <a
       href={href}
       aria-label="Brass Foundation home"
       className="inline-flex shrink-0 items-center"
     >
       {content}
-    </Link>
+    </a>
   );
 }

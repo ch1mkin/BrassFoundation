@@ -1,8 +1,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Suspense, useState } from "react";
-import { RouteLoader } from "@/components/brand/route-loader";
+import { useState } from "react";
 import { LocaleProvider } from "@/components/i18n/locale-provider";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -28,9 +27,6 @@ export function Providers({
   return (
     <QueryClientProvider client={queryClient}>
       <LocaleProvider initialLocale={initialLocale}>
-        <Suspense fallback={null}>
-          <RouteLoader />
-        </Suspense>
         {children}
       </LocaleProvider>
     </QueryClientProvider>

@@ -49,7 +49,9 @@ export function PageLoader({
       aria-busy="true"
       className={cn(
         "flex flex-col items-center justify-center gap-3",
-        fullScreen && "fixed inset-0 z-[100] bg-background/85 backdrop-blur-sm",
+        // Never capture clicks — overlays must not block the fixed header/nav.
+        fullScreen &&
+          "pointer-events-none fixed inset-0 z-[100] bg-background/85 backdrop-blur-sm",
         !fullScreen && "min-h-[12rem] w-full py-10",
         className,
       )}

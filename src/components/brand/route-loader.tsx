@@ -6,6 +6,7 @@ import { PageLoader } from "@/components/brand/page-loader";
 
 /**
  * Brief branded overlay on client-side route changes.
+ * Must never block clicks — the fixed header stays usable.
  */
 export function RouteLoader() {
   const pathname = usePathname();
