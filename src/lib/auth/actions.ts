@@ -10,7 +10,8 @@ export type AuthActionState = {
 };
 
 function safeNext(next: string) {
-  return next.startsWith("/") ? next : "/member";
+  if (!next.startsWith("/") || next.startsWith("//")) return "/member";
+  return next;
 }
 
 export async function signInAction(
@@ -36,16 +37,26 @@ export async function signInAction(
 
   try {
     const supabase = await createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
 
-    if (error) {
-      return { error: error.message };
+    const result = await Promise.race([
+      supabase.auth.signInWithPassword({ email, password }),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(
+            new Error(
+              "Sign-in timed out. Check your connection and try again.",
+            ),
+          );
+        }, 20_000);
+      }),
+    ]);
+
+    if (result.error) {
+      return { error: result.error.message };
     }
 
-    // Return path instead of redirect() so useActionState pending can clear.
+    // Do not call redirect() here — it leaves useActionState pending stuck.
+    // Cookies are set on this action response; client hard-navigates next.
     return { success: "Signed in", redirectTo: safeNext(next) };
   } catch (err) {
     return {

@@ -2,71 +2,42 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MaterialIcon } from "@/components/ui/material-icon";
-import { createClient } from "@/lib/supabase/client";
+import {
+  signInAction,
+  type AuthActionState,
+} from "@/lib/auth/actions";
 import { cn } from "@/lib/utils";
 
 function safeNext(next: string | null) {
-  if (!next || !next.startsWith("/")) return "/member";
+  if (!next || !next.startsWith("/") || next.startsWith("//")) {
+    return "/member";
+  }
   return next;
 }
+
+const initial: AuthActionState = {};
 
 export function LoginForm() {
   const searchParams = useSearchParams();
   const next = safeNext(searchParams.get("next"));
-  const [error, setError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
-  const [submitting, setSubmitting] = useState(false);
-  const busy = pending || submitting;
+  const urlError = searchParams.get("error");
+  const [state, formAction, pending] = useActionState(signInAction, initial);
+  const navigated = useRef(false);
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(null);
-    setSubmitting(true);
+  useEffect(() => {
+    if (!state.redirectTo || navigated.current) return;
+    navigated.current = true;
+    // Full reload so middleware sees the session cookies from the server action.
+    window.location.assign(state.redirectTo);
+  }, [state.redirectTo]);
 
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const email = String(formData.get("email") || "")
-      .trim()
-      .toLowerCase();
-    const password = String(formData.get("password") || "");
-
-    if (!email || !password) {
-      setError("Email and password are required.");
-      setSubmitting(false);
-      return;
-    }
-
-    try {
-      const supabase = createClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) {
-        setError(signInError.message);
-        setSubmitting(false);
-        return;
-      }
-
-      // Hard navigation so session cookies are applied and pending never sticks.
-      startTransition(() => {
-        window.location.assign(next);
-      });
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Sign-in failed. Please try again.",
-      );
-      setSubmitting(false);
-    }
-  }
+  const error = state.error || urlError;
+  const busy = pending || Boolean(state.redirectTo);
 
   return (
     <div className="w-full">
@@ -79,7 +50,8 @@ export function LoginForm() {
         </p>
       </div>
 
-      <form onSubmit={onSubmit} className="space-y-5" noValidate>
+      <form action={formAction} className="space-y-5" noValidate>
+        <input type="hidden" name="next" value={next} />
         <fieldset
           disabled={busy}
           aria-busy={busy}
