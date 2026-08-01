@@ -83,6 +83,7 @@ export async function submitMembershipApplicationAction(
   }
 
   revalidatePath("/admin/members");
+  revalidatePath("/member");
   return {
     success:
       "Application submitted. Our team will review it and notify you by email.",

@@ -4,7 +4,7 @@ import { SITE } from "@/lib/constants";
 const HIGHLIGHTS = [
   {
     title: "Verified membership",
-    body: "Mobile OTP keeps accounts genuine and secure.",
+    body: "Secure email sign-in for genuine member access.",
   },
   {
     title: "Member portal",

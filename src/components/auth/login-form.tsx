@@ -8,8 +8,8 @@ import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  signInWithPhoneAction,
-  signUpWithPhoneAction,
+  signInAction,
+  signUpAction,
   type AuthActionState,
 } from "@/lib/auth/actions";
 import { cn } from "@/lib/utils";
@@ -22,11 +22,11 @@ export function LoginForm() {
   const mode = searchParams.get("mode") === "signup" ? "signup" : "signin";
 
   const [signInState, signIn, signInPending] = useActionState(
-    signInWithPhoneAction,
+    signInAction,
     initial,
   );
   const [signUpState, signUp, signUpPending] = useActionState(
-    signUpWithPhoneAction,
+    signUpAction,
     initial,
   );
 
@@ -69,8 +69,8 @@ export function LoginForm() {
       </h1>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
         {mode === "signup"
-          ? "Register with your mobile number and a secure password."
-          : "Sign in with your registered mobile number and password."}
+          ? "Register with your email and a secure password."
+          : "Sign in with your email and password."}
       </p>
 
       <form
@@ -93,18 +93,15 @@ export function LoginForm() {
         )}
 
         <label className="block space-y-1.5">
-          <span className="text-sm font-medium">Phone number</span>
+          <span className="text-sm font-medium">Email</span>
           <Input
-            name="phone"
-            type="tel"
+            name="email"
+            type="email"
             required
-            placeholder="9876543210"
-            autoComplete="tel"
+            placeholder="you@example.com"
+            autoComplete="email"
             className="h-11 rounded-2xl"
           />
-          <span className="text-xs text-muted-foreground">
-            India numbers default to +91
-          </span>
         </label>
 
         <label className="block space-y-1.5">

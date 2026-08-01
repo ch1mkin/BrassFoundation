@@ -68,6 +68,7 @@ export async function approveMembershipAction(
   if (error) return { error };
 
   revalidatePath("/admin/members");
+  revalidatePath("/member");
   return { success: `Approved — ID ${membershipId}` };
 }
 
@@ -90,5 +91,6 @@ export async function rejectMembershipAction(
   if (error) return { error };
 
   revalidatePath("/admin/members");
+  revalidatePath("/member");
   return { success: "Application rejected." };
 }
