@@ -67,16 +67,16 @@ export function HeroSection({
     <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-surface pt-20">
       {hasBg ? (
         <>
-          {/* Mobile: contain + center so the full image width stays visible */}
+          {/* Mobile: full-bleed cover across the hero viewport */}
           {mobileBg ? (
-            <div className="absolute inset-0 bg-[#0B1C28] md:hidden">
+            <div className="absolute inset-0 md:hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={mobileBg}
                 alt=""
-                className="absolute top-1/2 left-1/2 h-auto max-h-[58svh] w-[min(100%,24rem)] -translate-x-1/2 -translate-y-[58%] object-contain object-center sm:w-[min(92%,28rem)] sm:max-h-[62svh]"
+                className="h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#001c3a]/55 via-[#004f58]/35 to-surface" />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#001c3a]/75 via-[#004f58]/55 to-surface" />
             </div>
           ) : null}
 
