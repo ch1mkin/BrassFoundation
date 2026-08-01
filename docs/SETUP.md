@@ -35,8 +35,11 @@ This way all email leaves through your Hostinger mailbox.
    - `supabase/migrations/20260801000000_core_rbac.sql`
    - `supabase/migrations/20260801010000_homepage_cms.sql`
    - `supabase/migrations/20260801020000_membership.sql`
+   - `supabase/migrations/20260801030000_profiles_role_dropdown.sql`
 
-This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS, and membership applications.
+This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS, membership applications, and a **role dropdown** on `profiles.role_id`.
+
+See [ROLE_DROPDOWN.sql.md](./ROLE_DROPDOWN.sql.md) for copy-paste SQL and how to promote yourself to Super Admin.
 
 ## 3. Auth settings (Supabase Dashboard)
 

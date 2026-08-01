@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   Accordion,
@@ -10,11 +10,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -25,13 +26,25 @@ import {
 } from "@/components/ui/sheet";
 import { BrandLogo } from "@/components/brand/logo";
 import { HamburgerButton } from "@/components/website/hamburger-button";
+import { signOutAction } from "@/lib/auth/actions";
 import { NAV_ITEMS, SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-export function SiteHeader() {
+export type HeaderUser = {
+  email: string | null;
+  fullName: string | null;
+  isAdmin: boolean;
+};
+
+export function SiteHeader({ user }: { user: HeaderUser | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const initials = (
+    user?.fullName?.trim()?.[0] ||
+    user?.email?.trim()?.[0] ||
+    "U"
+  ).toUpperCase();
 
   useEffect(() => {
     setOpen(false);
@@ -112,25 +125,89 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Link
-            href="/login"
-            className={cn(
-              buttonVariants({ variant: "ghost" }),
-              "rounded-2xl",
-              isHome && "text-white hover:bg-white/10 hover:text-white",
-            )}
-          >
-            Login
-          </Link>
-          <Link
-            href="/membership"
-            className={cn(
-              buttonVariants({ variant: "default" }),
-              "rounded-2xl bg-gold px-4 text-gold-foreground hover:bg-gold/90",
-            )}
-          >
-            Become a Member
-          </Link>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={cn(
+                  "inline-flex size-10 items-center justify-center rounded-full outline-none transition-colors",
+                  isHome
+                    ? "bg-white/15 text-white hover:bg-white/25"
+                    : "bg-primary text-primary-foreground hover:bg-primary/90",
+                )}
+                aria-label="Open profile menu"
+              >
+                <span className="font-heading text-sm font-semibold">
+                  {initials}
+                </span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                sideOffset={10}
+                className="min-w-52 rounded-2xl p-2 shadow-soft"
+              >
+                <div className="px-2 py-2">
+                  <p className="truncate text-sm font-medium">
+                    {user.fullName || "Member"}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {user.email}
+                  </p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-xl"
+                  render={<Link href="/member" />}
+                >
+                  Member portal
+                </DropdownMenuItem>
+                {user.isAdmin && (
+                  <DropdownMenuItem
+                    className="cursor-pointer rounded-xl"
+                    render={<Link href="/admin" />}
+                  >
+                    Admin portal
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-xl"
+                  render={<Link href="/membership" />}
+                >
+                  Membership
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <form action={signOutAction}>
+                  <button
+                    type="submit"
+                    className="flex w-full cursor-pointer items-center rounded-xl px-1.5 py-1.5 text-left text-sm text-destructive hover:bg-destructive/10"
+                  >
+                    Sign out
+                  </button>
+                </form>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className={cn(
+                  buttonVariants({ variant: "ghost" }),
+                  "rounded-2xl",
+                  isHome && "text-white hover:bg-white/10 hover:text-white",
+                )}
+              >
+                Login
+              </Link>
+              <Link
+                href="/login?mode=signup"
+                className={cn(
+                  buttonVariants({ variant: "default" }),
+                  "rounded-2xl bg-gold px-4 text-gold-foreground hover:bg-gold/90",
+                )}
+              >
+                Sign up
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="lg:hidden">
@@ -211,26 +288,78 @@ export function SiteHeader() {
               </Accordion>
 
               <div className="mt-auto flex flex-col gap-2 border-t border-border/70 pt-6 pb-6">
-                <Link
-                  href="/login"
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    buttonVariants({ variant: "outline", size: "lg" }),
-                    "justify-center rounded-2xl",
-                  )}
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/membership"
-                  onClick={() => setOpen(false)}
-                  className={cn(
-                    buttonVariants({ size: "lg" }),
-                    "justify-center rounded-2xl bg-gold text-gold-foreground hover:bg-gold/90",
-                  )}
-                >
-                  Become a Member
-                </Link>
+                {user ? (
+                  <>
+                    <div className="mb-2 flex items-center gap-3 rounded-2xl bg-muted px-3 py-3">
+                      <span className="inline-flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                        <UserRound className="size-5" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">
+                          {user.fullName || "Member"}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <Link
+                      href="/member"
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        buttonVariants({ size: "lg" }),
+                        "justify-center rounded-2xl",
+                      )}
+                    >
+                      Member portal
+                    </Link>
+                    {user.isAdmin && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setOpen(false)}
+                        className={cn(
+                          buttonVariants({ variant: "outline", size: "lg" }),
+                          "justify-center rounded-2xl",
+                        )}
+                      >
+                        Admin portal
+                      </Link>
+                    )}
+                    <form action={signOutAction}>
+                      <Button
+                        type="submit"
+                        variant="ghost"
+                        size="lg"
+                        className="w-full justify-center rounded-2xl text-destructive"
+                      >
+                        Sign out
+                      </Button>
+                    </form>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        buttonVariants({ variant: "outline", size: "lg" }),
+                        "justify-center rounded-2xl",
+                      )}
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/login?mode=signup"
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        buttonVariants({ size: "lg" }),
+                        "justify-center rounded-2xl bg-gold text-gold-foreground hover:bg-gold/90",
+                      )}
+                    >
+                      Sign up
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </SheetContent>
