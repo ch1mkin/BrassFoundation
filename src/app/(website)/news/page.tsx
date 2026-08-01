@@ -1,24 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageShell } from "@/components/website/page-shell";
+import { getPublishedNews } from "@/lib/content/queries";
 
 export const metadata: Metadata = { title: "News" };
 
-const PLACEHOLDER = [
-  {
-    title: "Foundation expands scholarship outreach",
-    date: "Coming soon",
-    blurb:
-      "Press releases, media coverage, and community updates will appear here once the news CMS module is connected.",
-  },
-  {
-    title: "District leadership circle announces cohort",
-    date: "Coming soon",
-    blurb:
-      "Announcements and articles will be editable from the admin portal.",
-  },
-] as const;
+export default async function NewsPage() {
+  const posts = await getPublishedNews();
 
-export default function NewsPage() {
   return (
     <PageShell
       eyebrow="News"
@@ -27,15 +16,25 @@ export default function NewsPage() {
       wide
     >
       <div className="grid gap-6 md:grid-cols-2">
-        {PLACEHOLDER.map((item) => (
-          <article key={item.title} className="glass-card rounded-2xl p-6">
+        {posts.map((item) => (
+          <article key={item.id} className="glass-card rounded-2xl p-6">
             <p className="text-xs font-semibold tracking-wide text-primary uppercase">
-              {item.date}
+              {item.is_pinned ? "Pinned · " : ""}
+              {item.category}
             </p>
             <h2 className="font-heading mt-2 text-xl font-semibold">
-              {item.title}
+              <Link href={`/news/${item.slug}`} className="hover:text-primary">
+                {item.title}
+              </Link>
             </h2>
-            <p className="mt-3 text-muted-foreground">{item.blurb}</p>
+            {item.excerpt ? (
+              <p className="mt-3 text-muted-foreground">{item.excerpt}</p>
+            ) : null}
+            <p className="mt-4 text-xs text-muted-foreground">
+              {new Date(item.published_at).toLocaleDateString("en-IN", {
+                dateStyle: "medium",
+              })}
+            </p>
           </article>
         ))}
       </div>

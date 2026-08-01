@@ -25,6 +25,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Community", href: "/community" },
   { label: "Resources", href: "/resources" },
   { label: "Events", href: "/events" },
+  { label: "Gallery", href: "/gallery" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -33,6 +34,7 @@ export const NAV_LINKS = [
   { href: "/community", label: "Community" },
   { href: "/events", label: "Events" },
   { href: "/resources", label: "Resources" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/marketplace", label: "Marketplace" },
   { href: "/news", label: "News" },
   { href: "/contact", label: "Contact" },

@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import { LoginForm } from "@/components/auth/login-form";
+import { UpdatePasswordForm } from "@/components/auth/update-password-form";
 import { PageLoader } from "@/components/brand/page-loader";
 import { SITE } from "@/lib/constants";
 
@@ -10,15 +12,27 @@ export const metadata: Metadata = {
   title: "Login",
 };
 
-export default function LoginPage() {
+function AuthPanel({ mode }: { mode: string }) {
+  if (mode === "forgot") return <ForgotPasswordForm />;
+  if (mode === "reset") return <UpdatePasswordForm />;
+  return <LoginForm />;
+}
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mode?: string }>;
+}) {
+  const params = await searchParams;
+  const mode = params.mode || "signin";
+
   return (
     <main className="flex min-h-[100svh] flex-col overflow-hidden md:flex-row">
       <section className="auth-bg-gradient relative hidden items-center justify-center overflow-hidden p-16 md:flex md:w-1/2">
         <div
           className="pointer-events-none absolute inset-0 opacity-10"
           style={{
-            backgroundImage:
-              "radial-gradient(#ffffff 1px, transparent 1px)",
+            backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)",
             backgroundSize: "40px 40px",
           }}
         />
@@ -62,7 +76,7 @@ export default function LoginPage() {
 
         <div className="glass-card w-full max-w-[440px] rounded-xl p-6 sm:p-10">
           <Suspense fallback={<PageLoader label="Loading…" />}>
-            <LoginForm />
+            <AuthPanel mode={mode} />
           </Suspense>
         </div>
 

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { NewsletterForm } from "@/components/website/newsletter-form";
 import { NAV_LINKS, SITE } from "@/lib/constants";
 
 export function SiteFooter() {
@@ -23,6 +24,7 @@ export function SiteFooter() {
             Empowering the marginalized through the light of knowledge and
             unity.
           </p>
+          <NewsletterForm />
         </div>
 
         <div>
@@ -53,15 +55,15 @@ export function SiteFooter() {
                 href="/membership"
                 className="text-xs font-semibold text-muted-foreground hover:text-secondary"
               >
-                Volunteer Portal
+                Become a Member
               </Link>
             </li>
             <li>
               <Link
-                href="/community"
+                href="/gallery"
                 className="text-xs font-semibold text-muted-foreground hover:text-secondary"
               >
-                Success Stories
+                Gallery
               </Link>
             </li>
             <li>
@@ -82,9 +84,12 @@ export function SiteFooter() {
           <p className="mb-4 text-xs font-semibold text-muted-foreground">
             India
           </p>
-          <p className="text-xs font-semibold text-muted-foreground">
+          <a
+            href="mailto:contact@brassfoundation.org"
+            className="text-xs font-semibold text-muted-foreground hover:text-primary"
+          >
             contact@brassfoundation.org
-          </p>
+          </a>
         </div>
       </div>
 
@@ -97,13 +102,13 @@ export function SiteFooter() {
             href="/contact"
             className="text-xs font-semibold text-muted-foreground hover:text-primary"
           >
-            Terms
+            Contact
           </Link>
           <Link
-            href="/contact"
+            href="/gallery"
             className="text-xs font-semibold text-muted-foreground hover:text-primary"
           >
-            Sitemap
+            Gallery
           </Link>
         </div>
       </div>

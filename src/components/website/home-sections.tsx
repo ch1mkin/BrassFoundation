@@ -276,7 +276,7 @@ export function CommunitySection({
               <p className="mb-4 text-muted-foreground">{project.description}</p>
             ) : null}
             <Link
-              href="/community"
+              href={`/community/${project.slug}`}
               className="inline-flex items-center gap-2 font-bold text-primary transition-all hover:gap-4"
             >
               Read More

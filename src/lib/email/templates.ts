@@ -54,3 +54,69 @@ export function passwordResetEmailHtml({
     </div>
   `;
 }
+
+export function membershipReceivedEmailHtml({
+  name,
+  appUrl,
+  applicationId,
+}: {
+  name: string;
+  appUrl: string;
+  applicationId: string;
+}) {
+  return `
+    <div style="font-family: Inter, Arial, sans-serif; color: #1B1B1B; line-height: 1.6; max-width: 560px; margin: 0 auto;">
+      <h1 style="font-family: Poppins, Arial, sans-serif; color: #006875; font-size: 24px;">
+        Application received
+      </h1>
+      <p>Hi ${name || "there"},</p>
+      <p>
+        Thank you for applying to Brass Foundation. Our team will review your
+        application and follow up by email.
+      </p>
+      <p style="color: #6B7280; font-size: 14px;">Reference: ${applicationId}</p>
+      <p style="margin: 28px 0;">
+        <a href="${appUrl}/member"
+           style="background: #006875; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 12px; display: inline-block;">
+          Open Member Portal
+        </a>
+      </p>
+    </div>
+  `;
+}
+
+export function eventRegistrationEmailHtml({
+  name,
+  eventTitle,
+  eventUrl,
+  startsAt,
+  location,
+}: {
+  name: string;
+  eventTitle: string;
+  eventUrl: string;
+  startsAt: string;
+  location: string | null;
+}) {
+  const when = new Date(startsAt).toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+  return `
+    <div style="font-family: Inter, Arial, sans-serif; color: #1B1B1B; line-height: 1.6; max-width: 560px; margin: 0 auto;">
+      <h1 style="font-family: Poppins, Arial, sans-serif; color: #006875; font-size: 24px;">
+        You are registered
+      </h1>
+      <p>Hi ${name || "there"},</p>
+      <p>You registered for <strong>${eventTitle}</strong>.</p>
+      <p><strong>When:</strong> ${when}</p>
+      ${location ? `<p><strong>Where:</strong> ${location}</p>` : ""}
+      <p style="margin: 28px 0;">
+        <a href="${eventUrl}"
+           style="background: #006875; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 12px; display: inline-block;">
+          View event
+        </a>
+      </p>
+    </div>
+  `;
+}

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
+import { notifyMembershipReceived } from "@/lib/content/actions";
 import {
   membershipApplicationSchema,
   type MembershipApplicationInput,
@@ -81,6 +82,12 @@ export async function submitMembershipApplicationAction(
           : error.message,
     };
   }
+
+  await notifyMembershipReceived({
+    name: data.full_name,
+    email: data.email,
+    applicationId: row.id,
+  });
 
   revalidatePath("/admin/members");
   revalidatePath("/member");

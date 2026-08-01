@@ -130,9 +130,12 @@ export function LoginForm() {
               />
               Remember Me
             </label>
-            <span className="text-sm font-medium text-primary">
+            <Link
+              href="/login?mode=forgot"
+              className="text-sm font-medium text-primary hover:underline"
+            >
               Forgot Password?
-            </span>
+            </Link>
           </div>
         )}
 
