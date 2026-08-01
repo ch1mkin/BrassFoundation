@@ -4,12 +4,14 @@ import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { subscribeNewsletterAction } from "@/lib/content/actions";
 import type { ContentActionState } from "@/lib/content/utils";
 
 const initial: ContentActionState = {};
 
 export function NewsletterForm() {
+  const { t } = useLocale();
   const [state, action, pending] = useActionState(
     subscribeNewsletterAction,
     initial,
@@ -23,7 +25,7 @@ export function NewsletterForm() {
           name="email"
           type="email"
           required
-          placeholder="Email for updates"
+          placeholder={t("footer.newsletterPlaceholder")}
           className="h-10 rounded-xl bg-white"
         />
         <Button
@@ -31,7 +33,7 @@ export function NewsletterForm() {
           disabled={pending}
           className="h-10 shrink-0 rounded-xl bg-primary px-4"
         >
-          {pending ? "…" : "Join"}
+          {pending ? "…" : t("footer.newsletterJoin")}
         </Button>
       </div>
       {state.error ? (

@@ -19,8 +19,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { BrandLogo } from "@/components/brand/logo";
+import { LanguageSwitcher } from "@/components/i18n/language-switcher";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { signOutAction } from "@/lib/auth/actions";
 import { NAV_ITEMS, SITE } from "@/lib/constants";
+import { NAV_MESSAGE_KEYS } from "@/lib/i18n/messages";
 import { cn } from "@/lib/utils";
 
 export type HeaderUser = {
@@ -32,6 +35,7 @@ export type HeaderUser = {
 export function SiteHeader({ user }: { user: HeaderUser | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { t } = useLocale();
   const initials = (
     user?.fullName?.trim()?.[0] ||
     user?.email?.trim()?.[0] ||
@@ -42,14 +46,19 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
     setOpen(false);
   }, [pathname]);
 
+  function navLabel(label: string) {
+    const key = NAV_MESSAGE_KEYS[label];
+    return key ? t(key) : label;
+  }
+
   return (
     <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#0B1C28]/95 shadow-md backdrop-blur-md">
-      <nav className="mx-auto flex h-20 max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-20">
+      <nav className="mx-auto flex h-20 max-w-[1280px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-20">
         <BrandLogo
           size="md"
           priority
           showWordmark
-          wordmarkClassName="font-heading text-xl font-bold text-white"
+          wordmarkClassName="notranslate font-heading text-xl font-bold text-white"
         />
 
         <div className="hidden items-center gap-8 md:flex">
@@ -62,19 +71,20 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                 key={item.label}
                 href={href}
                 className={cn(
-                  "text-sm font-medium transition-colors",
+                  "notranslate text-sm font-medium transition-colors",
                   active
                     ? "border-b-2 border-brand font-bold text-brand"
                     : "text-white/75 hover:text-white",
                 )}
               >
-                {item.label}
+                {navLabel(item.label)}
               </Link>
             );
           })}
         </div>
 
-        <div className="hidden items-center gap-4 lg:flex">
+        <div className="hidden items-center gap-3 lg:flex">
+          <LanguageSwitcher />
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -103,14 +113,14 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                   className="cursor-pointer rounded-lg"
                   render={<Link href="/member" />}
                 >
-                  Member portal
+                  {t("nav.memberPortal")}
                 </DropdownMenuItem>
                 {user.isAdmin && (
                   <DropdownMenuItem
                     className="cursor-pointer rounded-lg"
                     render={<Link href="/admin" />}
                   >
-                    Admin portal
+                    {t("nav.adminPortal")}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
@@ -119,7 +129,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                     type="submit"
                     className="flex w-full cursor-pointer items-center rounded-lg px-1.5 py-1.5 text-left text-sm text-destructive hover:bg-destructive/10"
                   >
-                    Sign out
+                    {t("nav.signOut")}
                   </button>
                 </form>
               </DropdownMenuContent>
@@ -128,52 +138,61 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
             <>
               <Link
                 href="/login"
-                className="hidden text-sm font-medium text-white/80 transition hover:text-white lg:block"
+                className="hidden text-sm font-medium text-white/80 transition hover:text-white xl:block"
               >
-                Login
+                {t("nav.login")}
               </Link>
               <Link
                 href="/membership"
                 className={cn(
                   buttonVariants(),
-                  "rounded-lg bg-brand px-6 py-2.5 text-sm font-bold text-[#004149] shadow-lg shadow-black/20 hover:bg-brand/90 active:scale-95",
+                  "rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-[#004149] shadow-lg shadow-black/20 hover:bg-brand/90 active:scale-95",
                 )}
               >
-                Become Member
+                {t("nav.becomeMember")}
               </Link>
             </>
           )}
         </div>
 
-        <button
-          type="button"
-          className="inline-flex size-10 items-center justify-center rounded-lg text-white hover:bg-white/10 md:hidden"
-          aria-label="Open menu"
-          onClick={() => setOpen(true)}
-        >
-          <Menu className="size-5" />
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <LanguageSwitcher compact />
+          <button
+            type="button"
+            className="inline-flex size-10 items-center justify-center rounded-lg text-white hover:bg-white/10 md:hidden"
+            aria-label="Open menu"
+            onClick={() => setOpen(true)}
+          >
+            <Menu className="size-5" />
+          </button>
+        </div>
 
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetContent side="right" className="w-[min(100%,20rem)] bg-[#0B1C28] text-white">
+          <SheetContent
+            side="right"
+            className="w-[min(100%,20rem)] bg-[#0B1C28] text-white"
+          >
             <SheetHeader>
               <SheetTitle className="sr-only">{SITE.name}</SheetTitle>
               <BrandLogo
                 size="sm"
                 href={null}
                 showWordmark
-                wordmarkClassName="text-white"
+                wordmarkClassName="notranslate text-white"
               />
             </SheetHeader>
             <nav className="mt-6 flex flex-col gap-2 px-2">
+              <div className="mb-2 px-1">
+                <LanguageSwitcher className="w-full justify-between" />
+              </div>
               {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href || "/"}
                   onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white"
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white notranslate"
                 >
-                  {item.label}
+                  {navLabel(item.label)}
                 </Link>
               ))}
               <div className="mt-4 border-t border-white/15 pt-4">
@@ -200,7 +219,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                         "mb-2 w-full justify-center rounded-lg bg-brand text-[#004149] hover:bg-brand/90",
                       )}
                     >
-                      Member portal
+                      {t("nav.memberPortal")}
                     </Link>
                     <form action={signOutAction}>
                       <Button
@@ -208,7 +227,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                         variant="ghost"
                         className="w-full text-red-300 hover:bg-white/10 hover:text-red-200"
                       >
-                        Sign out
+                        {t("nav.signOut")}
                       </Button>
                     </form>
                   </>
@@ -222,7 +241,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                         "mb-2 w-full justify-center rounded-lg border-white/30 bg-transparent text-white hover:bg-white/10",
                       )}
                     >
-                      Login
+                      {t("nav.login")}
                     </Link>
                     <Link
                       href="/membership"
@@ -232,7 +251,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                         "w-full justify-center rounded-lg bg-brand text-[#004149] hover:bg-brand/90",
                       )}
                     >
-                      Become Member
+                      {t("nav.becomeMember")}
                     </Link>
                   </>
                 )}

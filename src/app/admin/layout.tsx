@@ -40,7 +40,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-[100svh] bg-surface-low">
+    <div className="notranslate flex min-h-[100svh] bg-surface-low">
       <PortalSidebar
         title="Admin Portal"
         subtitle={`${context.email || ""} · ${context.roles.map((r) => r.name).join(", ") || "No roles"}`}

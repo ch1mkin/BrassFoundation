@@ -1,9 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { NewsletterForm } from "@/components/website/newsletter-form";
-import { NAV_LINKS, SITE } from "@/lib/constants";
+import { SITE } from "@/lib/constants";
 
 export function SiteFooter() {
+  const { t } = useLocale();
+
   return (
     <footer className="w-full bg-[#0B1C28] text-white">
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-4 py-16 sm:px-6 md:grid-cols-4 lg:px-20">
@@ -16,13 +21,12 @@ export function SiteFooter() {
               height={40}
               className="rounded-full bg-white p-0.5"
             />
-            <span className="font-heading text-lg font-bold text-white">
+            <span className="notranslate font-heading text-lg font-bold text-white">
               {SITE.name}
             </span>
           </div>
-          <p className="text-sm text-white/70">
-            Empowering the marginalized through the light of knowledge and
-            unity.
+          <p className="notranslate text-sm leading-relaxed text-white/70">
+            {t("footer.blurb")}
           </p>
           <div className="[&_input]:border-white/20 [&_input]:bg-white/10 [&_input]:text-white [&_input]:placeholder:text-white/40 [&_button]:bg-brand [&_button]:text-[#004149] [&_.text-destructive]:text-red-300 [&_.text-success]:text-emerald-300">
             <NewsletterForm />
@@ -30,34 +34,56 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h4 className="mb-4 text-xs font-semibold tracking-wide text-brand uppercase">
-            Quick Links
+          <h4 className="notranslate mb-4 text-xs font-semibold tracking-wide text-brand uppercase">
+            {t("footer.quickLinks")}
           </h4>
-          <ul className="space-y-2">
-            {NAV_LINKS.slice(0, 4).map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-xs font-semibold text-white/70 transition hover:text-brand"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+          <ul className="notranslate space-y-2">
+            <li>
+              <Link
+                href="/about"
+                className="text-xs font-semibold text-white/70 transition hover:text-brand"
+              >
+                {t("nav.about")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/community"
+                className="text-xs font-semibold text-white/70 transition hover:text-brand"
+              >
+                {t("nav.community")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/events"
+                className="text-xs font-semibold text-white/70 transition hover:text-brand"
+              >
+                {t("nav.events")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/resources"
+                className="text-xs font-semibold text-white/70 transition hover:text-brand"
+              >
+                {t("nav.resources")}
+              </Link>
+            </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="mb-4 text-xs font-semibold tracking-wide text-brand uppercase">
-            Community
+          <h4 className="notranslate mb-4 text-xs font-semibold tracking-wide text-brand uppercase">
+            {t("footer.community")}
           </h4>
-          <ul className="space-y-2">
+          <ul className="notranslate space-y-2">
             <li>
               <Link
                 href="/membership"
                 className="text-xs font-semibold text-white/70 hover:text-brand"
               >
-                Become a Member
+                {t("footer.becomeMember")}
               </Link>
             </li>
             <li>
@@ -65,7 +91,7 @@ export function SiteFooter() {
                 href="/gallery"
                 className="text-xs font-semibold text-white/70 hover:text-brand"
               >
-                Gallery
+                {t("footer.gallery")}
               </Link>
             </li>
             <li>
@@ -73,7 +99,7 @@ export function SiteFooter() {
                 href="/marketplace"
                 className="text-xs font-semibold text-white/70 hover:text-brand"
               >
-                Marketplace
+                {t("footer.marketplace")}
               </Link>
             </li>
           </ul>
@@ -81,12 +107,12 @@ export function SiteFooter() {
 
         <div>
           <h4 className="mb-4 text-xs font-semibold tracking-wide text-brand uppercase">
-            Contact Us
+            {t("footer.contactUs")}
           </h4>
           <p className="mb-4 text-xs font-semibold text-white/70">India</p>
           <a
             href="mailto:contact@brassfoundation.org"
-            className="text-xs font-semibold text-white/70 hover:text-brand"
+            className="notranslate text-xs font-semibold text-white/70 hover:text-brand"
           >
             contact@brassfoundation.org
           </a>
@@ -95,20 +121,23 @@ export function SiteFooter() {
 
       <div className="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-4 border-t border-white/10 px-4 py-6 sm:flex-row sm:px-6 lg:px-20">
         <span className="text-xs font-semibold text-white/55">
-          © {new Date().getFullYear()} {SITE.name}. All rights reserved.
+          <span className="notranslate">
+            © {new Date().getFullYear()} {SITE.name}.
+          </span>{" "}
+          {t("footer.rights")}
         </span>
         <div className="flex gap-6">
           <Link
             href="/contact"
             className="text-xs font-semibold text-white/55 hover:text-brand"
           >
-            Contact
+            {t("footer.contact")}
           </Link>
           <Link
             href="/gallery"
             className="text-xs font-semibold text-white/55 hover:text-brand"
           >
-            Gallery
+            {t("footer.gallery")}
           </Link>
         </div>
       </div>
