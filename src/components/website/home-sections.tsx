@@ -9,11 +9,11 @@ import {
   COMMUNITY_WORK,
   CORE_VALUES,
   FEATURED_BOOKS,
-  LEADERSHIP,
   RESOURCES_PREVIEW,
   UPCOMING_EVENTS,
 } from "@/lib/constants";
 import type { HomepageContent } from "@/lib/cms/homepage";
+import type { ExecutiveMember } from "@/lib/content/committee";
 import { cn } from "@/lib/utils";
 
 function AnimatedCounter({
@@ -161,46 +161,66 @@ export function AboutSection({
   );
 }
 
-export function LeadershipSection() {
+export function LeadershipSection({
+  members,
+}: {
+  members: ExecutiveMember[];
+}) {
   return (
     <section className="bg-surface-high py-16 lg:py-20">
       <div className="mx-auto mb-12 max-w-[1280px] px-4 text-center sm:px-6 lg:px-20">
         <h2 className="font-heading mb-3 text-3xl font-semibold">
-          Our Leadership
+          Executive Committee
         </h2>
         <p className="mx-auto max-w-2xl text-muted-foreground">
-          Guided by visionaries and community leaders dedicated to the cause of
-          social justice.
+          The committee guiding Brass Foundation&apos;s mission of education,
+          equality, and community development.
         </p>
       </div>
-      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-20">
-        {LEADERSHIP.map((leader, i) => (
-          <motion.div
-            key={leader.name}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.06 }}
-            className="glass-card group rounded-2xl p-8 text-center"
-          >
-            <div className="mx-auto mb-4 flex size-32 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-surface-highest shadow-lg transition-transform group-hover:scale-105">
-              <span className="font-heading text-3xl font-bold text-primary">
-                {leader.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .slice(0, 2)
-                  .join("")}
-              </span>
-            </div>
-            <h3 className="font-heading text-xl font-semibold text-foreground">
-              {leader.name}
-            </h3>
-            <p className="mb-4 text-sm font-medium text-primary">
-              {leader.role}
-            </p>
-            <p className="mb-6 text-sm text-muted-foreground">{leader.bio}</p>
-          </motion.div>
-        ))}
+      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:grid-cols-2 sm:px-6 md:grid-cols-3 lg:grid-cols-4 lg:px-20">
+        {members.map((member, i) => {
+          const initials = member.full_name
+            .replace(/^Sh\.\s*/i, "")
+            .replace(/^Adv\.\s*/i, "")
+            .split(" ")
+            .filter(Boolean)
+            .map((n) => n[0])
+            .slice(0, 2)
+            .join("")
+            .toUpperCase();
+
+          return (
+            <motion.div
+              key={member.id}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: Math.min(i * 0.04, 0.4) }}
+              className="text-center"
+            >
+              <div className="mx-auto mb-4 flex size-32 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-surface-highest shadow-lg">
+                {member.photo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={member.photo_url}
+                    alt={member.full_name}
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <span className="font-heading text-2xl font-bold text-primary/50">
+                    {initials || "—"}
+                  </span>
+                )}
+              </div>
+              <h3 className="font-heading text-lg font-semibold text-foreground">
+                {member.full_name}
+              </h3>
+              <p className="mt-1 text-sm font-medium text-primary">
+                {member.role_title}
+              </p>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );

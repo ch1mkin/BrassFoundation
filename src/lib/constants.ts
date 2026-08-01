@@ -95,28 +95,28 @@ export const CORE_VALUES = [
   },
 ] as const;
 
-export const LEADERSHIP = [
-  {
-    name: "Dr. Anita Shinde",
-    role: "President",
-    bio: "A dedicated social activist with 20 years of experience in rural education reform.",
-  },
-  {
-    name: "Rahul Kamble",
-    role: "General Secretary",
-    bio: "Specializing in digital infrastructure for remote learning programs.",
-  },
-  {
-    name: "Prof. V. Jadhav",
-    role: "Advisory Board",
-    bio: "Former Vice-Chancellor with expertise in institutional development.",
-  },
-  {
-    name: "Meena Pawar",
-    role: "Treasurer",
-    bio: "Financial expert focused on transparent resource allocation for NGO growth.",
-  },
+export const EXECUTIVE_COMMITTEE = [
+  { name: "Sh. Labh Singh Gobindgarh", role: "Chairman" },
+  { name: "Sh. Kuldip Singh", role: "Vice Chairman" },
+  { name: "Sh. Lakhwinder Singh", role: "General Secretary" },
+  { name: "Sh. Rinku Singh", role: "Treasurer" },
+  { name: "Sh. Harwinder Singh", role: "Principal Advisor" },
+  { name: "Sh. Gursewak Singh", role: "Advertising Secretary" },
+  { name: "Sh. Ajaib Singh Neelowal", role: "Press Secretary" },
+  { name: "Sh. Nirmal Singh", role: "Executive Member" },
+  { name: "Sh. Jarnail Singh", role: "Executive Member" },
+  { name: "Sh. Jagsir Singh", role: "Executive Member" },
+  { name: "Sh. Harpreet Kaur", role: "Executive Member" },
+  { name: "Adv. Hans Raj", role: "Legal Advisor" },
 ] as const;
+
+/** @deprecated Use EXECUTIVE_COMMITTEE */
+export const LEADERSHIP = EXECUTIVE_COMMITTEE.map((m) => ({
+  name: m.name,
+  role: m.role,
+  bio: "",
+}));
+
 
 export const COMMUNITY_WORK = [
   {

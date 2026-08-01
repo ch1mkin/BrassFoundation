@@ -10,9 +10,13 @@ import {
 } from "@/components/website/home-sections";
 import { HeroSection } from "@/components/website/hero-section";
 import { getPublishedHomepage } from "@/lib/cms/homepage";
+import { getExecutiveCommittee } from "@/lib/content/committee";
 
 export default async function HomePage() {
-  const content = await getPublishedHomepage();
+  const [content, committee] = await Promise.all([
+    getPublishedHomepage(),
+    getExecutiveCommittee(),
+  ]);
 
   return (
     <>
@@ -38,7 +42,7 @@ export default async function HomePage() {
         body={content.about_body}
         values={content.core_values}
       />
-      <LeadershipSection />
+      <LeadershipSection members={committee} />
       <CommunitySection items={content.community_work} />
       <EventsSection />
       <ResourcesSection />

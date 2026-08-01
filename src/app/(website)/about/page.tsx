@@ -2,14 +2,17 @@ import type { Metadata } from "next";
 import { PageShell } from "@/components/website/page-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
-import { CORE_VALUES, LEADERSHIP, SITE } from "@/lib/constants";
+import { CORE_VALUES, SITE } from "@/lib/constants";
+import { getExecutiveCommittee } from "@/lib/content/committee";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "About",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const committee = await getExecutiveCommittee();
+
   return (
     <PageShell
       eyebrow="About"
@@ -44,19 +47,41 @@ export default function AboutPage() {
         </div>
 
         <div>
-          <h2 className="font-heading text-2xl font-semibold">Leadership</h2>
+          <h2 className="font-heading text-2xl font-semibold">
+            Executive Committee
+          </h2>
           <p className="mt-2 text-muted-foreground">
-            Guided by community leaders dedicated to education and social
-            justice.
+            The committee guiding Brass Foundation&apos;s work in education and
+            community development.
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {LEADERSHIP.map((leader) => (
-              <div key={leader.name} className="glass-card rounded-2xl p-5">
-                <h3 className="font-heading font-semibold">{leader.name}</h3>
-                <p className="mt-1 text-sm font-medium text-primary">
-                  {leader.role}
-                </p>
-                <p className="mt-2 text-sm text-muted-foreground">{leader.bio}</p>
+            {committee.map((member) => (
+              <div
+                key={member.id}
+                className="glass-card flex gap-3 rounded-2xl p-4"
+              >
+                <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-highest">
+                  {member.photo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={member.photo_url}
+                      alt=""
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-xs font-semibold text-primary/40">
+                      Photo
+                    </span>
+                  )}
+                </span>
+                <div className="min-w-0">
+                  <h3 className="font-heading font-semibold">
+                    {member.full_name}
+                  </h3>
+                  <p className="mt-0.5 text-sm font-medium text-primary">
+                    {member.role_title}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

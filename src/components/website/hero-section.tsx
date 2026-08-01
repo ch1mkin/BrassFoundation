@@ -103,6 +103,7 @@ export function HeroSection({
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.55 }}
+            className="flex size-40 items-center justify-center rounded-full bg-white/30 p-3 shadow-lg ring-1 ring-white/40 sm:size-52 sm:p-4"
           >
             <Image
               src="/brand/logo.png"
@@ -110,7 +111,7 @@ export function HeroSection({
               width={192}
               height={192}
               priority
-              className="h-36 w-36 object-contain drop-shadow-2xl sm:h-48 sm:w-48"
+              className="h-full w-full object-contain drop-shadow-xl"
             />
           </motion.div>
         </div>
@@ -126,19 +127,9 @@ export function HeroSection({
           transition={{ delay: 0.15, duration: 0.6 }}
           lang={adminPa ? "pa" : undefined}
         >
-          {lines.map((line, i) => (
-            <span key={line} className="block">
-              {i === lines.length - 1 ? (
-                <span
-                  className={cn(
-                    hasBg ? "hero-headline-accent text-brand" : "text-primary",
-                  )}
-                >
-                  {line}
-                </span>
-              ) : (
-                line
-              )}
+          {lines.map((line) => (
+            <span key={line} className="block text-inherit">
+              {line}
             </span>
           ))}
         </motion.h1>
@@ -146,7 +137,7 @@ export function HeroSection({
         <motion.p
           className={cn(
             "mx-auto mb-10 max-w-2xl text-lg leading-relaxed",
-            hasBg ? "text-white/85" : "text-muted-foreground",
+            hasBg ? "text-white" : "text-muted-foreground",
             adminPa && "notranslate",
           )}
           initial={{ opacity: 0, y: 16 }}
