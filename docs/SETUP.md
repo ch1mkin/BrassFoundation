@@ -40,9 +40,13 @@ This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS,
 
 ## 3. Auth settings (Supabase Dashboard)
 
-- Authentication → Providers → Email: enable
+- Authentication → Providers → **Phone**: enable
+- Configure an SMS provider (Twilio, MessageBird, etc.) under Phone settings
+- Disable **Confirm email** under Authentication → Providers → Email (we use phone OTP, not email verification)
 - Site URL: your Vercel URL
 - Redirect URLs: `https://your-app.vercel.app/auth/callback` and `http://localhost:3000/auth/callback`
+
+Sessions stay signed in via long-lived auth cookies (~400 days) with automatic refresh.
 
 ## 4. First Super Admin
 

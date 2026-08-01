@@ -12,6 +12,11 @@ export async function updateSession(request: NextRequest) {
   }
 
   const supabase = createServerClient(url, key, {
+    cookieOptions: {
+      maxAge: 60 * 60 * 24 * 400,
+      path: "/",
+      sameSite: "lax",
+    },
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -22,7 +27,10 @@ export async function updateSession(request: NextRequest) {
         );
         supabaseResponse = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) =>
-          supabaseResponse.cookies.set(name, value, options),
+          supabaseResponse.cookies.set(name, value, {
+            ...options,
+            maxAge: 60 * 60 * 24 * 400,
+          }),
         );
       },
     },
