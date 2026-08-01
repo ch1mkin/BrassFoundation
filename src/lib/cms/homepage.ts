@@ -32,6 +32,7 @@ export type HomepageContent = {
   hero_cta_secondary_label: string;
   hero_cta_secondary_href: string;
   hero_background_url: string | null;
+  hero_background_mobile_url: string | null;
   hero_eyebrow_pa: string | null;
   hero_headline_pa: string | null;
   hero_subheadline_pa: string | null;
@@ -56,6 +57,7 @@ function fallbackHomepage(): HomepageContent {
   return {
     ...DEFAULT_HOMEPAGE,
     hero_background_url: null,
+    hero_background_mobile_url: null,
     hero_eyebrow_pa: null,
     hero_headline_pa: null,
     hero_subheadline_pa: null,
@@ -100,6 +102,7 @@ export async function getPublishedHomepage(): Promise<HomepageContent> {
       hero_cta_secondary_href:
         data.hero_cta_secondary_href ?? DEFAULT_HOMEPAGE.hero_cta_secondary_href,
       hero_background_url: data.hero_background_url ?? null,
+      hero_background_mobile_url: data.hero_background_mobile_url ?? null,
       hero_eyebrow_pa: data.hero_eyebrow_pa ?? null,
       hero_headline_pa: data.hero_headline_pa ?? null,
       hero_subheadline_pa: data.hero_subheadline_pa ?? null,

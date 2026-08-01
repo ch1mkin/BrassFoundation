@@ -221,6 +221,20 @@
   .auth-bg-gradient {
     background: linear-gradient(135deg, #001c3a 0%, #004f58 100%);
   }
+
+  /* White outline so hero headline stays readable on photo backgrounds */
+  .hero-headline {
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.95);
+    paint-order: stroke fill;
+    text-shadow:
+      0 1px 2px rgba(0, 28, 58, 0.35),
+      0 0 1px rgba(255, 255, 255, 0.8);
+  }
+
+  .hero-headline-accent {
+    -webkit-text-stroke: 1.15px rgba(255, 255, 255, 0.98);
+    paint-order: stroke fill;
+  }
 }
 
 /* Punjabi / Gurmukhi readability */

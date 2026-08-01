@@ -66,11 +66,19 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
           <h2 className="font-heading text-xl font-medium">Hero</h2>
           <FileOrUrlField
             name="hero_background_url"
-            label="Hero background image (upload or URL)"
+            label="Hero background image — desktop (upload or URL)"
             bucket="gallery"
             accept="image/*"
             folder="hero"
             defaultUrl={content.hero_background_url || undefined}
+          />
+          <FileOrUrlField
+            name="hero_background_mobile_url"
+            label="Hero background — mobile only (optional). If empty, desktop image is shown smaller/centered."
+            bucket="gallery"
+            accept="image/*"
+            folder="hero-mobile"
+            defaultUrl={content.hero_background_mobile_url || undefined}
           />
           <Field
             label="Eyebrow"

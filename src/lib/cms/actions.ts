@@ -11,6 +11,7 @@ export type CmsActionState = {
 
 const OPTIONAL_COLUMNS = [
   "hero_background_url",
+  "hero_background_mobile_url",
   "hero_eyebrow_pa",
   "hero_headline_pa",
   "hero_subheadline_pa",
@@ -69,6 +70,9 @@ export async function updateHomepageAction(
       ).trim(),
       hero_background_url:
         String(formData.get("hero_background_url") || "").trim() || null,
+      hero_background_mobile_url:
+        String(formData.get("hero_background_mobile_url") || "").trim() ||
+        null,
       hero_eyebrow_pa:
         String(formData.get("hero_eyebrow_pa") || "").trim() || null,
       hero_headline_pa:
@@ -145,7 +149,7 @@ export async function updateHomepageAction(
       if (isMissingColumnError(error.message)) {
         return {
           error:
-            "Database is missing homepage columns. Run supabase/migrations/20260801070000_hero_background.sql (and 80000) in the Supabase SQL Editor.",
+            "Database is missing homepage columns. Run supabase/migrations/20260801070000_hero_background.sql, 80000, and 20260801100000_hero_mobile_background.sql in the Supabase SQL Editor.",
         };
       }
       return { error: error.message };

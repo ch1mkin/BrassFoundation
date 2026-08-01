@@ -24,6 +24,7 @@ type HeroSectionProps = {
   secondaryLabel: string;
   secondaryHref: string;
   backgroundUrl?: string | null;
+  backgroundMobileUrl?: string | null;
   headlinePa?: string | null;
   subheadlinePa?: string | null;
   primaryLabelPa?: string | null;
@@ -39,6 +40,7 @@ export function HeroSection({
   secondaryLabel,
   secondaryHref,
   backgroundUrl,
+  backgroundMobileUrl,
   headlinePa,
   subheadlinePa,
   primaryLabelPa,
@@ -59,7 +61,10 @@ export function HeroSection({
   const lines = displayHeadline.split("\n").filter(Boolean);
   const left = floatingStats?.[0];
   const right = floatingStats?.[1];
-  const hasBg = Boolean(backgroundUrl);
+  const desktopBg = backgroundUrl?.trim() || null;
+  const mobileBg =
+    backgroundMobileUrl?.trim() || desktopBg;
+  const hasBg = Boolean(desktopBg || mobileBg);
   const adminPa = Boolean(
     locale === "pa" &&
       (headlinePa?.trim() || subheadlinePa?.trim()),
@@ -69,26 +74,43 @@ export function HeroSection({
     <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-surface pt-20">
       {hasBg ? (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={backgroundUrl!}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#001c3a]/75 via-[#004f58]/55 to-surface" />
+          {/* Mobile: contain + center so the full image width stays visible */}
+          {mobileBg ? (
+            <div className="absolute inset-0 bg-[#0B1C28] md:hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={mobileBg}
+                alt=""
+                className="absolute top-1/2 left-1/2 h-auto max-h-[58svh] w-[min(100%,24rem)] -translate-x-1/2 -translate-y-[58%] object-contain object-center sm:w-[min(92%,28rem)] sm:max-h-[62svh]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#001c3a]/55 via-[#004f58]/35 to-surface" />
+            </div>
+          ) : null}
+
+          {/* Desktop: edge-to-edge cover */}
+          {desktopBg ? (
+            <div className="absolute inset-0 hidden md:block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={desktopBg}
+                alt=""
+                className="h-full w-full object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#001c3a]/75 via-[#004f58]/55 to-surface" />
+            </div>
+          ) : null}
         </>
       ) : (
         <HeroParticles />
       )}
 
       <div className="relative z-10 mx-auto max-w-[1280px] px-4 py-16 text-center sm:px-6 lg:px-20">
-        <div className="mb-12 flex justify-center">
+        <div className="mb-10 flex justify-center sm:mb-12">
           <div className="relative">
             <motion.div
-              className="floating-animation"
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.55 }}
             >
               <Image
                 src="/brand/logo.png"
@@ -96,15 +118,12 @@ export function HeroSection({
                 width={192}
                 height={192}
                 priority
-                className="h-40 w-40 rounded-full bg-white/95 object-contain p-2 drop-shadow-2xl sm:h-48 sm:w-48"
+                className="h-36 w-36 rounded-full bg-white/95 object-contain p-2 drop-shadow-2xl sm:h-48 sm:w-48"
               />
             </motion.div>
 
             {left ? (
-              <div
-                className="glass-card absolute -top-8 -left-16 hidden rounded-xl p-3 animate-bounce sm:block"
-                style={{ animationDuration: "4s" }}
-              >
+              <div className="glass-card absolute -top-8 -left-16 hidden rounded-xl p-3 sm:block">
                 <span className="font-heading block text-xl font-semibold text-primary">
                   {left.value.toLocaleString()}
                   {left.suffix || ""}
@@ -115,10 +134,7 @@ export function HeroSection({
               </div>
             ) : null}
             {right ? (
-              <div
-                className="glass-card absolute top-16 -right-20 hidden rounded-xl p-3 animate-bounce sm:block"
-                style={{ animationDuration: "5s" }}
-              >
+              <div className="glass-card absolute top-16 -right-20 hidden rounded-xl p-3 sm:block">
                 <span className="font-heading block text-xl font-semibold text-secondary">
                   {right.value.toLocaleString()}
                   {right.suffix || ""}
@@ -134,7 +150,7 @@ export function HeroSection({
         <motion.h1
           className={cn(
             "font-heading mx-auto mb-6 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-[48px] lg:leading-[1.1]",
-            hasBg ? "text-white drop-shadow-md" : "text-foreground",
+            hasBg ? "hero-headline text-white" : "text-foreground",
             adminPa && "notranslate",
           )}
           initial={{ opacity: 0, y: 16 }}
@@ -145,7 +161,11 @@ export function HeroSection({
           {lines.map((line, i) => (
             <span key={line} className="block">
               {i === lines.length - 1 ? (
-                <span className={hasBg ? "text-brand" : "text-primary"}>
+                <span
+                  className={cn(
+                    hasBg ? "hero-headline-accent text-brand" : "text-primary",
+                  )}
+                >
                   {line}
                 </span>
               ) : (
