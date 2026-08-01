@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, UserRound } from "lucide-react";
+import { ChevronDown, Menu, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -22,7 +21,7 @@ import { BrandLogo } from "@/components/brand/logo";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { signOutAction } from "@/lib/auth/actions";
-import { NAV_ITEMS, SITE } from "@/lib/constants";
+import { NAV_ITEMS, SITE, type NavItem } from "@/lib/constants";
 import { NAV_MESSAGE_KEYS } from "@/lib/i18n/messages";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +30,15 @@ export type HeaderUser = {
   fullName: string | null;
   isAdmin: boolean;
 };
+
+function pathActive(pathname: string, href: string) {
+  return href === "/" ? pathname === "/" : pathname.startsWith(href);
+}
+
+function itemActive(pathname: string, item: NavItem) {
+  if (item.href) return pathActive(pathname, item.href);
+  return Boolean(item.children?.some((c) => pathActive(pathname, c.href)));
+}
 
 export function SiteHeader({ user }: { user: HeaderUser | null }) {
   const [open, setOpen] = useState(false);
@@ -57,9 +65,17 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
     router.push(href);
   }
 
+  const linkClass = (active: boolean) =>
+    cn(
+      "notranslate relative z-10 inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors",
+      active
+        ? "bg-white/10 font-semibold text-brand"
+        : "text-white/75 hover:bg-white/5 hover:text-white",
+    );
+
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-[#0B1C28]/95 shadow-md backdrop-blur-md">
-      <nav className="mx-auto flex h-20 max-w-[1280px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-20">
+    <header className="fixed top-0 z-[60] w-full border-b border-white/10 bg-[#0B1C28]/95 shadow-md backdrop-blur-md">
+      <div className="mx-auto flex h-20 max-w-[1280px] items-center gap-4 px-4 sm:px-6 lg:px-20">
         <BrandLogo
           size="md"
           priority
@@ -67,29 +83,69 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
           wordmarkClassName="notranslate font-heading text-xl font-bold text-white"
         />
 
-        <div className="hidden items-center gap-8 md:flex">
+        {/* Breathing room between brand and clustered nav */}
+        <div className="hidden min-w-8 flex-1 md:block" aria-hidden />
+
+        <nav
+          className="notranslate relative z-10 hidden items-center gap-1 md:flex"
+          aria-label="Primary"
+        >
           {NAV_ITEMS.map((item) => {
+            const active = itemActive(pathname, item);
+
+            if (item.children?.length) {
+              return (
+                <DropdownMenu key={item.label}>
+                  <DropdownMenuTrigger
+                    className={cn(linkClass(active), "outline-none")}
+                    aria-label={navLabel(item.label)}
+                  >
+                    {navLabel(item.label)}
+                    <ChevronDown className="size-3.5 opacity-70" aria-hidden />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    sideOffset={10}
+                    className="z-[80] min-w-56 rounded-xl p-2 shadow-soft"
+                  >
+                    {item.children.map((child) => (
+                      <DropdownMenuItem
+                        key={child.href}
+                        className="cursor-pointer rounded-lg"
+                        onClick={() => go(child.href)}
+                      >
+                        <span className="flex flex-col gap-0.5">
+                          <span className="text-sm font-medium">
+                            {navLabel(child.label)}
+                          </span>
+                          {child.description ? (
+                            <span className="text-xs text-muted-foreground">
+                              {child.description}
+                            </span>
+                          ) : null}
+                        </span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              );
+            }
+
             const href = item.href || "/";
-            const active =
-              href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
-              <Link
+              <button
                 key={item.label}
-                href={href}
-                className={cn(
-                  "notranslate text-sm font-medium transition-colors",
-                  active
-                    ? "border-b-2 border-brand font-bold text-brand"
-                    : "text-white/75 hover:text-white",
-                )}
+                type="button"
+                className={linkClass(active)}
+                onClick={() => go(href)}
               >
                 {navLabel(item.label)}
-              </Link>
+              </button>
             );
           })}
-        </div>
+        </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="relative z-10 ml-auto hidden items-center gap-3 md:flex">
           <LanguageSwitcher />
           {user ? (
             <DropdownMenu>
@@ -142,26 +198,28 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
             </DropdownMenu>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="hidden text-sm font-medium text-white/80 transition hover:text-white lg:block"
+              <button
+                type="button"
+                onClick={() => go("/login")}
+                className="hidden text-sm font-medium text-white/80 transition hover:text-white lg:inline"
               >
                 {t("nav.login")}
-              </Link>
-              <Link
-                href="/membership"
+              </button>
+              <button
+                type="button"
+                onClick={() => go("/membership")}
                 className={cn(
                   buttonVariants(),
                   "rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-[#004149] shadow-lg shadow-black/20 hover:bg-brand/90 active:scale-95",
                 )}
               >
                 {t("nav.becomeMember")}
-              </Link>
+              </button>
             </>
           )}
         </div>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="relative z-10 ml-auto flex items-center gap-2 md:hidden">
           <LanguageSwitcher />
           <button
             type="button"
@@ -176,7 +234,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetContent
             side="right"
-            className="w-[min(100%,20rem)] bg-[#0B1C28] text-white"
+            className="z-[70] w-[min(100%,20rem)] bg-[#0B1C28] text-white"
           >
             <SheetHeader>
               <SheetTitle className="sr-only">{SITE.name}</SheetTitle>
@@ -187,20 +245,42 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                 wordmarkClassName="notranslate text-white"
               />
             </SheetHeader>
-            <nav className="mt-6 flex flex-col gap-2 px-2">
+            <nav className="mt-6 flex flex-col gap-1 px-2" aria-label="Mobile">
               <div className="mb-2 px-1">
                 <LanguageSwitcher className="w-full justify-center" />
               </div>
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href || "/"}
-                  onClick={() => setOpen(false)}
-                  className="notranslate rounded-lg px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white"
-                >
-                  {navLabel(item.label)}
-                </Link>
-              ))}
+              {NAV_ITEMS.map((item) => {
+                if (item.children?.length) {
+                  return (
+                    <div key={item.label} className="mb-2">
+                      <p className="notranslate px-3 py-1.5 text-[11px] font-semibold tracking-wide text-white/45 uppercase">
+                        {navLabel(item.label)}
+                      </p>
+                      {item.children.map((child) => (
+                        <button
+                          key={child.href}
+                          type="button"
+                          onClick={() => go(child.href)}
+                          className="notranslate flex w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white"
+                        >
+                          {navLabel(child.label)}
+                        </button>
+                      ))}
+                    </div>
+                  );
+                }
+
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => go(item.href || "/")}
+                    className="notranslate flex w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white"
+                  >
+                    {navLabel(item.label)}
+                  </button>
+                );
+              })}
               <div className="mt-4 border-t border-white/15 pt-4">
                 {user ? (
                   <>
@@ -217,27 +297,27 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                         </p>
                       </div>
                     </div>
-                    <Link
-                      href="/member"
-                      onClick={() => setOpen(false)}
+                    <button
+                      type="button"
+                      onClick={() => go("/member")}
                       className={cn(
                         buttonVariants(),
                         "mb-2 w-full justify-center rounded-lg bg-brand text-[#004149] hover:bg-brand/90",
                       )}
                     >
                       {t("nav.memberPortal")}
-                    </Link>
+                    </button>
                     {user.isAdmin ? (
-                      <Link
-                        href="/admin"
-                        onClick={() => setOpen(false)}
+                      <button
+                        type="button"
+                        onClick={() => go("/admin")}
                         className={cn(
                           buttonVariants({ variant: "outline" }),
                           "mb-2 w-full justify-center rounded-lg border-white/30 bg-transparent text-white hover:bg-white/10",
                         )}
                       >
                         {t("nav.adminPortal")}
-                      </Link>
+                      </button>
                     ) : null}
                     <form action={signOutAction}>
                       <Button
@@ -251,33 +331,33 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                   </>
                 ) : (
                   <>
-                    <Link
-                      href="/login"
-                      onClick={() => setOpen(false)}
+                    <button
+                      type="button"
+                      onClick={() => go("/login")}
                       className={cn(
                         buttonVariants({ variant: "outline" }),
                         "mb-2 w-full justify-center rounded-lg border-white/30 bg-transparent text-white hover:bg-white/10",
                       )}
                     >
                       {t("nav.login")}
-                    </Link>
-                    <Link
-                      href="/membership"
-                      onClick={() => setOpen(false)}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => go("/membership")}
                       className={cn(
                         buttonVariants(),
                         "w-full justify-center rounded-lg bg-brand text-[#004149] hover:bg-brand/90",
                       )}
                     >
                       {t("nav.becomeMember")}
-                    </Link>
+                    </button>
                   </>
                 )}
               </div>
             </nav>
           </SheetContent>
         </Sheet>
-      </nav>
+      </div>
     </header>
   );
 }

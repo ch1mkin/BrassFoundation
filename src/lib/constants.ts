@@ -22,10 +22,43 @@ export type NavItem = {
 export const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Community", href: "/community" },
-  { label: "Resources", href: "/resources" },
-  { label: "Events", href: "/events" },
-  { label: "Gallery", href: "/gallery" },
+  {
+    label: "Explore",
+    children: [
+      {
+        href: "/community",
+        label: "Community",
+        description: "Chapters and local groups",
+      },
+      {
+        href: "/events",
+        label: "Events",
+        description: "Programs and gatherings",
+      },
+      {
+        href: "/gallery",
+        label: "Gallery",
+        description: "Photos and moments",
+      },
+    ],
+  },
+  {
+    label: "Learn",
+    children: [
+      {
+        href: "/resources",
+        label: "Resources",
+        description: "Books and study materials",
+      },
+      { href: "/news", label: "News", description: "Updates and announcements" },
+      { href: "/blog", label: "Blog", description: "Stories and reflections" },
+      {
+        href: "/marketplace",
+        label: "Marketplace",
+        description: "Community listings",
+      },
+    ],
+  },
   { label: "Contact", href: "/contact" },
 ];
 

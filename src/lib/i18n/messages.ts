@@ -3,10 +3,15 @@ import type { Locale } from "@/lib/i18n/config";
 export type MessageKey =
   | "nav.home"
   | "nav.about"
+  | "nav.explore"
+  | "nav.learn"
   | "nav.community"
   | "nav.resources"
   | "nav.events"
   | "nav.gallery"
+  | "nav.news"
+  | "nav.blog"
+  | "nav.marketplace"
   | "nav.contact"
   | "nav.login"
   | "nav.becomeMember"
@@ -31,10 +36,15 @@ export type MessageKey =
 const en: Record<MessageKey, string> = {
   "nav.home": "Home",
   "nav.about": "About",
+  "nav.explore": "Explore",
+  "nav.learn": "Learn",
   "nav.community": "Community",
   "nav.resources": "Resources",
   "nav.events": "Events",
   "nav.gallery": "Gallery",
+  "nav.news": "News",
+  "nav.blog": "Blog",
+  "nav.marketplace": "Marketplace",
   "nav.contact": "Contact",
   "nav.login": "Login",
   "nav.becomeMember": "Become Member",
@@ -62,10 +72,15 @@ const en: Record<MessageKey, string> = {
 const pa: Record<MessageKey, string> = {
   "nav.home": "ਘਰ",
   "nav.about": "ਬਾਰੇ",
+  "nav.explore": "ਖੋਜੋ",
+  "nav.learn": "ਸਿੱਖੋ",
   "nav.community": "ਕਮਿਊਨਿਟੀ",
   "nav.resources": "ਸਰੋਤ",
   "nav.events": "ਸਮਾਗਮ",
   "nav.gallery": "ਗੈਲਰੀ",
+  "nav.news": "ਖ਼ਬਰਾਂ",
+  "nav.blog": "ਬਲੌਗ",
+  "nav.marketplace": "ਬਾਜ਼ਾਰ",
   "nav.contact": "ਸੰਪਰਕ",
   "nav.login": "ਲਾਗਇਨ",
   "nav.becomeMember": "ਮੈਂਬਰ ਬਣੋ",
@@ -100,9 +115,14 @@ export function t(locale: Locale, key: MessageKey | string): string {
 export const NAV_MESSAGE_KEYS: Record<string, MessageKey> = {
   Home: "nav.home",
   About: "nav.about",
+  Explore: "nav.explore",
+  Learn: "nav.learn",
   Community: "nav.community",
   Resources: "nav.resources",
   Events: "nav.events",
   Gallery: "nav.gallery",
+  News: "nav.news",
+  Blog: "nav.blog",
+  Marketplace: "nav.marketplace",
   Contact: "nav.contact",
 };
