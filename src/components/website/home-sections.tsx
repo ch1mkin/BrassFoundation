@@ -674,7 +674,7 @@ export function MustReadSection({
             transition={{ delay: i * 0.05 }}
             className="group flex gap-4 rounded-2xl border border-border/40 bg-white p-4 transition hover:shadow-lg sm:p-5"
           >
-            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-highest sm:size-24">
+            <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-highest sm:size-24">
               {book.cover_image_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -688,6 +688,9 @@ export function MustReadSection({
                   className="text-3xl text-primary/40"
                 />
               )}
+              <span className="absolute right-1.5 bottom-1.5 flex size-7 items-center justify-center rounded-full bg-primary text-white shadow-md ring-2 ring-white">
+                <MaterialIcon name="menu_book" className="text-[16px]" />
+              </span>
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="font-heading line-clamp-2 text-base font-semibold sm:text-lg">
@@ -699,6 +702,7 @@ export function MustReadSection({
                 </p>
               ) : null}
               <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-primary">
+                <MaterialIcon name="menu_book" className="text-[18px]" />
                 Read PDF
                 <MaterialIcon name="open_in_new" className="text-[16px]" />
               </span>

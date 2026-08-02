@@ -51,6 +51,11 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Learn",
     children: [
       {
+        href: "/must-read",
+        label: "Must Read",
+        description: "Essential books with PDF access",
+      },
+      {
         href: "/resources",
         label: "Resources",
         description: "Books and study materials",
