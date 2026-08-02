@@ -62,6 +62,10 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
   );
 
   useEffect(() => {
+    setDesktopHeroUrl(content.hero_background_url || "");
+  }, [content.hero_background_url]);
+
+  useEffect(() => {
     if (state.success) router.refresh();
   }, [state.success, router]);
 
@@ -71,12 +75,13 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
         <section className="space-y-4 rounded-2xl bg-card p-6 shadow-soft">
           <h2 className="font-heading text-xl font-medium">Hero</h2>
           <HeroBackgroundField
+            key={`desktop-hero|${content.hero_background_url || ""}|${content.hero_bg_frame.focusX}|${content.hero_bg_frame.focusY}|${content.hero_bg_frame.zoom}`}
             urlName="hero_background_url"
             focusXName="hero_bg_focus_x"
             focusYName="hero_bg_focus_y"
             zoomName="hero_bg_zoom"
             label="Hero background — desktop"
-            hint="Shown on tablet/desktop (md+). Drag to move, zoom to crop."
+            hint="Shown on tablet/desktop (md+). Drag to move, zoom to crop. Bake crop publishes immediately."
             bucket="gallery"
             folder="hero"
             variant="desktop"
@@ -85,6 +90,7 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
             onUrlChange={setDesktopHeroUrl}
           />
           <HeroBackgroundField
+            key={`mobile-hero|${content.hero_background_mobile_url || ""}|${content.hero_bg_mobile_frame.focusX}|${content.hero_bg_mobile_frame.focusY}|${content.hero_bg_mobile_frame.zoom}`}
             urlName="hero_background_mobile_url"
             focusXName="hero_bg_mobile_focus_x"
             focusYName="hero_bg_mobile_focus_y"

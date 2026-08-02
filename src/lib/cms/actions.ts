@@ -10,15 +10,23 @@ export type CmsActionState = {
   success?: string;
 };
 
-const OPTIONAL_COLUMNS = [
-  "hero_background_url",
-  "hero_background_mobile_url",
+/** Framing columns — may be missing until migration 20260802080000. */
+const FRAMING_COLUMNS = [
   "hero_bg_focus_x",
   "hero_bg_focus_y",
   "hero_bg_zoom",
   "hero_bg_mobile_focus_x",
   "hero_bg_mobile_focus_y",
   "hero_bg_mobile_zoom",
+] as const;
+
+/** Never strip these when recovering from a missing framing column. */
+const HERO_URL_COLUMNS = [
+  "hero_background_url",
+  "hero_background_mobile_url",
+] as const;
+
+const OTHER_OPTIONAL_COLUMNS = [
   "hero_eyebrow_pa",
   "hero_headline_pa",
   "hero_subheadline_pa",
@@ -40,6 +48,118 @@ function isMissingColumnError(message: string) {
     /could not find the .* column/i.test(message) ||
     /schema cache/i.test(message)
   );
+}
+
+function extractMissingColumn(message: string): string | null {
+  const patterns = [
+    /Could not find the '([^']+)' column/i,
+    /column "([^"]+)" of relation/i,
+    /column ([a-z0-9_]+) does not exist/i,
+  ];
+  for (const re of patterns) {
+    const m = message.match(re);
+    if (m?.[1]) return m[1];
+  }
+  return null;
+}
+
+function revalidateHomepage() {
+  revalidatePath("/");
+  revalidatePath("/admin");
+  revalidatePath("/admin/website");
+}
+
+async function getHomepageRowId(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+) {
+  const { data: existing } = await supabase
+    .from("homepage_content")
+    .select("id")
+    .eq("is_published", true)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return existing?.id as string | undefined;
+}
+
+async function writeHomepage(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  id: string | undefined,
+  body: Record<string, unknown>,
+) {
+  return id
+    ? supabase.from("homepage_content").update(body).eq("id", id)
+    : supabase.from("homepage_content").insert(body);
+}
+
+/**
+ * Persist payload; if a column is missing, strip only that column (or framing)
+ * and retry. Hero image URLs are preserved whenever possible.
+ */
+async function writeHomepageResilient(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  id: string | undefined,
+  payload: Record<string, unknown>,
+): Promise<{ error: { message: string } | null; droppedFraming: boolean }> {
+  let body: Record<string, unknown> = { ...payload };
+  let droppedFraming = false;
+
+  for (let attempt = 0; attempt < 24; attempt++) {
+    const { error } = await writeHomepage(supabase, id, body);
+    if (!error) return { error: null, droppedFraming };
+
+    if (!isMissingColumnError(error.message)) {
+      return { error, droppedFraming };
+    }
+
+    const missing = extractMissingColumn(error.message);
+    if (missing && missing in body) {
+      if ((FRAMING_COLUMNS as readonly string[]).includes(missing)) {
+        droppedFraming = true;
+      }
+      delete body[missing];
+      continue;
+    }
+
+    // Can't parse column — drop framing first (keep hero URLs), then other optionals
+    if (!droppedFraming) {
+      const next = { ...body };
+      for (const col of FRAMING_COLUMNS) delete next[col];
+      body = next;
+      droppedFraming = true;
+      continue;
+    }
+
+    let removed = false;
+    const next = { ...body };
+    for (const col of OTHER_OPTIONAL_COLUMNS) {
+      if (col in next) {
+        delete next[col];
+        removed = true;
+        break;
+      }
+    }
+    if (removed) {
+      body = next;
+      continue;
+    }
+
+    // Last resort: strip hero URLs only if they themselves are the problem
+    for (const col of HERO_URL_COLUMNS) {
+      if (col in next) {
+        delete next[col];
+        body = next;
+        removed = true;
+        break;
+      }
+    }
+    if (!removed) return { error, droppedFraming };
+  }
+
+  return {
+    error: { message: "Could not save homepage after column fallbacks." },
+    droppedFraming,
+  };
 }
 
 export async function updateHomepageAction(
@@ -145,61 +265,117 @@ export async function updateHomepageAction(
     }
 
     const supabase = await createClient();
-
-    const { data: existing } = await supabase
-      .from("homepage_content")
-      .select("id")
-      .eq("is_published", true)
-      .order("updated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    async function write(body: Record<string, unknown>) {
-      return existing?.id
-        ? supabase.from("homepage_content").update(body).eq("id", existing.id)
-        : supabase.from("homepage_content").insert(body);
-    }
-
-    let { error } = await write(payload);
-
-    // If optional columns aren't migrated yet, strip them and retry once.
-    if (error && isMissingColumnError(error.message)) {
-      const stripped = { ...payload };
-      for (const col of OPTIONAL_COLUMNS) {
-        delete stripped[col];
-      }
-      const retry = await write(stripped);
-      error = retry.error;
-
-      if (!error) {
-        revalidatePath("/");
-        revalidatePath("/admin");
-        return {
-          success:
-            "Homepage saved. Run migration 20260802080000_hero_image_framing.sql in Supabase so hero framing persists.",
-        };
-      }
-    }
+    const id = await getHomepageRowId(supabase);
+    const { error, droppedFraming } = await writeHomepageResilient(
+      supabase,
+      id,
+      payload,
+    );
 
     if (error) {
       if (isMissingColumnError(error.message)) {
         return {
           error:
-            "Database is missing homepage columns. Run supabase/migrations/20260802000000_quotes_events_admin_bg.sql (and earlier hero migrations) in the Supabase SQL Editor.",
+            "Database is missing homepage columns. Run supabase/migrations/20260802080000_hero_image_framing.sql (and earlier homepage migrations) in the Supabase SQL Editor.",
         };
       }
       return { error: error.message };
     }
 
-    revalidatePath("/");
-    revalidatePath("/admin");
-    return { success: "Homepage content saved." };
+    revalidateHomepage();
+    return {
+      success: droppedFraming
+        ? "Homepage saved, but hero framing columns are missing. Run migration 20260802080000_hero_image_framing.sql so drag/zoom values persist. Baked crop images still save."
+        : "Homepage content saved.",
+    };
   } catch (err) {
     return {
       error:
         err instanceof Error
           ? err.message
           : "Could not save homepage. Please try again.",
+    };
+  }
+}
+
+/**
+ * Persist a baked (or framed) hero image immediately so the live site matches
+ * admin without requiring a full homepage form submit first.
+ */
+export async function persistHeroBakeAction(input: {
+  variant: "desktop" | "mobile";
+  url: string;
+  focusX?: number;
+  focusY?: number;
+  zoom?: number;
+}): Promise<CmsActionState> {
+  try {
+    const context = await getUserContext();
+    if (!context || !canAccessAdmin(context)) {
+      return { error: "Unauthorized." };
+    }
+
+    const url = String(input.url || "").trim();
+    if (!url) return { error: "Missing hero image URL." };
+
+    const focusX = clampHeroFocus(input.focusX ?? 50);
+    const focusY = clampHeroFocus(input.focusY ?? 50);
+    const zoom = clampHeroZoom(input.zoom ?? 1);
+
+    const payload: Record<string, unknown> =
+      input.variant === "mobile"
+        ? {
+            hero_background_mobile_url: url,
+            hero_bg_mobile_focus_x: focusX,
+            hero_bg_mobile_focus_y: focusY,
+            hero_bg_mobile_zoom: zoom,
+            updated_by: context.userId,
+            is_published: true,
+          }
+        : {
+            hero_background_url: url,
+            hero_bg_focus_x: focusX,
+            hero_bg_focus_y: focusY,
+            hero_bg_zoom: zoom,
+            updated_by: context.userId,
+            is_published: true,
+          };
+
+    const supabase = await createClient();
+    const id = await getHomepageRowId(supabase);
+    if (!id) {
+      return {
+        error:
+          "No homepage row found. Save the homepage once, then bake the crop again.",
+      };
+    }
+
+    const { error, droppedFraming } = await writeHomepageResilient(
+      supabase,
+      id,
+      payload,
+    );
+
+    if (error) {
+      return {
+        error:
+          error.message ||
+          "Could not save baked hero image. Check storage permissions and framing migration.",
+      };
+    }
+
+    revalidateHomepage();
+    return {
+      success: droppedFraming
+        ? "Cropped hero image published. Run migration 20260802080000_hero_image_framing.sql so focus/zoom values also persist."
+        : "Cropped hero image published to the live site.",
+    };
+  } catch (err) {
+    return {
+      error:
+        err instanceof Error
+          ? err.message
+          : "Could not save baked hero image.",
     };
   }
 }

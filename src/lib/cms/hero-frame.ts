@@ -39,9 +39,11 @@ export function parseHeroFrame(raw: {
 /** CSS for hero / preview framing (object-position + scale crop). */
 export function heroFrameStyle(frame: HeroImageFrame): CSSProperties {
   const { focusX, focusY, zoom } = frame;
+  const z = clampHeroZoom(zoom);
   return {
     objectPosition: `${focusX}% ${focusY}%`,
-    transform: zoom > 1 ? `scale(${zoom})` : undefined,
+    transform: z > 1.001 ? `scale(${z})` : undefined,
     transformOrigin: `${focusX}% ${focusY}%`,
+    willChange: z > 1.001 ? "transform" : undefined,
   };
 }
