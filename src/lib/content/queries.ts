@@ -115,8 +115,26 @@ export function formatEventDate(event: EventRow) {
 }
 
 export async function getEventBySlug(slug: string): Promise<EventRow | null> {
-  const events = await getPublishedEvents(50);
-  return events.find((e) => e.slug === slug) ?? null;
+  const decoded = decodeURIComponent(slug || "").trim();
+  if (!decoded) return null;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("events")
+      .select(
+        "id, slug, title, summary, body, location, location_icon, starts_at, ends_at, registration_open, tone, cover_image_url",
+      )
+      .eq("slug", decoded)
+      .eq("is_published", true)
+      .maybeSingle();
+    if (error) {
+      console.error("getEventBySlug", error.message);
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
 }
 
 export async function getPublishedNews(limit = 20): Promise<NewsRow[]> {

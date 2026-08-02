@@ -32,22 +32,24 @@ export async function registerForEventAction(
   formData: FormData,
 ): Promise<ContentActionState> {
   const context = await getUserContext();
-  if (!context) {
-    return { error: "Please sign in to register for this event." };
-  }
 
-  const eventId = String(formData.get("event_id") || "");
+  const eventId = String(formData.get("event_id") || "").trim();
   const phone = String(formData.get("phone") || "").trim() || null;
   const notes = String(formData.get("notes") || "").trim() || null;
-  const fullName =
-    String(formData.get("full_name") || "").trim() ||
-    context.profile?.full_name ||
-    context.email ||
-    "Member";
-  const email = (context.email || "").toLowerCase();
+  const fullName = String(formData.get("full_name") || "").trim();
+  const emailRaw = String(formData.get("email") || "").trim().toLowerCase();
+  const email = (emailRaw || context?.email || "").toLowerCase();
+  const name =
+    fullName ||
+    context?.profile?.full_name ||
+    context?.email ||
+    "";
 
-  if (!eventId || !email) {
-    return { error: "Your account email is required to register." };
+  if (!eventId) return { error: "Missing event." };
+  if (!name) return { error: "Full name is required." };
+  const emailCheck = z.string().email().safeParse(email);
+  if (!emailCheck.success) {
+    return { error: "A valid email is required to register." };
   }
 
   const supabase = await createClient();
@@ -71,9 +73,9 @@ export async function registerForEventAction(
 
   const { error } = await supabase.from("event_registrations").insert({
     event_id: event.id,
-    user_id: context.userId,
-    full_name: fullName,
-    email,
+    user_id: context?.userId || null,
+    full_name: name,
+    email: emailCheck.data,
     phone,
     notes,
   });
@@ -87,10 +89,10 @@ export async function registerForEventAction(
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   await sendEmail({
-    to: email,
+    to: emailCheck.data,
     subject: `Registered — ${event.title}`,
     html: eventRegistrationEmailHtml({
-      name: fullName,
+      name,
       eventTitle: event.title,
       eventUrl: `${appUrl}/events/${event.slug}`,
       startsAt: event.starts_at,
@@ -101,6 +103,7 @@ export async function registerForEventAction(
   revalidatePath(`/events/${event.slug}`);
   revalidatePath("/events");
   revalidatePath("/admin/events");
+  revalidatePath("/");
   return { success: "You are registered. Check your email for confirmation." };
 }
 

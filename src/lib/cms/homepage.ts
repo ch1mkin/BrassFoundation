@@ -178,10 +178,13 @@ export async function getPublishedHomepage(): Promise<HomepageContent> {
       stats: Array.isArray(data.stats) && data.stats.length
         ? data.stats
         : STATS.map((s) => ({ ...s })),
-      core_values:
+      core_values: (
         Array.isArray(data.core_values) && data.core_values.length
           ? data.core_values
-          : CORE_VALUES.map((v) => ({ ...v })),
+          : CORE_VALUES.map((v) => ({ ...v }))
+      ).map((v: HomepageValue) =>
+        v.title === "Community" ? { ...v, title: "Fraternity" } : v,
+      ),
       community_work:
         Array.isArray(data.community_work) && data.community_work.length
           ? data.community_work

@@ -37,7 +37,7 @@ create table if not exists public.homepage_content (
     {"title":"Knowledge","description":"Education as the foundation of liberation and progress."},
     {"title":"Leadership","description":"Building capable leaders who serve with integrity."},
     {"title":"Equality","description":"Dignity and opportunity for every individual."},
-    {"title":"Community","description":"Collective growth through solidarity and service."}
+    {"title":"Fraternity","description":"Collective growth through solidarity and service."}
   ]'::jsonb,
   community_work jsonb not null default '[
     {"title":"Blood Donation","slug":"blood-donation"},

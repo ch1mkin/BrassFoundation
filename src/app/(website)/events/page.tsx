@@ -28,19 +28,32 @@ export default async function EventsPage() {
         ) : null}
         {events.map((event) => {
           const { month, day } = formatEventDate(event);
+          const href = event.slug
+            ? `/events/${encodeURIComponent(event.slug)}`
+            : "/events";
           return (
             <div
               key={event.id}
               className="glass-card flex flex-col items-center gap-6 rounded-2xl p-5 md:flex-row md:gap-10"
             >
-              <div
-                className={cn(
-                  "flex size-24 shrink-0 flex-col items-center justify-center rounded-xl text-white",
-                  event.tone === "secondary" ? "bg-secondary" : "bg-primary",
-                )}
-              >
-                <span className="text-xs font-semibold">{month}</span>
-                <span className="font-heading text-3xl font-bold">{day}</span>
+              <div className="flex shrink-0 items-center gap-3">
+                {event.cover_image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={event.cover_image_url}
+                    alt=""
+                    className="size-20 rounded-xl object-cover ring-1 ring-border"
+                  />
+                ) : null}
+                <div
+                  className={cn(
+                    "flex size-20 shrink-0 flex-col items-center justify-center rounded-xl text-white sm:size-24",
+                    event.tone === "secondary" ? "bg-secondary" : "bg-primary",
+                  )}
+                >
+                  <span className="text-xs font-semibold">{month}</span>
+                  <span className="font-heading text-3xl font-bold">{day}</span>
+                </div>
               </div>
               <div className="flex-1 text-center md:text-left">
                 <h2 className="font-heading text-xl font-semibold">
@@ -59,9 +72,9 @@ export default async function EventsPage() {
                 ) : null}
               </div>
               <Link
-                href={`/events/${event.slug}`}
+                href={href}
                 className={cn(
-                  "rounded-lg px-8 py-2 text-sm font-bold text-white transition-transform active:scale-95",
+                  "rounded-lg px-8 py-2.5 text-sm font-bold text-white transition-transform active:scale-95",
                   event.tone === "secondary" ? "bg-secondary" : "bg-primary",
                 )}
               >

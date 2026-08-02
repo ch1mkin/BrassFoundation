@@ -251,7 +251,12 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
               >
                 {t("nav.login")}
               </NavLink>
-              <MembershipLink className={cn(GOLD_SHINY_BTN, "shadow-lg")}>
+              <MembershipLink
+                className={cn(
+                  GOLD_SHINY_BTN,
+                  "h-9 px-4 text-sm shadow-md sm:h-10 sm:px-5 sm:text-sm",
+                )}
+              >
                 <span>{t("nav.becomeMember")}</span>
               </MembershipLink>
             </>
@@ -382,7 +387,10 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                   </NavLink>
                   <MembershipLink
                     onClick={() => setMobileOpen(false)}
-                    className={cn(GOLD_SHINY_BTN, "w-full shadow-lg")}
+                    className={cn(
+                      GOLD_SHINY_BTN,
+                      "h-11 w-full px-5 text-sm shadow-md sm:h-11",
+                    )}
                   >
                     <span>{t("nav.becomeMember")}</span>
                   </MembershipLink>

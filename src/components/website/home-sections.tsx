@@ -216,11 +216,11 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
           }}
         >
           <div className="absolute right-0 bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
-            <p className="font-quote max-w-lg text-xl font-medium italic leading-snug sm:text-3xl sm:leading-snug">
+            <p className="font-quote max-w-xl text-2xl font-medium italic leading-snug sm:text-4xl sm:leading-snug">
               &ldquo;{current.quote}&rdquo;
             </p>
             {current.attribution ? (
-              <p className="mt-3 text-base font-medium text-white/85 sm:text-lg">
+              <p className="mt-3 text-base font-medium text-white/90 sm:text-xl">
                 — {current.attribution}
               </p>
             ) : null}
@@ -264,7 +264,7 @@ export function AboutSection({
   const valueRows =
     values?.length > 0
       ? values.map((v, i) => ({
-          title: v.title,
+          title: v.title === "Community" ? "Fraternity" : v.title,
           description: v.description,
           icon: i % 2 === 0 ? "visibility" : "rocket_launch",
         }))
@@ -413,18 +413,18 @@ export function EventsSection({
 }) {
   return (
     <section
-      className="relative overflow-hidden bg-foreground py-16 text-background lg:py-20"
+      className="relative overflow-hidden bg-[#0B1C28] py-16 text-background lg:py-20"
       id="events"
     >
       {backgroundUrl ? (
         <>
-          <InstantImg
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={backgroundUrl}
             alt=""
-            priority
-            className="absolute inset-0 size-full object-cover opacity-35"
+            className="pointer-events-none absolute inset-0 z-0 size-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-foreground/75" />
+          <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/45 via-black/50 to-black/65" />
         </>
       ) : null}
       <div className="relative z-10 mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-20">
@@ -449,28 +449,41 @@ export function EventsSection({
               const day = String(starts.getDate()).padStart(2, "0");
               const tone =
                 event.tone === "secondary" ? "secondary" : "primary";
+              const href = event.slug
+                ? `/events/${encodeURIComponent(event.slug)}`
+                : "/events";
               return (
                 <div
                   key={event.id}
-                  className="flex flex-col items-center gap-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-[2px] transition hover:bg-white/10 md:flex-row"
+                  className="flex flex-col items-center gap-6 rounded-2xl border border-white/15 bg-white/10 p-6 shadow-lg backdrop-blur-[2px] transition hover:bg-white/15 md:flex-row md:gap-8"
                 >
-                  <div
-                    className={cn(
-                      "flex size-24 shrink-0 flex-col items-center justify-center rounded-xl text-white",
-                      tone === "primary" ? "bg-primary" : "bg-secondary",
-                    )}
-                  >
-                    <span className="text-xs font-semibold">{month}</span>
-                    <span className="font-heading text-3xl font-bold">
-                      {day}
-                    </span>
+                  <div className="flex shrink-0 items-center gap-3">
+                    {event.cover_image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={event.cover_image_url}
+                        alt=""
+                        className="size-20 rounded-xl object-cover ring-2 ring-white/20"
+                      />
+                    ) : null}
+                    <div
+                      className={cn(
+                        "flex size-20 shrink-0 flex-col items-center justify-center rounded-xl text-white sm:size-24",
+                        tone === "primary" ? "bg-primary" : "bg-secondary",
+                      )}
+                    >
+                      <span className="text-xs font-semibold">{month}</span>
+                      <span className="font-heading text-3xl font-bold">
+                        {day}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex-grow text-center md:text-left">
                     <h4 className="font-heading mb-2 text-xl font-semibold">
                       {event.title}
                     </h4>
                     {event.location ? (
-                      <p className="flex items-center justify-center gap-2 text-white/60 md:justify-start">
+                      <p className="flex items-center justify-center gap-2 text-white/70 md:justify-start">
                         <MaterialIcon
                           name={event.location_icon || "location_on"}
                           className="text-[18px]"
@@ -480,9 +493,9 @@ export function EventsSection({
                     ) : null}
                   </div>
                   <Link
-                    href={`/events/${event.slug}`}
+                    href={href}
                     className={cn(
-                      "rounded-lg px-8 py-2 text-sm font-bold text-white transition active:scale-95",
+                      "rounded-lg px-8 py-2.5 text-sm font-bold text-white transition active:scale-95",
                       tone === "primary" ? "bg-primary" : "bg-secondary",
                     )}
                   >
