@@ -174,7 +174,6 @@ export function MustReadBookCard({
             >
               <MaterialIcon name="menu_book" className="text-[18px]" />
               Read PDF
-              <MaterialIcon name="open_in_new" className="text-[16px]" />
             </a>
           </div>
         </div>
@@ -236,7 +235,6 @@ export function MustReadBookCard({
           >
             <MaterialIcon name="menu_book" className="text-[18px]" />
             Read PDF
-            <MaterialIcon name="open_in_new" className="text-[16px]" />
           </a>
         </div>
       </div>

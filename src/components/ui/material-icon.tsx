@@ -46,6 +46,7 @@ import {
   Globe,
   HelpCircle,
   X,
+  ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -105,6 +106,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   sparkles: Sparkles,
   help: HelpCircle,
   close: X,
+  open_in_new: ExternalLink,
 };
 
 function sizeFromClass(className?: string) {
