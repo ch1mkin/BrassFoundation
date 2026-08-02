@@ -215,19 +215,22 @@ export async function upsertEventAction(
     tone: String(formData.get("tone") || "primary").trim() || "primary",
     cover_image_url:
       String(formData.get("cover_image_url") || "").trim() || null,
-    created_by: auth.userId,
   };
 
   const supabase = await createClient();
   const { error } = id
     ? await supabase.from("events").update(payload).eq("id", id)
-    : await supabase.from("events").insert(payload);
+    : await supabase.from("events").insert({
+        ...payload,
+        created_by: auth.userId,
+      });
 
   if (error) return { error: error.message };
 
   revalidatePath("/");
   revalidatePath("/events");
   revalidatePath("/admin/events");
+  if (id) revalidatePath(`/events/${slug}`);
   return { success: id ? "Event updated." : "Event created." };
 }
 

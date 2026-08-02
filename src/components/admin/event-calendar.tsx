@@ -63,8 +63,13 @@ export function EventCalendar({
     const dd = String(date.getDate()).padStart(2, "0");
     const value = `${yyyy}-${mm}-${dd}T10:00`;
     router.push(
-      `${createHrefBase}?date=${encodeURIComponent(value)}#create-event`,
+      `${createHrefBase}?date=${encodeURIComponent(value)}#event-form`,
     );
+  }
+
+  function onEventClick(e: React.MouseEvent, eventId: string) {
+    e.stopPropagation();
+    router.push(`${createHrefBase}?edit=${eventId}#event-form`);
   }
 
   return (
@@ -98,7 +103,9 @@ export function EventCalendar({
       <div className="grid grid-cols-7 gap-1">
         {days.map((cell) => {
           if (!cell.date) {
-            return <div key={cell.key} className="min-h-24 rounded-lg bg-transparent" />;
+            return (
+              <div key={cell.key} className="min-h-24 rounded-lg bg-transparent" />
+            );
           }
           const key = `${cell.date.getFullYear()}-${cell.date.getMonth()}-${cell.date.getDate()}`;
           const dayEvents = byDay.get(key) || [];
@@ -115,15 +122,27 @@ export function EventCalendar({
                 isToday && "border-primary/50 bg-primary/5",
               )}
             >
-              <span className="text-xs font-semibold">{cell.date.getDate()}</span>
+              <span className="text-xs font-semibold">
+                {cell.date.getDate()}
+              </span>
               <div className="mt-1 space-y-0.5">
                 {dayEvents.slice(0, 3).map((ev) => (
-                  <div
+                  <span
                     key={ev.id}
-                    className="truncate rounded bg-primary/15 px-1 py-0.5 text-[10px] font-medium text-primary"
+                    role="link"
+                    tabIndex={0}
+                    onClick={(e) => onEventClick(e, ev.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onEventClick(e as unknown as React.MouseEvent, ev.id);
+                      }
+                    }}
+                    className="block truncate rounded bg-primary/15 px-1 py-0.5 text-[10px] font-medium text-primary hover:bg-primary/30"
+                    title={`Edit: ${ev.title}`}
                   >
                     {ev.title}
-                  </div>
+                  </span>
                 ))}
                 {dayEvents.length > 3 ? (
                   <div className="text-[10px] text-muted-foreground">
@@ -136,7 +155,7 @@ export function EventCalendar({
         })}
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        Click a date to create an event starting that day.
+        Click a date to create an event. Click an event name to edit it.
       </p>
     </div>
   );
