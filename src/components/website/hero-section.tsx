@@ -9,6 +9,7 @@ import { MembershipLink } from "@/components/membership/membership-link";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { InstantImg } from "@/components/website/instant-img";
+import { SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const HeroParticles = dynamic(
@@ -32,6 +33,80 @@ type HeroSectionProps = {
   primaryLabelPa?: string | null;
   secondaryLabelPa?: string | null;
 };
+
+function HeroLogoWithSlogan({ hasBg }: { hasBg: boolean }) {
+  const ring = 220;
+  const r = ring / 2 - 14;
+  const pathId = "hero-logo-slogan-path";
+  const label = `${SITE.slogan} · ${SITE.slogan} · `;
+
+  return (
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: ring, height: ring }}
+    >
+      {/* Text orbits the fixed logo */}
+      <svg
+        width={ring}
+        height={ring}
+        viewBox={`0 0 ${ring} ${ring}`}
+        className={cn(
+          "logo-slogan-spin pointer-events-none absolute inset-0 size-full",
+          hasBg ? "text-white" : "text-foreground/80",
+        )}
+        aria-hidden
+      >
+        <defs>
+          <path
+            id={pathId}
+            d={`M ${ring / 2},${ring / 2} m -${r},0 a ${r},${r} 0 1,1 ${r * 2},0 a ${r},${r} 0 1,1 -${r * 2},0`}
+            fill="none"
+          />
+        </defs>
+        <text
+          className="fill-current uppercase"
+          style={{
+            fontSize: 11,
+            letterSpacing: "0.28em",
+            fontWeight: 700,
+          }}
+        >
+          <textPath href={`#${pathId}`} startOffset="0%">
+            {label}
+          </textPath>
+        </text>
+      </svg>
+
+      <div className="relative z-[1] flex size-36 items-center justify-center rounded-full bg-white p-3 shadow-lg ring-1 ring-black/5 sm:size-44 sm:p-4">
+        <Image
+          src="/brand/logo.png"
+          alt="Brass Foundation"
+          width={176}
+          height={176}
+          priority
+          className="h-full w-full object-contain drop-shadow-xl"
+        />
+      </div>
+      <span className="sr-only">{SITE.slogan}</span>
+    </div>
+  );
+}
+
+function isSloganOnly(text: string | null | undefined) {
+  if (!text) return true;
+  const normalized = text
+    .trim()
+    .toLowerCase()
+    .replace(/[·•.]/g, " ")
+    .replace(/\s+/g, " ");
+  const slogan = SITE.slogan.toLowerCase();
+  return (
+    !normalized ||
+    normalized === slogan ||
+    normalized === `${slogan}.` ||
+    normalized.replace(/\s/g, "") === slogan.replace(/\s/g, "")
+  );
+}
 
 export function HeroSection({
   headline,
@@ -70,12 +145,12 @@ export function HeroSection({
     /member|join/i.test(displayPrimary)
       ? "/membership"
       : primaryHref;
+  const showSubheadline = !isSloganOnly(displaySub);
 
   return (
     <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-surface pt-20">
       {hasBg ? (
         <>
-          {/* Mobile: full-bleed cover across the hero viewport */}
           {mobileBg ? (
             <div className="pointer-events-none absolute inset-0 md:hidden">
               <InstantImg
@@ -84,12 +159,10 @@ export function HeroSection({
                 priority
                 className="h-full w-full object-cover object-center"
               />
-              {/* Soft vignette only at the very bottom so the photo stays nearly full */}
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface/80 to-transparent" />
             </div>
           ) : null}
 
-          {/* Desktop: edge-to-edge cover */}
           {desktopBg ? (
             <div className="pointer-events-none absolute inset-0 hidden md:block">
               <InstantImg
@@ -112,16 +185,8 @@ export function HeroSection({
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.55 }}
-            className="flex size-40 items-center justify-center rounded-full bg-white p-3 shadow-lg ring-1 ring-black/5 sm:size-52 sm:p-4"
           >
-            <Image
-              src="/brand/logo.png"
-              alt="Brass Foundation"
-              width={192}
-              height={192}
-              priority
-              className="h-full w-full object-contain drop-shadow-xl"
-            />
+            <HeroLogoWithSlogan hasBg={hasBg} />
           </motion.div>
         </div>
 
@@ -143,19 +208,23 @@ export function HeroSection({
           ))}
         </motion.h1>
 
-        <motion.p
-          className={cn(
-            "mx-auto mb-10 max-w-2xl text-lg leading-relaxed",
-            hasBg ? "text-white" : "text-muted-foreground",
-            adminPa && "notranslate",
-          )}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          lang={adminPa ? "pa" : undefined}
-        >
-          {displaySub}
-        </motion.p>
+        {showSubheadline ? (
+          <motion.p
+            className={cn(
+              "mx-auto mb-10 max-w-2xl text-lg leading-relaxed",
+              hasBg ? "text-white" : "text-muted-foreground",
+              adminPa && "notranslate",
+            )}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            lang={adminPa ? "pa" : undefined}
+          >
+            {displaySub}
+          </motion.p>
+        ) : (
+          <div className="mb-10" aria-hidden />
+        )}
 
         <motion.div
           className="flex flex-col justify-center gap-4 sm:flex-row"
