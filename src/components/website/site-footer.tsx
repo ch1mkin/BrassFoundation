@@ -1,15 +1,17 @@
+/* eslint-disable @next/next/no-html-link-for-pages --
+ * Footer uses native anchors so navigation always works (Next soft-nav was
+ * getting swallowed by overlays / i18n). External + internal both use <a>.
+ */
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useLocale } from "@/components/i18n/locale-provider";
-import { MembershipLink } from "@/components/membership/membership-link";
 import { NewsletterForm } from "@/components/website/newsletter-form";
 import { SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const linkClass =
-  "pointer-events-auto relative z-10 text-xs font-semibold text-white/70 transition hover:text-brand";
+  "pointer-events-auto relative z-10 inline-block text-xs font-semibold text-white/70 transition hover:text-brand";
 
 function FooterLink({
   href,
@@ -21,9 +23,9 @@ function FooterLink({
   className?: string;
 }) {
   return (
-    <Link href={href} className={cn(linkClass, className)}>
+    <a href={href} className={cn(linkClass, className)}>
       {children}
-    </Link>
+    </a>
   );
 }
 
@@ -31,10 +33,10 @@ export function SiteFooter() {
   const { t } = useLocale();
 
   return (
-    <footer className="relative z-20 w-full bg-[#0B1C28] text-white">
+    <footer className="pointer-events-auto relative z-50 isolate w-full bg-[#0B1C28] text-white">
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-4 py-16 sm:px-6 md:grid-cols-4 lg:px-20">
         <div className="flex flex-col gap-4">
-          <Link href="/" className="inline-flex items-center gap-2">
+          <a href="/" className="inline-flex items-center gap-2">
             <Image
               src="/brand/logo.png"
               alt=""
@@ -45,7 +47,7 @@ export function SiteFooter() {
             <span className="notranslate font-heading text-lg font-bold text-white">
               {SITE.name}
             </span>
-          </Link>
+          </a>
           <p className="notranslate text-sm leading-relaxed text-white/70">
             {t("footer.blurb")}
           </p>
@@ -89,9 +91,9 @@ export function SiteFooter() {
           </h4>
           <ul className="notranslate space-y-2">
             <li>
-              <MembershipLink className={linkClass}>
+              <FooterLink href="/membership">
                 {t("footer.becomeMember")}
-              </MembershipLink>
+              </FooterLink>
             </li>
             <li>
               <FooterLink href="/gallery">{t("footer.gallery")}</FooterLink>
@@ -119,9 +121,9 @@ export function SiteFooter() {
               <FooterLink href="/contact">{t("footer.contact")}</FooterLink>
             </li>
             <li>
-              <MembershipLink className={linkClass}>
+              <FooterLink href="/membership">
                 {t("footer.becomeMember")}
-              </MembershipLink>
+              </FooterLink>
             </li>
           </ul>
         </div>

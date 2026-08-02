@@ -53,7 +53,7 @@ export function PortalNavProvider({
         <PageLoader
           fullScreen
           label="Loading…"
-          className="pointer-events-auto z-[300] bg-background/92"
+          className="z-[300] bg-background/92"
         />
       ) : null}
     </>

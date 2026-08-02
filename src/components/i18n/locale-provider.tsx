@@ -190,7 +190,7 @@ export function LocaleProvider({
         <PageLoader
           fullScreen
           label={loaderLabel(locale)}
-          className="pointer-events-auto z-[500] bg-background/90"
+          className="z-[500] bg-background/90"
         />
       ) : null}
     </LocaleContext.Provider>
