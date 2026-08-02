@@ -376,7 +376,6 @@ export function CommunitySection({
                     <span
                       className={cn(
                         "rounded-full px-4 py-1 text-xs font-semibold text-white",
-                        project.badgeTone === "error" && "bg-destructive",
                         project.badgeTone === "primary" && "bg-primary",
                         project.badgeTone === "secondary" && "bg-secondary",
                         project.badgeTone === "tertiary" && "bg-tertiary",
