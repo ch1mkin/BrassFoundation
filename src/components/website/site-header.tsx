@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, UserRound, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand/logo";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useLocale } from "@/components/i18n/locale-provider";
