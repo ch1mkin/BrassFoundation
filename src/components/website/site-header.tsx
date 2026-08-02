@@ -8,7 +8,7 @@ import { BrandLogo } from "@/components/brand/logo";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { MembershipLink } from "@/components/membership/membership-link";
-import { signOutAction } from "@/lib/auth/actions";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { NAV_ITEMS, SITE, type NavItem } from "@/lib/constants";
 import { NAV_MESSAGE_KEYS } from "@/lib/i18n/messages";
 import { cn } from "@/lib/utils";
@@ -236,14 +236,9 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                     </NavLink>
                   ) : null}
                   <div className="my-1 h-px bg-border" />
-                  <form action={signOutAction}>
-                    <button
-                      type="submit"
-                      className="flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm text-destructive hover:bg-destructive/10"
-                    >
-                      {t("nav.signOut")}
-                    </button>
-                  </form>
+                  <SignOutButton className="flex w-full cursor-pointer items-center rounded-lg px-3 py-2 text-left text-sm text-destructive hover:bg-destructive/10">
+                    {t("nav.signOut")}
+                  </SignOutButton>
                 </div>
               </details>
             </div>
@@ -373,15 +368,9 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                       {t("nav.adminPortal")}
                     </NavLink>
                   ) : null}
-                  <form action={signOutAction}>
-                    <Button
-                      type="submit"
-                      variant="ghost"
-                      className="w-full text-red-300 hover:bg-white/10 hover:text-red-200"
-                    >
-                      {t("nav.signOut")}
-                    </Button>
-                  </form>
+                  <SignOutButton className="inline-flex h-9 w-full items-center justify-center rounded-lg px-3 text-sm font-medium text-red-300 hover:bg-white/10 hover:text-red-200">
+                    {t("nav.signOut")}
+                  </SignOutButton>
                 </>
               ) : (
                 <>

@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand/logo";
-import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { cn } from "@/lib/utils";
 
@@ -43,14 +43,14 @@ export function PortalSidebar({
   subtitle,
   avatarUrl,
   nav,
-  signOutAction,
   storageKey,
 }: {
   title: string;
   subtitle?: string | null;
   avatarUrl?: string | null;
   nav: readonly NavItem[];
-  signOutAction: (formData: FormData) => void | Promise<void>;
+  /** @deprecated Sign-out is handled client-side now. */
+  signOutAction?: (formData: FormData) => void | Promise<void>;
   storageKey: string;
 }) {
   const pathname = usePathname();
@@ -169,19 +169,20 @@ export function PortalSidebar({
         })}
       </nav>
 
-      <form action={signOutAction} className="mt-4">
-        <Button
-          type="submit"
-          variant="outline"
-          className={cn("w-full rounded-xl", collapsed && "px-2")}
+      <div className="mt-4">
+        <SignOutButton
+          className={cn(
+            "inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-medium transition hover:bg-surface-low",
+            collapsed && "px-2",
+          )}
         >
           {collapsed ? (
             <MaterialIcon name="logout" className="text-[18px]" />
           ) : (
             "Sign out"
           )}
-        </Button>
-      </form>
+        </SignOutButton>
+      </div>
     </aside>
   );
 
