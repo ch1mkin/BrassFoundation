@@ -29,9 +29,17 @@ export function PortalNavProvider({
       const href = anchor.getAttribute("href") || "";
       if (!href.startsWith("/") || href.startsWith("//")) return;
       if (anchor.target === "_blank") return;
-      const nextPath = href.split("#")[0] || href;
-      if (nextPath === pathname) return;
-      // Same-origin portal / site nav from the panel
+
+      let nextPathname = href;
+      try {
+        nextPathname = new URL(href, window.location.origin).pathname;
+      } catch {
+        nextPathname = href.split("?")[0]?.split("#")[0] || href;
+      }
+
+      // Same page with only ?query / #hash — do not block the UI
+      if (nextPathname === pathname) return;
+
       startTransition(() => setPending(true));
     }
     document.addEventListener("click", onClick, true);

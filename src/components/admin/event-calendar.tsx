@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 type CalEvent = {
@@ -18,7 +18,6 @@ export function EventCalendar({
   events: CalEvent[];
   createHrefBase?: string;
 }) {
-  const router = useRouter();
   const [cursor, setCursor] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
@@ -57,19 +56,12 @@ export function EventCalendar({
     year: "numeric",
   });
 
-  function onDayClick(date: Date) {
+  function dayHref(date: Date) {
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, "0");
     const dd = String(date.getDate()).padStart(2, "0");
-    const value = `${yyyy}-${mm}-${dd}T10:00`;
-    router.push(
-      `${createHrefBase}?date=${encodeURIComponent(value)}#event-form`,
-    );
-  }
-
-  function onEventClick(e: React.MouseEvent, eventId: string) {
-    e.stopPropagation();
-    router.push(`${createHrefBase}?edit=${eventId}#event-form`);
+    // Use date-only param — more reliable than encoding T/colon in some browsers
+    return `${createHrefBase}?date=${yyyy}-${mm}-${dd}#event-form`;
   }
 
   return (
@@ -104,7 +96,10 @@ export function EventCalendar({
         {days.map((cell) => {
           if (!cell.date) {
             return (
-              <div key={cell.key} className="min-h-24 rounded-lg bg-transparent" />
+              <div
+                key={cell.key}
+                className="min-h-24 rounded-lg bg-transparent"
+              />
             );
           }
           const key = `${cell.date.getFullYear()}-${cell.date.getMonth()}-${cell.date.getDate()}`;
@@ -113,44 +108,40 @@ export function EventCalendar({
             new Date().toDateString() === cell.date.toDateString();
 
           return (
-            <button
+            <div
               key={cell.key}
-              type="button"
-              onClick={() => onDayClick(cell.date!)}
               className={cn(
-                "min-h-24 rounded-lg border border-border/40 p-1.5 text-left transition hover:border-primary hover:bg-primary/5",
+                "relative min-h-24 rounded-lg border border-border/40 p-1.5 text-left transition hover:border-primary hover:bg-primary/5",
                 isToday && "border-primary/50 bg-primary/5",
               )}
             >
-              <span className="text-xs font-semibold">
+              <Link
+                href={dayHref(cell.date)}
+                className="absolute inset-0 z-0 rounded-lg"
+                aria-label={`Create event on ${cell.date.toDateString()}`}
+              />
+              <span className="relative z-10 text-xs font-semibold pointer-events-none">
                 {cell.date.getDate()}
               </span>
-              <div className="mt-1 space-y-0.5">
+              <div className="relative z-10 mt-1 space-y-0.5">
                 {dayEvents.slice(0, 3).map((ev) => (
-                  <span
+                  <Link
                     key={ev.id}
-                    role="link"
-                    tabIndex={0}
-                    onClick={(e) => onEventClick(e, ev.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        onEventClick(e as unknown as React.MouseEvent, ev.id);
-                      }
-                    }}
+                    href={`${createHrefBase}?edit=${ev.id}#event-form`}
                     className="block truncate rounded bg-primary/15 px-1 py-0.5 text-[10px] font-medium text-primary hover:bg-primary/30"
                     title={`Edit: ${ev.title}`}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     {ev.title}
-                  </span>
+                  </Link>
                 ))}
                 {dayEvents.length > 3 ? (
-                  <div className="text-[10px] text-muted-foreground">
+                  <div className="pointer-events-none text-[10px] text-muted-foreground">
                     +{dayEvents.length - 3} more
                   </div>
                 ) : null}
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
