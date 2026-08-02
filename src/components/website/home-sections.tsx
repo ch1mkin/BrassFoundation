@@ -216,11 +216,11 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
           }}
         >
           <div className="absolute right-0 bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
-            <p className="font-quote max-w-md text-base font-medium italic sm:text-xl">
+            <p className="font-quote max-w-lg text-xl font-medium italic leading-snug sm:text-3xl sm:leading-snug">
               &ldquo;{current.quote}&rdquo;
             </p>
             {current.attribution ? (
-              <p className="mt-2 text-sm font-medium text-white/80">
+              <p className="mt-3 text-base font-medium text-white/85 sm:text-lg">
                 — {current.attribution}
               </p>
             ) : null}
@@ -336,7 +336,7 @@ export function CommunitySection({
       <div className="relative z-10 mx-auto mb-12 flex max-w-[1280px] flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-end lg:px-20">
         <div className="max-w-xl">
           <h2 className="font-heading mb-3 text-3xl font-semibold">
-            Our Community Initiatives
+            Our Fraternity Initiatives
           </h2>
           <p className="text-muted-foreground">
             We believe in holistic development, ranging from health awareness to
@@ -610,6 +610,93 @@ export function MarketplaceSection() {
   );
 }
 
+export function MustReadSection({
+  books,
+}: {
+  books: Array<{
+    id: string;
+    title: string;
+    author: string | null;
+    summary: string | null;
+    cover_image_url: string | null;
+    pdf_url: string;
+  }>;
+}) {
+  if (!books.length) return null;
+
+  return (
+    <section className="bg-surface-low/60 py-12 sm:py-16 lg:py-20" id="must-read">
+      <div className="mx-auto mb-6 flex max-w-[1280px] flex-col items-start justify-between gap-4 px-4 sm:mb-12 sm:flex-row sm:items-end sm:px-6 lg:px-20">
+        <div className="max-w-xl">
+          <p className="mb-2 text-sm font-semibold tracking-wide text-primary uppercase">
+            Essential reading
+          </p>
+          <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
+            Books You Must Read
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Curated titles with free PDF access — open a book and start reading.
+          </p>
+        </div>
+        <Link
+          href="/must-read"
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+          )}
+        >
+          View all
+        </Link>
+      </div>
+      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:gap-6 sm:px-6 md:grid-cols-3 lg:px-20">
+        {books.slice(0, 6).map((book, i) => (
+          <motion.a
+            key={book.id}
+            href={book.pdf_url}
+            target="_blank"
+            rel="noreferrer"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.05 }}
+            className="group flex gap-4 rounded-2xl border border-border/40 bg-white p-4 transition hover:shadow-lg sm:p-5"
+          >
+            <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-highest sm:size-24">
+              {book.cover_image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={book.cover_image_url}
+                  alt=""
+                  className="size-full object-cover transition duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <MaterialIcon
+                  name="auto_stories"
+                  className="text-3xl text-primary/40"
+                />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-heading line-clamp-2 text-base font-semibold sm:text-lg">
+                {book.title}
+              </h3>
+              {book.author ? (
+                <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
+                  {book.author}
+                </p>
+              ) : null}
+              <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-primary">
+                Read PDF
+                <MaterialIcon name="open_in_new" className="text-[16px]" />
+              </span>
+            </div>
+          </motion.a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function MembershipCta({
   headline,
   body,
@@ -633,7 +720,7 @@ export function MembershipCta({
                 {[
                   "Exclusive Access to Digital Library",
                   "Volunteer Opportunities",
-                  "Direct Community Impact",
+                  "Direct Fraternity Impact",
                   "Skill Development Workshops",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2">

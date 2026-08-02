@@ -27,13 +27,18 @@ export const NAV_ITEMS: NavItem[] = [
     children: [
       {
         href: "/community",
-        label: "Community",
+        label: "Fraternity",
         description: "Chapters and local groups",
       },
       {
         href: "/events",
         label: "Events",
         description: "Programs and gatherings",
+      },
+      {
+        href: "/must-read",
+        label: "Must Read",
+        description: "Essential books with PDF access",
       },
       {
         href: "/gallery",
@@ -64,8 +69,9 @@ export const NAV_ITEMS: NavItem[] = [
 
 export const NAV_LINKS = [
   { href: "/about", label: "About" },
-  { href: "/community", label: "Community" },
+  { href: "/community", label: "Fraternity" },
   { href: "/events", label: "Events" },
+  { href: "/must-read", label: "Must Read" },
   { href: "/resources", label: "Resources" },
   { href: "/gallery", label: "Gallery" },
   { href: "/marketplace", label: "Marketplace" },

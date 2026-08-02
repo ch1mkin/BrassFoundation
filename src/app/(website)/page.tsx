@@ -4,6 +4,7 @@ import {
   EventsSection,
   MarketplaceSection,
   MembershipCta,
+  MustReadSection,
   ResourcesSection,
   StatsSection,
 } from "@/components/website/home-sections";
@@ -12,13 +13,15 @@ import { SectionDivider } from "@/components/website/section-divider";
 import { HeroSection } from "@/components/website/hero-section";
 import { getPublishedHomepage } from "@/lib/cms/homepage";
 import { getExecutiveCommittee } from "@/lib/content/committee";
+import { getPublishedMustReadBooks } from "@/lib/content/must-read-actions";
 import { getPublishedEvents } from "@/lib/content/queries";
 
 export default async function HomePage() {
-  const [content, committee, events] = await Promise.all([
+  const [content, committee, events, mustRead] = await Promise.all([
     getPublishedHomepage(),
     getExecutiveCommittee(),
     getPublishedEvents(6),
+    getPublishedMustReadBooks(),
   ]);
 
   return (
@@ -60,6 +63,8 @@ export default async function HomePage() {
       <SectionDivider />
       <ResourcesSection />
       <SectionDivider />
+      <MustReadSection books={mustRead} />
+      {mustRead.length ? <SectionDivider /> : null}
       <MarketplaceSection />
       <SectionDivider />
       <MembershipCta

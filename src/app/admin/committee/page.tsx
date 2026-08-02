@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 import { AdminLockedForm } from "@/components/admin/admin-locked-form";
-import { FileOrUrlField } from "@/components/admin/file-or-url-field";
+import { CircularImageCropField } from "@/components/admin/circular-image-crop-field";
 import {
   deleteExecutiveMemberAction,
   upsertExecutiveMemberFormAction,
@@ -62,11 +62,10 @@ export default async function AdminCommitteePage() {
               placeholder="Sort order"
               className="h-10 w-full rounded-xl border border-input bg-white px-3 text-sm"
             />
-            <FileOrUrlField
+            <CircularImageCropField
               name="photo_url"
-              label="Photo"
+              label="Photo (circular crop)"
               bucket="avatars"
-              accept="image/*"
               folder="committee"
             />
           </AdminLockedForm>
@@ -126,11 +125,10 @@ export default async function AdminCommitteePage() {
                   name="sort_order"
                   value={member.sort_order}
                 />
-                <FileOrUrlField
+                <CircularImageCropField
                   name="photo_url"
-                  label="Update photo"
+                  label="Update photo (circular crop)"
                   bucket="avatars"
-                  accept="image/*"
                   folder="committee"
                   defaultUrl={member.photo_url || undefined}
                 />
