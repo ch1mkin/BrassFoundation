@@ -18,7 +18,11 @@ export default async function AdminMarketplacePage() {
       <div>
         <h1 className="font-heading text-3xl font-semibold">Marketplace</h1>
         <p className="mt-2 text-muted-foreground">
-          Add books with cover images and PDF uploads or URLs.
+          Paid featured books with PDF for web-only reading after purchase
+          confirmation.{" "}
+          <a href="/admin/book-purchases" className="font-semibold text-primary">
+            Review purchases →
+          </a>
         </p>
       </div>
       {error ? (

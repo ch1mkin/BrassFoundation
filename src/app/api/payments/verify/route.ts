@@ -120,6 +120,62 @@ export async function POST(request: Request) {
       });
     }
 
+    if (order.purpose === "book_purchase") {
+      const meta = (order.meta || {}) as { marketplace_item_id?: string };
+      const itemId = meta.marketplace_item_id;
+      if (!itemId) {
+        return NextResponse.json(
+          { error: "Book purchase meta missing." },
+          { status: 400 },
+        );
+      }
+
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("full_name, email, phone")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      await admin.from("book_purchases").upsert(
+        {
+          user_id: user.id,
+          marketplace_item_id: itemId,
+          payment_order_id: order.id,
+          status: "paid_awaiting_approval",
+          paid_at: new Date().toISOString(),
+          buyer_name: profile?.full_name || null,
+          buyer_email: profile?.email || user.email || null,
+          buyer_phone: profile?.phone || null,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,marketplace_item_id" },
+      );
+
+      await admin.from("transactions").insert({
+        user_id: user.id,
+        order_id: order.id,
+        type: "contribution",
+        amount_paise: order.amount_paise,
+        currency: "INR",
+        razorpay_payment_id: paymentId,
+        status: "captured",
+        description: `Featured book purchase — awaiting owner confirmation`,
+      });
+
+      revalidatePath("/admin/book-purchases");
+      revalidatePath("/member/books");
+      revalidatePath("/marketplace");
+      revalidatePath("/");
+
+      return NextResponse.json({
+        ok: true,
+        purpose: "book_purchase",
+        status: "paid_awaiting_approval",
+        message:
+          "Payment received. Access usually within 24 hours after owner confirmation.",
+      });
+    }
+
     await admin.from("transactions").insert({
       user_id: user.id,
       application_id: applicationId,

@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import {
   COMMUNITY_WORK,
-  FEATURED_BOOKS,
   RESOURCE_CATEGORIES,
 } from "@/lib/constants";
 
@@ -67,6 +66,7 @@ export type MarketplaceRow = {
   author: string | null;
   summary: string | null;
   price_label: string;
+  price_paise: number | null;
   rating: number | null;
   review_count: number;
   cover_image_url: string | null;
@@ -306,29 +306,36 @@ export async function getPublishedMarketplace(
     const { data, error } = await supabase
       .from("marketplace_items")
       .select(
-        "id, slug, title, author, summary, price_label, rating, review_count, cover_image_url, buy_url",
+        "id, slug, title, author, summary, price_label, price_paise, rating, review_count, cover_image_url, buy_url",
       )
       .eq("is_published", true)
       .order("sort_order", { ascending: true })
       .limit(limit);
 
-    if (error || !data?.length) {
-      return FEATURED_BOOKS.map((b, i) => ({
-        id: `fallback-book-${i}`,
-        slug: b.title.toLowerCase().replace(/\s+/g, "-"),
-        title: b.title,
-        author: "Dr. B. R. Ambedkar",
-        summary: null,
-        price_label: b.price,
-        rating: b.rating,
-        review_count: b.reviews,
-        cover_image_url: null,
-        buy_url: null,
-      }));
-    }
-    return data;
+    if (error || !data) return [];
+    return data as MarketplaceRow[];
   } catch {
     return [];
+  }
+}
+
+export async function getMarketplaceBySlug(
+  slug: string,
+): Promise<MarketplaceRow | null> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("marketplace_items")
+      .select(
+        "id, slug, title, author, summary, price_label, price_paise, rating, review_count, cover_image_url, buy_url",
+      )
+      .eq("slug", slug)
+      .eq("is_published", true)
+      .maybeSingle();
+    if (error || !data) return null;
+    return data as MarketplaceRow;
+  } catch {
+    return null;
   }
 }
 

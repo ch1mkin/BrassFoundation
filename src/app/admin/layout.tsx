@@ -17,6 +17,7 @@ const NAV = [
   { label: "Resources", href: "/admin/resources", icon: "menu_book" },
   { label: "Community Work", href: "/admin/community", icon: "diversity_3" },
   { label: "Marketplace", href: "/admin/marketplace", icon: "storefront" },
+  { label: "Book purchases", href: "/admin/book-purchases", icon: "receipt_long" },
   { label: "Must Read", href: "/admin/must-read", icon: "auto_stories" },
   { label: "Gallery", href: "/admin/gallery", icon: "photo_library" },
   { label: "Executive Committee", href: "/admin/committee", icon: "groups" },

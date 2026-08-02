@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import type { ExecutiveMember } from "@/lib/content/committee";
+import { buttonVariants } from "@/components/ui/button";
 import {
   GoldHairline,
   SectionOrnaments,
@@ -208,15 +210,26 @@ export function LeadershipSection({
   return (
     <section className="relative overflow-hidden bg-surface-high py-10 sm:py-14 lg:py-16">
       <SectionOrnaments />
-      <div className="relative z-10 mx-auto mb-8 max-w-[1280px] px-4 text-center sm:mb-10 sm:px-6 lg:px-20">
-        <h2 className="font-heading mb-2 text-2xl font-semibold sm:text-3xl">
-          Executive Committee
-        </h2>
-        <GoldHairline className="mb-3 mt-3" />
-        <p className="mx-auto max-w-2xl text-sm text-muted-foreground sm:text-base">
-          The committee guiding Brass Foundation&apos;s mission of education,
-          equality, and community development.
-        </p>
+      <div className="relative z-10 mx-auto mb-8 flex max-w-[1280px] flex-col items-center justify-between gap-4 px-4 text-center sm:mb-10 sm:flex-row sm:items-end sm:px-6 sm:text-left lg:px-20">
+        <div>
+          <h2 className="font-heading mb-2 text-2xl font-semibold sm:text-3xl">
+            Executive Committee
+          </h2>
+          <GoldHairline className="mx-auto mb-3 mt-3 sm:mx-0" />
+          <p className="mx-auto max-w-2xl text-sm text-muted-foreground sm:mx-0 sm:text-base">
+            The committee guiding Brass Foundation&apos;s mission of education,
+            equality, and community development.
+          </p>
+        </div>
+        <Link
+          href="/about"
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "relative z-20 shrink-0 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+          )}
+        >
+          View all
+        </Link>
       </div>
 
       <div className="relative z-10 mx-auto flex max-w-[1280px] flex-col items-stretch gap-6 px-2 sm:gap-8 sm:px-6 lg:gap-10 lg:px-20">

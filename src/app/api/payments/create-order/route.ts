@@ -6,6 +6,7 @@ import {
   isRazorpayConfigured,
 } from "@/lib/payments/razorpay";
 import { REGISTRATION_FEE_PAISE } from "@/lib/payments/constants";
+import { resolveBookPricePaise } from "@/lib/content/book-purchases";
 
 export async function POST(request: Request) {
   try {
@@ -18,8 +19,9 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as {
       applicationId?: string;
-      purpose?: "registration_fee" | "contribution";
+      purpose?: "registration_fee" | "contribution" | "book_purchase";
       amountPaise?: number;
+      marketplaceItemId?: string;
     };
 
     const purpose = body.purpose || "registration_fee";
@@ -34,6 +36,8 @@ export async function POST(request: Request) {
 
     let amountPaise = body.amountPaise;
     const applicationId = body.applicationId || null;
+    let marketplaceItemId = body.marketplaceItemId || null;
+    let bookTitle = "";
 
     if (purpose === "registration_fee") {
       amountPaise = REGISTRATION_FEE_PAISE;
@@ -50,6 +54,63 @@ export async function POST(request: Request) {
           { status: 400 },
         );
       }
+    } else if (purpose === "book_purchase") {
+      if (!marketplaceItemId) {
+        return NextResponse.json(
+          { error: "Missing marketplace item id." },
+          { status: 400 },
+        );
+      }
+
+      const adminPeek = createServiceClient();
+      const { data: item } = await adminPeek
+        .from("marketplace_items")
+        .select("id, title, price_paise, price_label, file_url, is_published")
+        .eq("id", marketplaceItemId)
+        .maybeSingle();
+
+      if (!item || !item.is_published) {
+        return NextResponse.json({ error: "Book not found." }, { status: 404 });
+      }
+      if (!item.file_url) {
+        return NextResponse.json(
+          { error: "This book is not available for purchase yet." },
+          { status: 400 },
+        );
+      }
+
+      const price = resolveBookPricePaise(item);
+      if (!price || price < 100) {
+        return NextResponse.json(
+          { error: "Book price is not configured." },
+          { status: 400 },
+        );
+      }
+      amountPaise = price;
+      bookTitle = item.title;
+
+      const { data: existing } = await adminPeek
+        .from("book_purchases")
+        .select("id, status")
+        .eq("user_id", user.id)
+        .eq("marketplace_item_id", marketplaceItemId)
+        .maybeSingle();
+
+      if (existing?.status === "approved") {
+        return NextResponse.json(
+          { error: "You already own this book." },
+          { status: 409 },
+        );
+      }
+      if (existing?.status === "paid_awaiting_approval") {
+        return NextResponse.json(
+          {
+            error:
+              "Payment received — awaiting owner confirmation (usually within 24 hours).",
+          },
+          { status: 409 },
+        );
+      }
     } else {
       return NextResponse.json({ error: "Invalid purpose." }, { status: 400 });
     }
@@ -63,6 +124,8 @@ export async function POST(request: Request) {
         purpose,
         user_id: user.id,
         application_id: applicationId || "",
+        marketplace_item_id: marketplaceItemId || "",
+        book_title: bookTitle,
       },
     });
 
@@ -77,6 +140,9 @@ export async function POST(request: Request) {
         currency: "INR",
         razorpay_order_id: order.id,
         status: "created",
+        meta: marketplaceItemId
+          ? { marketplace_item_id: marketplaceItemId, book_title: bookTitle }
+          : {},
       })
       .select("id")
       .single();
@@ -92,12 +158,35 @@ export async function POST(request: Request) {
         .eq("id", applicationId);
     }
 
+    if (purpose === "book_purchase" && marketplaceItemId) {
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("full_name, email, phone")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      await admin.from("book_purchases").upsert(
+        {
+          user_id: user.id,
+          marketplace_item_id: marketplaceItemId,
+          payment_order_id: row.id,
+          status: "pending_payment",
+          buyer_name: profile?.full_name || null,
+          buyer_email: profile?.email || user.email || null,
+          buyer_phone: profile?.phone || null,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,marketplace_item_id" },
+      );
+    }
+
     return NextResponse.json({
       orderId: order.id,
       amount: order.amount,
       currency: order.currency,
       paymentOrderId: row.id,
       keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      bookTitle: bookTitle || undefined,
     });
   } catch (err) {
     return NextResponse.json(

@@ -11,18 +11,30 @@ import {
 import { LeadershipSection } from "@/components/website/executive-committee-section";
 import { SectionDivider } from "@/components/website/section-divider";
 import { HeroSection } from "@/components/website/hero-section";
+import { getUserContext } from "@/lib/auth/session";
 import { getPublishedHomepage } from "@/lib/cms/homepage";
+import { getUserBookPurchaseMap } from "@/lib/content/book-purchases";
 import { getExecutiveCommittee } from "@/lib/content/committee";
 import { getPublishedMustReadBooks } from "@/lib/content/must-read-actions";
-import { getPublishedEvents } from "@/lib/content/queries";
+import {
+  getPublishedEvents,
+  getPublishedMarketplace,
+} from "@/lib/content/queries";
 
 export default async function HomePage() {
-  const [content, committee, events, mustRead] = await Promise.all([
-    getPublishedHomepage(),
-    getExecutiveCommittee(),
-    getPublishedEvents(6),
-    getPublishedMustReadBooks(),
-  ]);
+  const [content, committee, events, mustRead, marketplace, context] =
+    await Promise.all([
+      getPublishedHomepage(),
+      getExecutiveCommittee(),
+      getPublishedEvents(6),
+      getPublishedMustReadBooks(),
+      getPublishedMarketplace(6),
+      getUserContext(),
+    ]);
+
+  const purchaseMap = context
+    ? await getUserBookPurchaseMap(context.userId)
+    : {};
 
   return (
     <>
@@ -65,7 +77,7 @@ export default async function HomePage() {
       <SectionDivider />
       <MustReadSection books={mustRead} />
       <SectionDivider />
-      <MarketplaceSection />
+      <MarketplaceSection books={marketplace} purchaseMap={purchaseMap} />
       <SectionDivider />
       <MembershipCta
         headline={content.membership_headline}

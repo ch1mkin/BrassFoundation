@@ -12,14 +12,15 @@ import {
 } from "@/components/website/premium-accents";
 import {
   COMMUNITY_WORK,
-  FEATURED_BOOKS,
   RESOURCE_CATEGORIES,
 } from "@/lib/constants";
 import type { HomepageContent, HomepageQuote } from "@/lib/cms/homepage";
-import type { EventRow } from "@/lib/content/queries";
+import type { EventRow, MarketplaceRow } from "@/lib/content/queries";
+import type { BookPurchaseStatus } from "@/lib/content/book-purchases";
 import { cn } from "@/lib/utils";
 import { InstantImg, preloadImages } from "@/components/website/instant-img";
 import { MustReadBookCard } from "@/components/website/must-read-book-card";
+import { BookBuyButton } from "@/components/marketplace/book-buy-button";
 
 function AnimatedCounter({
   value,
@@ -348,7 +349,7 @@ export function CommunitySection({
           href="/community"
           className={cn(
             buttonVariants({ variant: "secondary" }),
-            "relative rounded-lg bg-surface-highest font-bold text-primary hover:bg-surface-high",
+            "relative z-20 rounded-lg bg-surface-highest font-bold text-primary hover:bg-surface-high",
           )}
         >
           View All Work
@@ -428,17 +429,27 @@ export function EventsSection({
           <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/45 via-black/50 to-black/65" />
         </>
       ) : null}
+      <div className="relative z-10 mx-auto mb-10 flex max-w-[1280px] flex-col items-center justify-between gap-4 px-4 sm:mb-12 sm:flex-row sm:items-end sm:px-6 lg:px-20">
+        <div className="text-center sm:text-left">
+          <h2 className="font-heading mb-3 text-3xl font-semibold">
+            Upcoming Events
+          </h2>
+          <GoldHairline className="mx-auto mb-0 sm:mx-0" />
+        </div>
+        <Link
+          href="/events"
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "relative z-20 shrink-0 rounded-full border-white/40 bg-white/10 px-3 text-xs text-white hover:bg-white/20 hover:text-white sm:px-4 sm:text-sm",
+          )}
+        >
+          View all
+        </Link>
+      </div>
       <div className="relative z-10 mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-20">
-        <h2 className="font-heading mb-3 text-center text-3xl font-semibold">
-          Upcoming Events
-        </h2>
-        <GoldHairline className="mb-10" />
         {!events.length ? (
           <p className="text-center text-white/70">
-            New events will appear here once published.{" "}
-            <Link href="/events" className="font-semibold text-brand underline">
-              View all events
-            </Link>
+            New events will appear here once published.
           </p>
         ) : (
           <div className="space-y-4">
@@ -531,7 +542,7 @@ export function ResourcesSection() {
           href="/resources"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "relative rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+            "relative z-20 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
           )}
         >
           View all
@@ -568,10 +579,16 @@ export function ResourcesSection() {
   );
 }
 
-export function MarketplaceSection() {
+export function MarketplaceSection({
+  books,
+  purchaseMap = {},
+}: {
+  books: MarketplaceRow[];
+  purchaseMap?: Record<string, BookPurchaseStatus>;
+}) {
   return (
     <section className="overflow-hidden py-12 sm:py-16 lg:py-20">
-      <div className="mx-auto mb-6 flex max-w-[1280px] items-center justify-between gap-3 px-4 sm:mb-12 sm:px-6 lg:px-20">
+      <div className="relative z-10 mx-auto mb-6 flex max-w-[1280px] items-center justify-between gap-3 px-4 sm:mb-12 sm:px-6 lg:px-20">
         <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
           Featured Books
         </h2>
@@ -579,42 +596,64 @@ export function MarketplaceSection() {
           href="/marketplace"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "relative rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+            "relative z-20 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
           )}
         >
           View all
         </Link>
       </div>
-      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-3 px-4 sm:grid-cols-2 sm:gap-6 sm:px-6 md:grid-cols-3 lg:px-20">
-        {FEATURED_BOOKS.map((book) => (
-          <Link
-            key={book.title}
-            href="/marketplace"
-            className="block rounded-xl border border-border/40 bg-white p-4 transition hover:shadow-2xl sm:rounded-2xl sm:p-8"
-          >
-            <div className="mb-3 flex h-36 items-center justify-center rounded-lg bg-surface-highest sm:mb-4 sm:h-72 sm:rounded-xl">
-              <MaterialIcon
-                name="menu_book"
-                className="text-4xl text-primary/40 sm:text-6xl"
-              />
+      {books.length === 0 ? (
+        <p className="relative z-10 mx-auto max-w-[1280px] px-4 text-center text-muted-foreground sm:px-6 lg:px-20">
+          Featured books will appear here once published from the admin
+          marketplace.
+        </p>
+      ) : (
+        <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-3 px-4 sm:grid-cols-2 sm:gap-6 sm:px-6 md:grid-cols-3 lg:px-20">
+          {books.map((book) => (
+            <div
+              key={book.id}
+              className="rounded-xl border border-border/40 bg-white p-4 transition hover:shadow-2xl sm:rounded-2xl sm:p-8"
+            >
+              <Link href={`/marketplace/${book.slug}`} className="block">
+                <div className="mb-3 flex h-36 items-center justify-center overflow-hidden rounded-lg bg-surface-highest sm:mb-4 sm:h-72 sm:rounded-xl">
+                  {book.cover_image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={book.cover_image_url}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <MaterialIcon
+                      name="menu_book"
+                      className="text-4xl text-primary/40 sm:text-6xl"
+                    />
+                  )}
+                </div>
+                <h4 className="font-heading text-base font-semibold sm:text-xl">
+                  {book.title}
+                </h4>
+                <p className="mt-1 text-[11px] text-muted-foreground sm:mt-2 sm:text-xs">
+                  ({book.review_count} Reviews)
+                </p>
+              </Link>
+              <div className="mt-3 flex items-center justify-between gap-2 sm:mt-6">
+                <span className="font-heading text-lg font-semibold text-primary sm:text-2xl">
+                  {book.price_label}
+                </span>
+                <BookBuyButton
+                  bookId={book.id}
+                  bookSlug={book.slug}
+                  title={book.title}
+                  priceLabel={book.price_label}
+                  status={purchaseMap[book.id] || null}
+                  size="sm"
+                />
+              </div>
             </div>
-            <h4 className="font-heading text-base font-semibold sm:text-xl">
-              {book.title}
-            </h4>
-            <p className="mt-1 text-[11px] text-muted-foreground sm:mt-2 sm:text-xs">
-              ({book.reviews} Reviews)
-            </p>
-            <div className="mt-3 flex items-center justify-between gap-2 sm:mt-6">
-              <span className="font-heading text-lg font-semibold text-primary sm:text-2xl">
-                {book.price}
-              </span>
-              <span className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white sm:px-6 sm:py-2 sm:text-sm">
-                Buy Now
-              </span>
-            </div>
-          </Link>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

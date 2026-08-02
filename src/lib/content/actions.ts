@@ -9,11 +9,12 @@ import {
   eventRegistrationEmailHtml,
   membershipReceivedEmailHtml,
 } from "@/lib/email/templates";
-import { ContentActionState, slugify } from "@/lib/content/utils";
 import {
   getResourceCategory,
   isResourceCategorySlug,
 } from "@/lib/constants";
+import { priceLabelToPaise } from "@/lib/content/book-purchases";
+import { ContentActionState, slugify } from "@/lib/content/utils";
 
 async function requireAdmin(): Promise<
   { ok: true; userId: string } | { ok: false; error: string }
@@ -474,20 +475,36 @@ export async function upsertMarketplaceAction(
     String(formData.get("slug") || "").trim() || slugify(title);
   if (!title) return { error: "Title is required." };
 
+  const fileUrl = String(formData.get("file_url") || "").trim() || null;
+  if (!fileUrl && !id) {
+    return { error: "PDF upload is required for paid featured books." };
+  }
+
+  const priceLabel = String(formData.get("price_label") || "").trim();
+  const priceRupees = Number(formData.get("price_rupees") || 0);
+  const pricePaise =
+    priceRupees > 0
+      ? Math.round(priceRupees * 100)
+      : priceLabelToPaise(priceLabel);
+  if (!pricePaise || pricePaise < 100) {
+    return { error: "Enter a valid price in ₹ (minimum ₹1)." };
+  }
+
   const payload = {
     title,
     slug,
     author: String(formData.get("author") || "").trim() || null,
     summary: String(formData.get("summary") || "").trim() || null,
-    price_label: String(formData.get("price_label") || "Free").trim(),
+    price_label: priceLabel || `₹${Math.round(pricePaise / 100)}`,
+    price_paise: pricePaise,
     rating: Number(formData.get("rating") || 5),
     review_count: Number(formData.get("review_count") || 0),
     cover_image_url:
       String(formData.get("cover_image_url") || "").trim() || null,
-    file_url: String(formData.get("file_url") || "").trim() || null,
+    file_url: fileUrl,
     file_size_label:
       String(formData.get("file_size_label") || "").trim() || null,
-    buy_url: String(formData.get("buy_url") || "").trim() || null,
+    buy_url: null as string | null,
     is_published: boolFromForm(formData, "is_published"),
     is_featured: boolFromForm(formData, "is_featured"),
     sort_order: Number(formData.get("sort_order") || 0),
@@ -501,7 +518,8 @@ export async function upsertMarketplaceAction(
   if (error) return { error: error.message };
   revalidatePath("/marketplace");
   revalidatePath("/admin/marketplace");
-  return { success: id ? "Item updated." : "Item created." };
+  revalidatePath("/");
+  return { success: id ? "Book updated." : "Book created." };
 }
 
 export async function deleteMarketplaceAction(
