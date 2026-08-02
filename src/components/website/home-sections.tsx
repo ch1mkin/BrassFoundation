@@ -341,8 +341,8 @@ export function CommunitySection({
             Our Community Initiatives
           </h2>
           <p className="text-muted-foreground">
-            We believe in holistic development, ranging from health awareness to
-            educational empowerment.
+            Empowering communities through education and service — study
+            centres, mentorship, cultural programs, and collective growth.
           </p>
         </div>
         <Link
@@ -379,6 +379,7 @@ export function CommunitySection({
                         project.badgeTone === "error" && "bg-destructive",
                         project.badgeTone === "primary" && "bg-primary",
                         project.badgeTone === "secondary" && "bg-secondary",
+                        project.badgeTone === "tertiary" && "bg-tertiary",
                       )}
                     >
                       {project.badge}

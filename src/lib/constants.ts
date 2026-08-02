@@ -129,30 +129,114 @@ export const LEADERSHIP = EXECUTIVE_COMMITTEE.map((m) => ({
 }));
 
 
+export const COMMUNITY_PAGE = {
+  eyebrow: "Community Work",
+  title: "Community Work",
+  headline: "Empowering Communities Through Education and Service",
+  intro:
+    "Community development lies at the heart of everything we do. Our initiatives are designed not only to educate individuals but also to strengthen families and communities through knowledge, awareness, and collective participation.",
+  initiatives: [
+    {
+      slug: "free-study-centres",
+      title: "Free Study Centres",
+      icon: "menu_book",
+      body: "Our Study Centres provide academic assistance, mentoring, and a supportive learning environment for students and families building brighter futures through education. These centres help students grow academically while building confidence and life skills.",
+      impact: [
+        "150+ students supported",
+        "10+ active study centres",
+        "Free educational assistance",
+        "Career guidance and mentorship",
+        "2 Community Libraries",
+      ],
+    },
+    {
+      slug: "career-guidance-mentorship",
+      title: "Career Guidance & Student Mentorship",
+      icon: "school",
+      body: "Education extends beyond classrooms. We regularly organize career guidance sessions, mentoring programs, and awareness workshops that help students make informed academic and professional decisions.",
+    },
+    {
+      slug: "ambedkar-sports-meet",
+      title: "Ambedkar Sports Meet",
+      icon: "sports_soccer",
+      body: "Held annually in November, the Sports Meet promotes teamwork, discipline, physical fitness, and leadership among young participants while encouraging community participation.",
+    },
+    {
+      slug: "kranti-mela",
+      title: "Kranti Mela",
+      icon: "celebration",
+      body: "Organized at Village Landhran, Jalandhar, during the last quarter of the financial year, Kranti Mela brings together educators, social workers, students, and community members to celebrate education, awareness, and social empowerment — in the memory of Late Actor, Educator and Social Worker Sh. Makhan Kranti.",
+    },
+    {
+      slug: "mai-bhi-ambedkar-award",
+      title: "Mai Bhi Ambedkar Award (MBA Award)",
+      icon: "emoji_events",
+      body: "Organized twice every year (February & August), this initiative recognizes individuals who demonstrate excellence in education, leadership, social service, and community contribution, encouraging others to become agents of positive change.",
+    },
+    {
+      slug: "educational-tours",
+      title: "Educational Tours",
+      icon: "directions_bus",
+      body: "Conducted during July–August, these educational tours expose students to new experiences, historical places, educational institutions, and cultural heritage, broadening their understanding beyond textbooks.",
+    },
+    {
+      slug: "ambedkar-arts-utsav",
+      title: "Ambedkar Arts Utsav",
+      icon: "theater_comedy",
+      body: "Organized every May, the Arts Utsav celebrates creativity through art, music, literature, theatre, poetry, and cultural performances inspired by the ideals of equality and social justice.",
+    },
+    {
+      slug: "ambedkar-jagriti-kafila",
+      title: "Ambedkar Jagriti Kafila",
+      icon: "flag",
+      body: "Held annually in December, this awareness campaign reaches communities through educational outreach, public interaction, and programs promoting constitutional values, education, and social awareness.",
+    },
+    {
+      slug: "bahujan-kranti-mela",
+      title: "Bahujan Kranti Mela",
+      icon: "public",
+      body: "A community gathering celebrating social awareness, education, culture, and collective progress. The event provides a platform for dialogue, learning, and community participation.",
+    },
+    {
+      slug: "annual-general-body-meeting",
+      title: "Annual General Body Meeting",
+      icon: "groups",
+      body: "Held annually on 4 April, coinciding with the birth anniversary of Dr. B. R. Ambedkar, the General Body Meeting reviews the Foundation's work, plans future initiatives, and strengthens community participation in organizational development.",
+    },
+    {
+      slug: "womens-empowerment-wing",
+      title:
+        "Savitribai Phule & Fatima Sheikh Women's Empowerment Wing",
+      icon: "diversity_3",
+      body: "Inspired by the pioneering legacy of Savitribai Phule and Fatima Sheikh, this initiative is dedicated to empowering women through education, leadership, skill development, and social awareness. The Wing promotes equal opportunities, constitutional values, and self-reliance while encouraging women and girls to become confident leaders and active contributors to building an inclusive, educated, and progressive society.",
+    },
+  ],
+} as const;
+
 export const COMMUNITY_WORK = [
   {
-    title: "Blood Donation Camps",
-    slug: "blood-donation",
+    title: "Free Study Centres",
+    slug: "free-study-centres",
     description:
-      "Organizing quarterly camps to support local hospitals and emergency reserves.",
-    badge: "URGENT",
-    badgeTone: "error" as const,
-  },
-  {
-    title: "Digital Literacy Program",
-    slug: "educational-programs",
-    description:
-      "Empowering youth with coding, software use, and internet navigation skills.",
-    badge: "ONGOING",
+      "Academic support, mentoring, and confidence-building for students growing through education — 150+ learners across 10+ centres.",
+    badge: "IMPACT",
     badgeTone: "primary" as const,
   },
   {
-    title: "Women Leadership Circle",
-    slug: "womens-empowerment",
+    title: "Career Guidance & Mentorship",
+    slug: "career-guidance-mentorship",
     description:
-      "Providing a platform for women to develop leadership skills and community impact.",
-    badge: "FEATURED",
+      "Workshops and mentoring that help students make informed academic and professional decisions.",
+    badge: "ONGOING",
     badgeTone: "secondary" as const,
+  },
+  {
+    title: "Women’s Empowerment Wing",
+    slug: "womens-empowerment-wing",
+    description:
+      "Inspired by Savitribai Phule and Fatima Sheikh — education, leadership, and self-reliance for women and girls.",
+    badge: "FEATURED",
+    badgeTone: "tertiary" as const,
   },
 ] as const;
 

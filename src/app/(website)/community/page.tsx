@@ -1,56 +1,91 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "@/components/website/page-shell";
-import { getPublishedCommunity } from "@/lib/content/queries";
-import { cn } from "@/lib/utils";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { ABOUT_PAGE, COMMUNITY_PAGE } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Community" };
-
-const badgeClass: Record<string, string> = {
-  error: "bg-destructive text-white",
-  primary: "bg-primary text-white",
-  secondary: "bg-secondary text-white",
+export const metadata: Metadata = {
+  title: "Community Work",
+  description: COMMUNITY_PAGE.headline,
 };
 
-export default async function CommunityPage() {
-  const projects = await getPublishedCommunity();
-
+export default function CommunityPage() {
   return (
     <PageShell
-      eyebrow="Community Work"
-      title="Projects & Impact"
-      description="Holistic development — from health awareness to educational empowerment across districts."
+      eyebrow={COMMUNITY_PAGE.eyebrow}
+      title={COMMUNITY_PAGE.title}
+      description={COMMUNITY_PAGE.headline}
       wide
     >
-      <div className="grid gap-8 md:grid-cols-3">
-        {projects.map((item) => (
-          <article key={item.id} className="group" id={item.slug}>
-            <div className="relative mb-4 flex h-48 items-end overflow-hidden rounded-2xl bg-surface-high p-4">
-              {item.badge ? (
-                <span
-                  className={cn(
-                    "rounded-full px-3 py-1 text-xs font-semibold",
-                    badgeClass[item.badge_tone] || badgeClass.primary,
-                  )}
-                >
-                  {item.badge}
-                </span>
-              ) : null}
-            </div>
-            <h2 className="font-heading text-xl font-semibold">{item.title}</h2>
-            {item.summary ? (
-              <p className="mt-2 text-muted-foreground">{item.summary}</p>
-            ) : null}
-            <Link
-              href={`/community/${item.slug}`}
-              className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary"
+      <div className="space-y-12">
+        <p
+          className="mx-auto max-w-3xl text-center text-base leading-relaxed text-muted-foreground sm:text-lg"
+          data-i18n="content"
+        >
+          {COMMUNITY_PAGE.intro}
+        </p>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {COMMUNITY_PAGE.initiatives.map((item) => (
+            <article
+              key={item.slug}
+              id={item.slug}
+              className="scroll-mt-28 rounded-2xl border border-border/50 bg-white p-6 sm:p-8"
             >
-              Read More
-              <MaterialIcon name="arrow_right_alt" className="text-[18px]" />
-            </Link>
-          </article>
-        ))}
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <MaterialIcon name={item.icon} className="text-[26px]" />
+                </div>
+                <h2 className="font-heading text-xl font-semibold sm:text-2xl">
+                  {item.title}
+                </h2>
+              </div>
+              <p
+                className="text-sm leading-relaxed text-muted-foreground sm:text-base"
+                data-i18n="content"
+              >
+                {item.body}
+              </p>
+              {"impact" in item && item.impact ? (
+                <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+                  {item.impact.map((line) => (
+                    <li
+                      key={line}
+                      className="flex items-start gap-2 rounded-xl bg-primary/5 px-3 py-2 text-sm font-medium text-foreground"
+                    >
+                      <MaterialIcon
+                        name="check_circle"
+                        className="mt-0.5 text-[18px] text-primary"
+                      />
+                      <span className="notranslate" translate="no">
+                        {line}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </article>
+          ))}
+        </div>
+
+        <div className="rounded-2xl bg-surface-low px-6 py-8 text-center sm:px-10">
+          <p className="text-muted-foreground">
+            Learn more about our foundation story on the{" "}
+            <Link href="/about" className="font-semibold text-primary">
+              About Us
+            </Link>{" "}
+            page — {ABOUT_PAGE.headline}.
+          </p>
+          <Link
+            href="/membership"
+            className={cn(
+              "mt-5 inline-flex rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white",
+            )}
+          >
+            Become a Member
+          </Link>
+        </div>
       </div>
     </PageShell>
   );
