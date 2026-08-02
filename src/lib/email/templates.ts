@@ -120,3 +120,45 @@ export function eventRegistrationEmailHtml({
     </div>
   `;
 }
+
+/** Inbox notification for Contact Us submissions (name/email/message must already be escaped). */
+export function contactInboxEmailHtml({
+  name,
+  email,
+  messageHtml,
+}: {
+  name: string;
+  email: string;
+  messageHtml: string;
+}) {
+  return `
+    <div style="font-family: Inter, Arial, sans-serif; color: #1B1B1B; line-height: 1.6; max-width: 560px; margin: 0 auto;">
+      <h1 style="font-family: Poppins, Arial, sans-serif; color: #114C88; font-size: 22px;">
+        New contact message
+      </h1>
+      <p><strong>From:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 20px 0;" />
+      <p style="white-space: pre-wrap;">${messageHtml}</p>
+    </div>
+  `;
+}
+
+/** Auto-reply to the person who submitted Contact Us (name must already be escaped). */
+export function contactAutoReplyEmailHtml({ name }: { name: string }) {
+  return `
+    <div style="font-family: Inter, Arial, sans-serif; color: #1B1B1B; line-height: 1.6; max-width: 560px; margin: 0 auto;">
+      <h1 style="font-family: Poppins, Arial, sans-serif; color: #114C88; font-size: 22px;">
+        We received your message
+      </h1>
+      <p>Hi ${name || "there"},</p>
+      <p>
+        Thank you for contacting Brass Foundation. Our team has received your
+        message and will get back to you as soon as we can.
+      </p>
+      <p style="color: #6B7280; font-size: 14px;">
+        Education · Empowerment · Equality
+      </p>
+    </div>
+  `;
+}

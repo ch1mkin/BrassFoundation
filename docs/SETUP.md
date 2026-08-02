@@ -17,13 +17,16 @@ Copy `.env.example` → `.env` (local) and add the same keys in Vercel → Proje
 - `SMTP_PASS` — mailbox password
 - `SMTP_FROM_NAME=Brass Foundation`
 - `SMTP_FROM_EMAIL` — usually same as `SMTP_USER`
+- `CONTACT_INBOX` — where Contact Us + membership alerts land (e.g. `contact@yourdomain.com`; defaults to `SMTP_FROM_EMAIL`)
 
 **Two places to configure Hostinger:**
 
-1. **App transactional mail** (contact form, welcome notices) — the env vars above (Nodemailer)
+1. **App transactional mail** (contact form, membership notices, event registration) — the env vars above (Nodemailer)
 2. **Supabase Auth emails** (verify email, password reset) — Supabase Dashboard → Project Settings → Authentication → SMTP Settings → enable custom SMTP with the same Hostinger credentials
 
 This way all email leaves through your Hostinger mailbox.
+
+**Contact Us flow:** visitor submits name + email + message → saved to `contact_messages` → email to `CONTACT_INBOX` (reply-to = visitor) → auto-reply to visitor. Rate-limited (5 / 15 min / IP) with a honeypot field.
 
 ### App
 - `NEXT_PUBLIC_APP_URL` — `http://localhost:3000` locally, your Vercel URL in production
@@ -42,6 +45,7 @@ This way all email leaves through your Hostinger mailbox.
    - `supabase/migrations/20260801070000_hero_background.sql`
    - `supabase/migrations/20260801080000_i18n_payments.sql`
    - `supabase/migrations/20260801090000_fix_hero_upload.sql`
+   - …later migrations through `20260802100000_secure_storage_uploads.sql` (tightens storage uploads to staff only)
 
 This creates profiles, dynamic roles/permissions, audit logs, RLS, homepage CMS (including hero background + Punjabi fields), membership applications, payments/mandates/transactions, UI translations, a **role dropdown** on `profiles.role_id`, public content modules, **storage buckets**, gallery, org tree, blogs, and resource PDF thumbnails.
 

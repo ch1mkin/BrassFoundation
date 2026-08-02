@@ -140,22 +140,6 @@ export async function subscribeNewsletterAction(
   return { success: "Subscribed. Thank you for joining our updates." };
 }
 
-export async function submitContactMessageAction(input: {
-  name: string;
-  email: string;
-  message: string;
-  form_type?: string;
-}): Promise<ContentActionState & { skipped?: boolean }> {
-  const supabase = await createClient();
-  await supabase.from("contact_messages").insert({
-    name: input.name,
-    email: input.email,
-    message: input.message,
-    form_type: input.form_type || "contact",
-  });
-  return { success: "Message saved." };
-}
-
 export async function notifyMembershipReceived(input: {
   name: string;
   email: string;
@@ -172,7 +156,10 @@ export async function notifyMembershipReceived(input: {
     }),
   });
 
-  const inbox = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER;
+  const inbox =
+    process.env.CONTACT_INBOX ||
+    process.env.SMTP_FROM_EMAIL ||
+    process.env.SMTP_USER;
   if (inbox) {
     await sendEmail({
       to: inbox,

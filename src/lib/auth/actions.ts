@@ -6,17 +6,13 @@ import {
   AUTH_SUCCESS,
   professionalAuthError,
 } from "@/lib/auth/messages";
+import { safeNextPath } from "@/lib/security/safe-next";
 
 export type AuthActionState = {
   error?: string;
   success?: string;
   redirectTo?: string;
 };
-
-function safeNext(next: string) {
-  if (!next.startsWith("/") || next.startsWith("//")) return "/member";
-  return next;
-}
 
 export async function signInAction(
   _prev: AuthActionState,
@@ -64,7 +60,7 @@ export async function signInAction(
 
     // Do not call redirect() here — it leaves useActionState pending stuck.
     // Cookies are set on this action response; client hard-navigates next.
-    return { success: AUTH_SUCCESS.signedIn, redirectTo: safeNext(next) };
+    return { success: AUTH_SUCCESS.signedIn, redirectTo: safeNextPath(next) };
   } catch (err) {
     return {
       error: professionalAuthError(
@@ -126,7 +122,7 @@ export async function signUpAction(
       .from("profiles")
       .update({ full_name: fullName, email })
       .eq("id", data.user.id);
-    redirect(safeNext(next));
+    redirect(safeNextPath(next));
   }
 
   const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -148,7 +144,7 @@ export async function signUpAction(
       .eq("id", data.user.id);
   }
 
-  redirect(safeNext(next));
+  redirect(safeNextPath(next));
 }
 
 export async function signOutAction() {

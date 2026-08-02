@@ -26,8 +26,9 @@ export function ContactForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: data.get("name"),
-          email: data.get("email") || undefined,
+          email: data.get("email"),
           message: data.get("message"),
+          website: data.get("website") || "",
         }),
       });
       const json = (await res.json()) as {
@@ -64,53 +65,93 @@ export function ContactForm() {
   const pending = status === "pending";
 
   return (
-    <form onSubmit={onSubmit} className="glass-card space-y-5 rounded-2xl p-6 sm:p-8">
-      <FormLock pending={pending} className="space-y-5">
-      <label className="block space-y-2">
-        <span className="ml-1 text-sm font-medium text-muted-foreground">
-          Full name
-        </span>
-        <Input
-          name="name"
-          required
-          placeholder="Your name"
-          className="h-12 rounded-xl bg-white"
-        />
-      </label>
-      {/* Email field temporarily hidden — API accepts optional email */}
-      <label className="block space-y-2">
-        <span className="ml-1 text-sm font-medium text-muted-foreground">
-          Message
-        </span>
-        <textarea
-          name="message"
-          required
-          rows={5}
-          placeholder="How can we help?"
-          className="w-full rounded-xl border border-input bg-white px-3 py-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-        />
-      </label>
+    <form
+      onSubmit={onSubmit}
+      className="relative glass-card space-y-6 rounded-2xl p-6 sm:p-8"
+      noValidate
+    >
+      <FormLock pending={pending} className="space-y-5" label="Sending…">
+        <label className="block space-y-2">
+          <span className="block text-sm font-medium text-foreground">
+            Full name
+          </span>
+          <Input
+            name="name"
+            required
+            autoComplete="name"
+            maxLength={120}
+            placeholder="Your name"
+            className="h-12 rounded-xl bg-white"
+          />
+        </label>
 
-      {message ? (
-        <p
-          className={
-            status === "error" ? "text-sm text-destructive" : "text-sm text-success"
-          }
-          role="status"
+        <label className="block space-y-2">
+          <span className="block text-sm font-medium text-foreground">
+            Email
+          </span>
+          <Input
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            maxLength={254}
+            placeholder="you@example.com"
+            className="h-12 rounded-xl bg-white"
+          />
+        </label>
+
+        {/* Honeypot — hidden from users, bots often fill it */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0"
         >
-          {message}
-        </p>
-      ) : null}
+          <label>
+            Website
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </label>
+        </div>
 
-      <Button
-        type="submit"
-        size="lg"
-        disabled={pending}
-        className="h-12 rounded-xl bg-primary px-8 shadow-lg shadow-primary/15"
-      >
-        {pending ? "Sending…" : "Send message"}
-        <MaterialIcon name="send" className="text-[18px]" />
-      </Button>
+        <label className="block space-y-2">
+          <span className="block text-sm font-medium text-foreground">
+            Message
+          </span>
+          <textarea
+            name="message"
+            required
+            rows={5}
+            maxLength={5000}
+            placeholder="How can we help?"
+            className="w-full rounded-xl border border-input bg-white px-3 py-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          />
+        </label>
+
+        {message ? (
+          <p
+            className={
+              status === "error"
+                ? "text-sm text-destructive"
+                : "text-sm font-medium text-success"
+            }
+            role="status"
+          >
+            {message}
+          </p>
+        ) : null}
+
+        <Button
+          type="submit"
+          size="lg"
+          disabled={pending}
+          className="h-12 rounded-xl bg-primary px-8 shadow-lg shadow-primary/15"
+        >
+          {pending ? "Sending…" : "Send message"}
+          <MaterialIcon name="send" className="text-[18px]" />
+        </Button>
       </FormLock>
     </form>
   );

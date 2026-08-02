@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import { ContentActionState, slugify } from "@/lib/content/utils";
+import { sanitizeRichHtml } from "@/lib/security/html";
 
 export async function upsertBlogAction(
   _prev: ContentActionState,
@@ -18,7 +19,9 @@ export async function upsertBlogAction(
   const title = String(formData.get("title") || "").trim();
   const slug =
     String(formData.get("slug") || "").trim() || slugify(title);
-  const bodyHtml = String(formData.get("body_html") || "").trim();
+  const bodyHtml = sanitizeRichHtml(
+    String(formData.get("body_html") || "").trim(),
+  );
   const isPublished =
     formData.get("is_published") === "on" ||
     formData.get("is_published") === "true";

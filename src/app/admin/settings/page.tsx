@@ -4,6 +4,11 @@ import { isSmtpConfigured } from "@/lib/email/smtp";
 export const metadata: Metadata = { title: "Admin · Settings" };
 
 export default function AdminSettingsPage() {
+  const contactInbox =
+    process.env.CONTACT_INBOX ||
+    process.env.SMTP_FROM_EMAIL ||
+    process.env.SMTP_USER;
+
   const checks = [
     {
       label: "Supabase URL",
@@ -20,6 +25,10 @@ export default function AdminSettingsPage() {
     {
       label: "Hostinger SMTP",
       ok: isSmtpConfigured(),
+    },
+    {
+      label: "Contact inbox",
+      ok: Boolean(contactInbox),
     },
     {
       label: "App URL",
@@ -47,12 +56,22 @@ export default function AdminSettingsPage() {
           </div>
         ))}
       </div>
-      <div className="glass-card rounded-2xl p-6 text-sm text-muted-foreground">
-        Homepage copy and stats are edited in{" "}
-        <a href="/admin/website" className="font-semibold text-primary">
-          Website CMS
-        </a>
-        . Brand logo lives at <code>/public/brand/logo.png</code>.
+      <div className="glass-card space-y-3 rounded-2xl p-6 text-sm text-muted-foreground">
+        <p>
+          Contact Us mail uses Hostinger SMTP. Set{" "}
+          <code className="text-xs">SMTP_USER</code>,{" "}
+          <code className="text-xs">SMTP_PASS</code>,{" "}
+          <code className="text-xs">SMTP_FROM_EMAIL</code>, and optionally{" "}
+          <code className="text-xs">CONTACT_INBOX</code> (defaults to from
+          address). See <code className="text-xs">docs/SETUP.md</code>.
+        </p>
+        <p>
+          Homepage copy and stats are edited in{" "}
+          <a href="/admin/website" className="font-semibold text-primary">
+            Website CMS
+          </a>
+          . Brand logo lives at <code>/public/brand/logo.png</code>.
+        </p>
       </div>
     </div>
   );
