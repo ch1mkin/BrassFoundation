@@ -36,22 +36,26 @@ type HeroSectionProps = {
 
 function HeroLogoWithSlogan({ hasBg }: { hasBg: boolean }) {
   const ring = 220;
+  const cx = ring / 2;
+  const cy = ring / 2;
   const r = ring / 2 - 14;
   const pathId = "hero-logo-slogan-path";
-  const label = `${SITE.slogan} · ${SITE.slogan} · `;
+  // Fixed top-arc curved heading (not rotating)
+  const arcStartX = cx - r;
+  const arcEndX = cx + r;
+  const arcY = cy;
 
   return (
     <div
       className="relative flex items-center justify-center"
       style={{ width: ring, height: ring }}
     >
-      {/* Text orbits the fixed logo */}
       <svg
         width={ring}
         height={ring}
         viewBox={`0 0 ${ring} ${ring}`}
         className={cn(
-          "logo-slogan-spin pointer-events-none absolute inset-0 size-full",
+          "pointer-events-none absolute inset-0 size-full",
           hasBg ? "text-white" : "text-foreground/80",
         )}
         aria-hidden
@@ -59,20 +63,24 @@ function HeroLogoWithSlogan({ hasBg }: { hasBg: boolean }) {
         <defs>
           <path
             id={pathId}
-            d={`M ${ring / 2},${ring / 2} m -${r},0 a ${r},${r} 0 1,1 ${r * 2},0 a ${r},${r} 0 1,1 -${r * 2},0`}
+            d={`M ${arcStartX},${arcY} A ${r},${r} 0 0,1 ${arcEndX},${arcY}`}
             fill="none"
           />
         </defs>
         <text
           className="fill-current uppercase"
           style={{
-            fontSize: 11,
-            letterSpacing: "0.28em",
+            fontSize: 12,
+            letterSpacing: "0.22em",
             fontWeight: 700,
           }}
         >
-          <textPath href={`#${pathId}`} startOffset="0%">
-            {label}
+          <textPath
+            href={`#${pathId}`}
+            startOffset="50%"
+            textAnchor="middle"
+          >
+            {SITE.slogan}
           </textPath>
         </text>
       </svg>
@@ -145,6 +153,8 @@ export function HeroSection({
     /member|join/i.test(displayPrimary)
       ? "/membership"
       : primaryHref;
+  // Slogan lives on the curved logo heading — hide duplicate headline/sub lines
+  const showHeadline = !isSloganOnly(displayHeadline);
   const showSubheadline = !isSloganOnly(displaySub);
 
   return (
@@ -190,23 +200,33 @@ export function HeroSection({
           </motion.div>
         </div>
 
-        <motion.h1
-          className={cn(
-            "font-heading mx-auto mb-6 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-[48px] lg:leading-[1.1]",
-            hasBg ? "hero-headline text-white" : "text-foreground",
-            adminPa && "notranslate",
-          )}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.6 }}
-          lang={adminPa ? "pa" : undefined}
-        >
-          {lines.map((line) => (
-            <span key={line} className="block text-inherit">
-              {line}
-            </span>
-          ))}
-        </motion.h1>
+        {showHeadline ? (
+          <motion.h1
+            className={cn(
+              "font-heading mx-auto mb-6 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-[48px] lg:leading-[1.1]",
+              hasBg ? "hero-headline text-white" : "text-foreground",
+              adminPa && "notranslate",
+            )}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.6 }}
+            lang={adminPa ? "pa" : undefined}
+          >
+            {lines.map((line) => (
+              <span key={line} className="block text-inherit">
+                {line}
+              </span>
+            ))}
+          </motion.h1>
+        ) : (
+          /* Same footprint as the slogan headline on mobile; collapse on md+ */
+          <p
+            className="font-heading invisible mx-auto mb-6 max-w-4xl select-none text-4xl font-bold tracking-tight sm:text-5xl md:hidden"
+            aria-hidden
+          >
+            {SITE.slogan}.
+          </p>
+        )}
 
         {showSubheadline ? (
           <motion.p
@@ -223,7 +243,7 @@ export function HeroSection({
             {displaySub}
           </motion.p>
         ) : (
-          <div className="mb-10" aria-hidden />
+          <div className="mb-10 md:mb-10" aria-hidden />
         )}
 
         <motion.div
