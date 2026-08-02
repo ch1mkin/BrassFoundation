@@ -163,13 +163,18 @@ export function HeroSection({
           transition={{ delay: 0.45, duration: 0.6 }}
         >
           {joinHref === "/membership" ? (
-            <MembershipLink className={cn(GOLD_SHINY_BTN, "shadow-lg")}>
-              {displayPrimary}
+            <MembershipLink
+              className={cn(GOLD_SHINY_BTN, "w-full shadow-lg sm:w-auto")}
+            >
+              <span>{displayPrimary}</span>
               <MaterialIcon name="person_add" className="text-[20px]" />
             </MembershipLink>
           ) : (
-            <a href={joinHref} className={cn(GOLD_SHINY_BTN, "shadow-lg")}>
-              {displayPrimary}
+            <a
+              href={joinHref}
+              className={cn(GOLD_SHINY_BTN, "w-full shadow-lg sm:w-auto")}
+            >
+              <span>{displayPrimary}</span>
               <MaterialIcon name="person_add" className="text-[20px]" />
             </a>
           )}

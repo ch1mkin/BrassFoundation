@@ -9,6 +9,7 @@ import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { MembershipLink } from "@/components/membership/membership-link";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { NAV_ITEMS, SITE, type NavItem } from "@/lib/constants";
 import { NAV_MESSAGE_KEYS } from "@/lib/i18n/messages";
 import { cn } from "@/lib/utils";
@@ -250,13 +251,8 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
               >
                 {t("nav.login")}
               </NavLink>
-              <MembershipLink
-                className={cn(
-                  buttonVariants(),
-                  "rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-[#004149] shadow-lg shadow-black/20 hover:bg-brand/90 active:scale-95",
-                )}
-              >
-                {t("nav.becomeMember")}
+              <MembershipLink className={cn(GOLD_SHINY_BTN, "shadow-lg")}>
+                <span>{t("nav.becomeMember")}</span>
               </MembershipLink>
             </>
           )}
@@ -386,12 +382,9 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                   </NavLink>
                   <MembershipLink
                     onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      buttonVariants(),
-                      "w-full justify-center rounded-lg bg-brand text-[#004149] hover:bg-brand/90",
-                    )}
+                    className={cn(GOLD_SHINY_BTN, "w-full shadow-lg")}
                   >
-                    {t("nav.becomeMember")}
+                    <span>{t("nav.becomeMember")}</span>
                   </MembershipLink>
                 </>
               )}

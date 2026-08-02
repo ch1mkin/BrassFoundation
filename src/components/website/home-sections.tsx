@@ -112,6 +112,8 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
           },
         ];
   const [index, setIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -119,34 +121,79 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
       setIndex((i) => (i + 1) % slides.length);
     }, 6500);
     return () => window.clearInterval(id);
-  }, [slides.length]);
+  }, [slides.length, index]);
+
+  function go(delta: number) {
+    setIndex((i) => (i + delta + slides.length) % slides.length);
+  }
+
+  function onPointerDown(e: React.PointerEvent) {
+    if (slides.length <= 1) return;
+    touchStartX.current = e.clientX;
+    touchStartY.current = e.clientY;
+  }
+
+  function onPointerUp(e: React.PointerEvent) {
+    if (
+      touchStartX.current == null ||
+      touchStartY.current == null ||
+      slides.length <= 1
+    ) {
+      return;
+    }
+    const dx = e.clientX - touchStartX.current;
+    const dy = e.clientY - touchStartY.current;
+    touchStartX.current = null;
+    touchStartY.current = null;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    go(dx < 0 ? 1 : -1);
+  }
 
   const current = slides[index]!;
 
   return (
-    <div className="relative aspect-video overflow-hidden rounded-2xl bg-surface-highest shadow-2xl">
+    <div
+      className="relative aspect-[16/10] touch-pan-y overflow-hidden rounded-2xl bg-surface-highest shadow-2xl sm:aspect-video"
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerCancel={() => {
+        touchStartX.current = null;
+        touchStartY.current = null;
+      }}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Vision quotes"
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={index}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.55 }}
-          className="absolute inset-0"
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -24 }}
+          transition={{ duration: 0.35 }}
+          className="absolute inset-0 select-none"
+          drag={slides.length > 1 ? "x" : false}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={(_, info) => {
+            if (info.offset.x < -50) go(1);
+            else if (info.offset.x > 50) go(-1);
+          }}
         >
           {current.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={current.image_url}
               alt=""
-              className="size-full object-cover"
+              className="pointer-events-none size-full object-cover"
+              draggable={false}
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-secondary/70 to-primary/40" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
           <div className="absolute right-0 bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
-            <p className="font-quote max-w-md text-lg font-medium italic sm:text-xl">
+            <p className="font-quote max-w-md text-base font-medium italic sm:text-xl">
               &ldquo;{current.quote}&rdquo;
             </p>
             {current.attribution ? (
@@ -165,6 +212,7 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
               key={i}
               type="button"
               aria-label={`Show quote ${i + 1}`}
+              aria-current={i === index}
               onClick={() => setIndex(i)}
               className={cn(
                 "size-2 rounded-full transition",
@@ -415,36 +463,48 @@ export function ResourcesSection() {
   };
 
   return (
-    <section className="relative bg-muted py-16 lg:py-20" id="resources">
-      <div className="relative z-10 mx-auto mb-12 max-w-[1280px] px-4 sm:px-6 lg:px-20">
-        <h2 className="font-heading text-3xl font-semibold">
+    <section className="relative bg-muted py-12 sm:py-16 lg:py-20" id="resources">
+      <div className="relative z-10 mx-auto mb-6 max-w-[1280px] px-4 sm:mb-12 sm:px-6 lg:px-20">
+        <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
           Digital Library & Resources
         </h2>
       </div>
-      <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-4 lg:px-20">
+      <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-6 sm:px-6 md:grid-cols-4 lg:px-20">
         {RESOURCES_PREVIEW.map((item) => (
-          <div key={item.title} className="glass-card group rounded-2xl p-6">
+          <div
+            key={item.title}
+            className="glass-card group rounded-xl p-3 sm:rounded-2xl sm:p-6"
+          >
             <div
               className={cn(
-                "mb-4 flex aspect-[3/4] w-full items-center justify-center rounded-xl bg-surface-highest transition-all duration-300",
+                "mb-2 flex aspect-[3/4] max-h-36 w-full items-center justify-center rounded-lg bg-surface-highest transition-all duration-300 sm:mb-4 sm:max-h-none sm:rounded-xl",
                 toneClass[item.tone],
               )}
             >
-              <MaterialIcon name={item.icon} className="text-[64px]" />
+              <MaterialIcon
+                name={item.icon}
+                className="text-[36px] sm:text-[64px]"
+              />
             </div>
-            <h4 className="font-heading mb-1 text-lg font-semibold">
+            <h4 className="font-heading mb-0.5 line-clamp-2 text-sm font-semibold sm:mb-1 sm:text-lg">
               {item.title}
             </h4>
-            <p className="mb-4 text-sm text-muted-foreground">{item.subtitle}</p>
-            <div className="flex items-center justify-between">
+            <p className="mb-2 line-clamp-2 text-[11px] text-muted-foreground sm:mb-4 sm:text-sm">
+              {item.subtitle}
+            </p>
+            <div className="flex items-center justify-between gap-1">
               <span
-                className="notranslate rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary"
+                className="notranslate rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary sm:px-2 sm:py-1 sm:text-xs"
                 translate="no"
               >
                 {item.size}
               </span>
-              <Link href="/resources" className="text-primary" aria-label="Download">
-                <MaterialIcon name="download" />
+              <Link
+                href="/resources"
+                className="text-primary"
+                aria-label="Download"
+              >
+                <MaterialIcon name="download" className="text-[18px] sm:text-[24px]" />
               </Link>
             </div>
           </div>
@@ -456,41 +516,45 @@ export function ResourcesSection() {
 
 export function MarketplaceSection() {
   return (
-    <section className="overflow-hidden py-16 lg:py-20">
-      <div className="mx-auto mb-12 flex max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-20">
-        <h2 className="font-heading text-3xl font-semibold">Featured Books</h2>
+    <section className="overflow-hidden py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto mb-6 flex max-w-[1280px] items-center justify-between gap-3 px-4 sm:mb-12 sm:px-6 lg:px-20">
+        <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
+          Featured Books
+        </h2>
         <Link
           href="/marketplace"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "rounded-full",
+            "rounded-full px-3 text-xs sm:px-4 sm:text-sm",
           )}
         >
           View all
         </Link>
       </div>
-      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
+      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-3 px-4 sm:grid-cols-2 sm:gap-6 sm:px-6 md:grid-cols-3 lg:px-20">
         {FEATURED_BOOKS.map((book) => (
           <Link
             key={book.title}
             href="/marketplace"
-            className="block rounded-2xl border border-border/40 bg-white p-8 transition hover:shadow-2xl"
+            className="block rounded-xl border border-border/40 bg-white p-4 transition hover:shadow-2xl sm:rounded-2xl sm:p-8"
           >
-            <div className="mb-4 flex h-72 items-center justify-center rounded-xl bg-surface-highest">
+            <div className="mb-3 flex h-36 items-center justify-center rounded-lg bg-surface-highest sm:mb-4 sm:h-72 sm:rounded-xl">
               <MaterialIcon
                 name="menu_book"
-                className="text-6xl text-primary/40"
+                className="text-4xl text-primary/40 sm:text-6xl"
               />
             </div>
-            <h4 className="font-heading text-xl font-semibold">{book.title}</h4>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <h4 className="font-heading text-base font-semibold sm:text-xl">
+              {book.title}
+            </h4>
+            <p className="mt-1 text-[11px] text-muted-foreground sm:mt-2 sm:text-xs">
               ({book.reviews} Reviews)
             </p>
-            <div className="mt-6 flex items-center justify-between">
-              <span className="font-heading text-2xl font-semibold text-primary">
+            <div className="mt-3 flex items-center justify-between gap-2 sm:mt-6">
+              <span className="font-heading text-lg font-semibold text-primary sm:text-2xl">
                 {book.price}
               </span>
-              <span className="rounded-lg bg-primary px-6 py-2 text-sm font-bold text-white">
+              <span className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white sm:px-6 sm:py-2 sm:text-sm">
                 Buy Now
               </span>
             </div>
@@ -509,16 +573,18 @@ export function MembershipCta({
   body: string;
 }) {
   return (
-    <section className="py-16 lg:py-20">
+    <section className="py-12 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-20">
-        <div className="gold-radiant-card relative overflow-hidden rounded-[32px] bg-secondary p-10 text-secondary-foreground sm:p-16">
-          <div className="relative z-10 flex flex-col items-center gap-12 lg:flex-row">
-            <div className="lg:w-2/3">
-              <h2 className="font-heading mb-6 text-4xl font-bold tracking-tight sm:text-5xl">
+        <div className="gold-radiant-card relative overflow-hidden rounded-2xl bg-secondary p-6 text-secondary-foreground sm:rounded-[32px] sm:p-16">
+          <div className="relative z-10 flex flex-col items-center gap-8 lg:flex-row lg:gap-12">
+            <div className="w-full lg:w-2/3">
+              <h2 className="font-heading mb-4 text-3xl font-bold tracking-tight sm:mb-6 sm:text-4xl sm:text-5xl">
                 {headline}
               </h2>
-              <p className="mb-10 text-lg text-white/80">{body}</p>
-              <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <p className="mb-6 text-base text-white/80 sm:mb-10 sm:text-lg">
+                {body}
+              </p>
+              <div className="mb-6 grid grid-cols-1 gap-3 sm:mb-10 sm:gap-4 md:grid-cols-2">
                 {[
                   "Exclusive Access to Digital Library",
                   "Volunteer Opportunities",
@@ -537,10 +603,10 @@ export function MembershipCta({
               <MembershipLink
                 className={cn(
                   GOLD_SHINY_BTN,
-                  "h-auto rounded-xl px-10 py-4 text-lg shadow-2xl hover:scale-105 active:scale-95",
+                  "h-auto w-full justify-center rounded-xl px-6 py-3.5 text-base shadow-2xl sm:w-auto sm:px-10 sm:py-4 sm:text-lg sm:hover:scale-105 active:scale-95",
                 )}
               >
-                Start Your Membership
+                <span>Start Your Membership</span>
               </MembershipLink>
             </div>
             <div className="flex justify-center lg:w-1/3">
@@ -548,7 +614,7 @@ export function MembershipCta({
               <img
                 src="/brand/logo.png"
                 alt="Brass Foundation"
-                className="floating-animation h-56 w-56 rounded-full bg-white object-contain p-4 shadow-2xl"
+                className="floating-animation h-36 w-36 rounded-full bg-white object-contain p-3 shadow-2xl sm:h-56 sm:w-56 sm:p-4"
               />
             </div>
           </div>

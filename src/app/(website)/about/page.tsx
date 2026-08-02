@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/website/page-shell";
-import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { MembershipLink } from "@/components/membership/membership-link";
 import { LeadershipSection } from "@/components/website/executive-committee-section";
+import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { CORE_VALUES, SITE } from "@/lib/constants";
 import { getExecutiveCommittee } from "@/lib/content/committee";
 import { cn } from "@/lib/utils";
@@ -40,13 +40,8 @@ export default async function AboutPage() {
                 </div>
               </div>
             ))}
-            <MembershipLink
-              className={cn(
-                buttonVariants(),
-                "mt-2 inline-flex rounded-xl bg-primary shadow-lg shadow-primary/20",
-              )}
-            >
-              Become a Member
+            <MembershipLink className={cn(GOLD_SHINY_BTN, "mt-2 shadow-lg")}>
+              <span>Become a Member</span>
             </MembershipLink>
           </div>
           <div className="glass-card rounded-2xl p-6 text-muted-foreground">
