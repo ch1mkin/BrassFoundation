@@ -57,6 +57,7 @@ export type CommunityRow = {
   badge_tone: string;
   status: string;
   cover_image_url: string | null;
+  is_featured?: boolean;
 };
 
 export type MarketplaceRow = {
@@ -268,9 +269,10 @@ export async function getPublishedCommunity(
     const { data, error } = await supabase
       .from("community_projects")
       .select(
-        "id, slug, title, summary, body, badge, badge_tone, status, cover_image_url",
+        "id, slug, title, summary, body, badge, badge_tone, status, cover_image_url, is_featured",
       )
       .eq("is_published", true)
+      .order("is_featured", { ascending: false })
       .order("sort_order", { ascending: true })
       .limit(limit);
 
@@ -285,12 +287,23 @@ export async function getPublishedCommunity(
         badge_tone: c.badgeTone,
         status: "ongoing",
         cover_image_url: null,
+        is_featured: true,
       }));
     }
     return data;
   } catch {
     return [];
   }
+}
+
+/** Homepage community cards — featured first, else top published. */
+export async function getHomepageCommunity(
+  limit = 3,
+): Promise<CommunityRow[]> {
+  const all = await getPublishedCommunity(24);
+  if (!all.length) return [];
+  const featured = all.filter((p) => p.is_featured);
+  return (featured.length ? featured : all).slice(0, limit);
 }
 
 export async function getCommunityBySlug(

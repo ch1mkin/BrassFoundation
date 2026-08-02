@@ -5,7 +5,7 @@ import { isSmtpConfigured, sendEmail } from "@/lib/email/smtp";
 
 const schema = z.object({
   name: z.string().min(1).max(120),
-  email: z.string().email(),
+  email: z.string().email().optional().or(z.literal("")),
   message: z.string().min(1).max(5000),
 });
 
@@ -21,7 +21,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, email, message } = parsed.data;
+    const { name, message } = parsed.data;
+    const email =
+      parsed.data.email?.trim() || "not-provided@brassfoundation.local";
 
     try {
       const supabase = await createClient();
@@ -47,10 +49,12 @@ export async function POST(request: Request) {
     const inbox = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER!;
     const result = await sendEmail({
       to: inbox,
-      replyTo: email,
+      replyTo: email.includes("not-provided@") ? undefined : email,
       subject: `Contact form — ${name}`,
       html: `
-        <p><strong>From:</strong> ${name} (${email})</p>
+        <p><strong>From:</strong> ${name}${
+          email.includes("not-provided@") ? "" : ` (${email})`
+        }</p>
         <p>${message.replace(/\n/g, "<br/>")}</p>
       `,
     });

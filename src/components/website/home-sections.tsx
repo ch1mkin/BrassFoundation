@@ -14,7 +14,11 @@ import {
   COMMUNITY_WORK,
 } from "@/lib/constants";
 import type { HomepageContent, HomepageQuote } from "@/lib/cms/homepage";
-import type { EventRow, MarketplaceRow } from "@/lib/content/queries";
+import type {
+  CommunityRow,
+  EventRow,
+  MarketplaceRow,
+} from "@/lib/content/queries";
 import type { BookPurchaseStatus } from "@/lib/content/book-purchases";
 import type { ResourceCategoryRow } from "@/lib/content/resource-categories";
 import { cn } from "@/lib/utils";
@@ -321,18 +325,24 @@ export function AboutSection({
 }
 
 export function CommunitySection({
-  items,
+  projects,
 }: {
-  items: HomepageContent["community_work"];
+  projects: CommunityRow[];
 }) {
-  const projects = COMMUNITY_WORK.length
-    ? COMMUNITY_WORK
-    : items.map((item) => ({
-        ...item,
-        description: "",
-        badge: "ONGOING" as const,
-        badgeTone: "primary" as const,
-      }));
+  const items =
+    projects.length > 0
+      ? projects
+      : COMMUNITY_WORK.map((c, i) => ({
+          id: `fallback-${i}`,
+          slug: c.slug,
+          title: c.title,
+          summary: c.description,
+          body: null,
+          badge: c.badge,
+          badge_tone: c.badgeTone,
+          status: "ongoing",
+          cover_image_url: null as string | null,
+        }));
 
   return (
     <section className="relative py-16 lg:py-20" id="community">
@@ -351,50 +361,63 @@ export function CommunitySection({
         </ViewAllLink>
       </div>
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
-        {projects.map((project, i) => (
-          <Link
-            key={project.slug}
-            href={`/community/${project.slug}`}
-            className="group block"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.06 }}
+        {items.map((project, i) => {
+          const tone = project.badge_tone || "primary";
+          return (
+            <Link
+              key={project.id || project.slug}
+              href={`/community/${project.slug}`}
+              className="group block"
             >
-              <div className="relative mb-4 h-64 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-secondary/20 to-tertiary/20">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(17,181,201,0.35),transparent_55%)] transition-transform duration-500 group-hover:scale-110" />
-                {"badge" in project && project.badge ? (
-                  <div className="absolute top-4 left-4">
-                    <span
-                      className={cn(
-                        "rounded-full px-4 py-1 text-xs font-semibold text-white",
-                        project.badgeTone === "primary" && "bg-primary",
-                        project.badgeTone === "secondary" && "bg-secondary",
-                        project.badgeTone === "tertiary" && "bg-tertiary",
-                      )}
-                    >
-                      {project.badge}
-                    </span>
-                  </div>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+              >
+                <div className="relative mb-4 h-64 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-secondary/20 to-tertiary/20">
+                  {project.cover_image_url ? (
+                    <InstantImg
+                      src={project.cover_image_url}
+                      alt=""
+                      className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(17,181,201,0.35),transparent_55%)] transition-transform duration-500 group-hover:scale-110" />
+                  )}
+                  {project.badge ? (
+                    <div className="absolute top-4 left-4">
+                      <span
+                        className={cn(
+                          "rounded-full px-4 py-1 text-xs font-semibold text-white",
+                          tone === "primary" && "bg-primary",
+                          tone === "secondary" && "bg-secondary",
+                          tone === "tertiary" && "bg-tertiary",
+                          tone !== "primary" &&
+                            tone !== "secondary" &&
+                            tone !== "tertiary" &&
+                            "bg-primary",
+                        )}
+                      >
+                        {project.badge}
+                      </span>
+                    </div>
+                  ) : null}
+                </div>
+                <h3 className="font-heading mb-2 text-xl font-semibold">
+                  {project.title}
+                </h3>
+                {project.summary ? (
+                  <p className="mb-4 text-muted-foreground">{project.summary}</p>
                 ) : null}
-              </div>
-              <h3 className="font-heading mb-2 text-xl font-semibold">
-                {project.title}
-              </h3>
-              {"description" in project && project.description ? (
-                <p className="mb-4 text-muted-foreground">
-                  {project.description}
-                </p>
-              ) : null}
-              <span className="inline-flex items-center gap-2 font-bold text-primary transition-all group-hover:gap-4">
-                Read More
-                <MaterialIcon name="arrow_right_alt" className="text-[18px]" />
-              </span>
-            </motion.div>
-          </Link>
-        ))}
+                <span className="inline-flex items-center gap-2 font-bold text-primary transition-all group-hover:gap-4">
+                  Read More
+                  <MaterialIcon name="arrow_right_alt" className="text-[18px]" />
+                </span>
+              </motion.div>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

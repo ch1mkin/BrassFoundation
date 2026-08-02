@@ -1,27 +1,39 @@
 import type { Metadata } from "next";
-import { AdminContentForm } from "@/components/admin/content-form";
+import Link from "next/link";
 import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 import {
-  deleteCommunityAction,
-  upsertCommunityAction,
-} from "@/lib/content/actions";
+  CommunityProjectForm,
+  type CommunityAdminRow,
+} from "@/components/admin/community-project-form";
+import { deleteCommunityAction } from "@/lib/content/actions";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Admin · Community" };
 
-export default async function AdminCommunityPage() {
+export default async function AdminCommunityPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ edit?: string }>;
+}) {
+  const { edit } = await searchParams;
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("community_projects")
-    .select("id, title, badge, status, is_published")
+    .select(
+      "id, title, slug, summary, body, badge, badge_tone, status, cover_image_url, sort_order, is_published, is_featured",
+    )
     .order("sort_order", { ascending: true });
+
+  const editing =
+    (data || []).find((row) => row.id === edit) ?? null;
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="font-heading text-3xl font-semibold">Community Work</h1>
         <p className="mt-2 text-muted-foreground">
-          Projects and impact stories for the public community section.
+          Projects and impact stories for the homepage Community section. Add a
+          cover image so cards show a photo instead of a gradient.
         </p>
       </div>
       {error ? (
@@ -30,35 +42,60 @@ export default async function AdminCommunityPage() {
         </p>
       ) : null}
       <div className="grid gap-8 lg:grid-cols-2">
-        <AdminContentForm
-          title="Add project"
-          action={upsertCommunityAction}
-          fields={[
-            { name: "title", label: "Title", required: true },
-            { name: "slug", label: "Slug (optional)" },
-            { name: "summary", label: "Summary", type: "textarea" },
-            { name: "body", label: "Details", type: "textarea" },
-            { name: "badge", label: "Badge", placeholder: "ONGOING" },
-            { name: "badge_tone", label: "Badge tone", defaultValue: "primary" },
-            { name: "status", label: "Status", defaultValue: "ongoing" },
-            { name: "is_published", label: "Published", type: "checkbox", defaultValue: true },
-          ]}
+        <CommunityProjectForm
+          key={editing?.id || "new"}
+          project={editing as CommunityAdminRow | null}
         />
         <div className="space-y-3">
           {(data || []).map((row) => (
             <div key={row.id} className="glass-card rounded-2xl p-4">
-              <div className="flex justify-between gap-3">
-                <div>
-                  <p className="font-medium">{row.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {row.status}
-                    {row.badge ? ` · ${row.badge}` : ""}
-                  </p>
+              <div className="flex gap-3">
+                {row.cover_image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={row.cover_image_url}
+                    alt=""
+                    className="size-16 shrink-0 rounded-xl object-cover"
+                  />
+                ) : (
+                  <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-xs text-primary">
+                    No img
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex justify-between gap-3">
+                    <div>
+                      <p className="font-medium">{row.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {row.status}
+                        {row.badge ? ` · ${row.badge}` : ""}
+                        {row.is_featured ? " · Featured" : ""}
+                        {row.is_published ? "" : " · Draft"}
+                      </p>
+                    </div>
+                    <AdminDeleteButton
+                      id={row.id}
+                      action={deleteCommunityAction}
+                    />
+                  </div>
+                  <Link
+                    href={`/admin/community?edit=${row.id}`}
+                    className="mt-2 inline-block text-xs font-semibold text-primary hover:underline"
+                  >
+                    Edit / change image
+                  </Link>
                 </div>
-                <AdminDeleteButton id={row.id} action={deleteCommunityAction} />
               </div>
             </div>
           ))}
+          {editing ? (
+            <Link
+              href="/admin/community"
+              className="inline-block text-sm font-semibold text-primary hover:underline"
+            >
+              ← Cancel edit / add new
+            </Link>
+          ) : null}
         </div>
       </div>
     </div>

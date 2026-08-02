@@ -26,7 +26,7 @@ export function ContactForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: data.get("name"),
-          email: data.get("email"),
+          email: data.get("email") || undefined,
           message: data.get("message"),
         }),
       });
@@ -77,18 +77,7 @@ export function ContactForm() {
           className="h-12 rounded-xl bg-white"
         />
       </label>
-      <label className="block space-y-2">
-        <span className="ml-1 text-sm font-medium text-muted-foreground">
-          Email
-        </span>
-        <Input
-          name="email"
-          type="email"
-          required
-          placeholder="you@example.com"
-          className="h-12 rounded-xl bg-white"
-        />
-      </label>
+      {/* Email field temporarily hidden — API accepts optional email */}
       <label className="block space-y-2">
         <span className="ml-1 text-sm font-medium text-muted-foreground">
           Message

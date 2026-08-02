@@ -444,7 +444,9 @@ export async function upsertCommunityAction(
     : await supabase.from("community_projects").insert(payload);
 
   if (error) return { error: error.message };
+  revalidatePath("/");
   revalidatePath("/community");
+  revalidatePath(`/community/${slug}`);
   revalidatePath("/admin/community");
   return { success: id ? "Project updated." : "Project created." };
 }
@@ -463,6 +465,7 @@ export async function deleteCommunityAction(
     .delete()
     .eq("id", id);
   if (error) return { error: error.message };
+  revalidatePath("/");
   revalidatePath("/community");
   revalidatePath("/admin/community");
   return { success: "Project deleted." };

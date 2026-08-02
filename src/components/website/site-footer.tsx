@@ -1,20 +1,39 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { MembershipLink } from "@/components/membership/membership-link";
 import { NewsletterForm } from "@/components/website/newsletter-form";
 import { SITE } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+
+const linkClass =
+  "pointer-events-auto relative z-10 text-xs font-semibold text-white/70 transition hover:text-brand";
+
+function FooterLink({
+  href,
+  children,
+  className,
+}: {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <a href={href} className={cn(linkClass, className)}>
+      {children}
+    </a>
+  );
+}
 
 export function SiteFooter() {
   const { t } = useLocale();
 
   return (
-    <footer className="w-full bg-[#0B1C28] text-white">
+    <footer className="relative z-20 w-full bg-[#0B1C28] text-white">
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-4 py-16 sm:px-6 md:grid-cols-4 lg:px-20">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2">
+          <a href="/" className="inline-flex items-center gap-2">
             <Image
               src="/brand/logo.png"
               alt=""
@@ -25,7 +44,7 @@ export function SiteFooter() {
             <span className="notranslate font-heading text-lg font-bold text-white">
               {SITE.name}
             </span>
-          </div>
+          </a>
           <p className="notranslate text-sm leading-relaxed text-white/70">
             {t("footer.blurb")}
           </p>
@@ -40,36 +59,25 @@ export function SiteFooter() {
           </h4>
           <ul className="notranslate space-y-2">
             <li>
-              <Link
-                href="/about"
-                className="text-xs font-semibold text-white/70 transition hover:text-brand"
-              >
-                {t("nav.about")}
-              </Link>
+              <FooterLink href="/about">{t("nav.about")}</FooterLink>
             </li>
             <li>
-              <Link
-                href="/community"
-                className="text-xs font-semibold text-white/70 transition hover:text-brand"
-              >
-                {t("nav.community")}
-              </Link>
+              <FooterLink href="/community">{t("nav.community")}</FooterLink>
             </li>
             <li>
-              <Link
-                href="/events"
-                className="text-xs font-semibold text-white/70 transition hover:text-brand"
-              >
-                {t("nav.events")}
-              </Link>
+              <FooterLink href="/events">{t("nav.events")}</FooterLink>
             </li>
             <li>
-              <Link
-                href="/resources"
-                className="text-xs font-semibold text-white/70 transition hover:text-brand"
-              >
-                {t("nav.resources")}
-              </Link>
+              <FooterLink href="/resources">{t("nav.resources")}</FooterLink>
+            </li>
+            <li>
+              <FooterLink href="/must-read">{t("nav.mustRead")}</FooterLink>
+            </li>
+            <li>
+              <FooterLink href="/news">{t("nav.news")}</FooterLink>
+            </li>
+            <li>
+              <FooterLink href="/blog">{t("nav.blog")}</FooterLink>
             </li>
           </ul>
         </div>
@@ -80,41 +88,23 @@ export function SiteFooter() {
           </h4>
           <ul className="notranslate space-y-2">
             <li>
-              <MembershipLink className="text-xs font-semibold text-white/70 hover:text-brand">
+              <MembershipLink className={linkClass}>
                 {t("footer.becomeMember")}
               </MembershipLink>
             </li>
             <li>
-              <Link
-                href="/gallery"
-                className="text-xs font-semibold text-white/70 transition hover:text-brand"
-              >
-                {t("footer.gallery")}
-              </Link>
+              <FooterLink href="/gallery">{t("footer.gallery")}</FooterLink>
             </li>
             <li>
-              <Link
-                href="/marketplace"
-                className="text-xs font-semibold text-white/70 transition hover:text-brand"
-              >
+              <FooterLink href="/marketplace">
                 {t("footer.marketplace")}
-              </Link>
+              </FooterLink>
             </li>
             <li>
-              <Link
-                href="/privacy"
-                className="text-xs font-semibold text-white/70 transition hover:text-brand"
-              >
-                Privacy Policy
-              </Link>
+              <FooterLink href="/privacy">Privacy Policy</FooterLink>
             </li>
             <li>
-              <Link
-                href="/terms"
-                className="text-xs font-semibold text-white/70 transition hover:text-brand"
-              >
-                Terms &amp; Conditions
-              </Link>
+              <FooterLink href="/terms">Terms &amp; Conditions</FooterLink>
             </li>
           </ul>
         </div>
@@ -123,12 +113,16 @@ export function SiteFooter() {
           <h4 className="notranslate mb-4 text-xs font-semibold tracking-wide text-brand uppercase">
             {t("footer.contactUs")}
           </h4>
-          <a
-            href="mailto:contact@brassfoundation.org"
-            className="notranslate text-xs font-semibold text-white/70 hover:text-brand"
-          >
-            contact@brassfoundation.org
-          </a>
+          <ul className="notranslate space-y-2">
+            <li>
+              <FooterLink href="/contact">{t("footer.contact")}</FooterLink>
+            </li>
+            <li>
+              <MembershipLink className={linkClass}>
+                {t("footer.becomeMember")}
+              </MembershipLink>
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -150,24 +144,21 @@ export function SiteFooter() {
           </a>
         </div>
         <div className="flex flex-wrap justify-center gap-6">
-          <Link
+          <FooterLink
             href="/privacy"
-            className="text-xs font-semibold text-white/55 hover:text-brand"
+            className="text-white/55 hover:text-brand"
           >
             Privacy Policy
-          </Link>
-          <Link
-            href="/terms"
-            className="text-xs font-semibold text-white/55 hover:text-brand"
-          >
+          </FooterLink>
+          <FooterLink href="/terms" className="text-white/55 hover:text-brand">
             Terms &amp; Conditions
-          </Link>
-          <Link
+          </FooterLink>
+          <FooterLink
             href="/contact"
-            className="text-xs font-semibold text-white/55 hover:text-brand"
+            className="text-white/55 hover:text-brand"
           >
             {t("footer.contact")}
-          </Link>
+          </FooterLink>
         </div>
       </div>
     </footer>

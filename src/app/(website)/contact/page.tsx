@@ -13,23 +13,12 @@ export default function ContactPage() {
       description="Questions, volunteer interest, or partnership ideas — we would love to hear from you."
       wide
     >
-      <div className="grid gap-10 lg:grid-cols-2">
+      <div className="mx-auto max-w-2xl">
         <ContactForm />
-        <div className="space-y-6">
-          <div className="glass-card rounded-2xl p-6">
-            <h2 className="font-heading text-lg font-semibold">Email</h2>
-            <a
-              href="mailto:contact@brassfoundation.org"
-              className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
-            >
-              contact@brassfoundation.org
-            </a>
-            <p className="mt-4 text-sm text-muted-foreground">
-              {SITE.slogan} — reach out anytime and our team will respond as
-              soon as possible.
-            </p>
-          </div>
-        </div>
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          {SITE.slogan} — send a message and our team will respond as soon as
+          possible.
+        </p>
       </div>
     </PageShell>
   );

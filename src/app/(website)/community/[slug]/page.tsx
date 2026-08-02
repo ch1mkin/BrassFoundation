@@ -80,6 +80,14 @@ export default async function CommunityDetailPage({ params }: Props) {
       title={project.title}
       description={project.summary || undefined}
     >
+      {project.cover_image_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={project.cover_image_url}
+          alt=""
+          className="mb-8 aspect-[16/9] w-full rounded-2xl object-cover"
+        />
+      ) : null}
       {project.body ? (
         <div className="whitespace-pre-wrap leading-relaxed">{project.body}</div>
       ) : (

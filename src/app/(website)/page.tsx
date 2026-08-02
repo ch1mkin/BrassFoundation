@@ -17,14 +17,23 @@ import { getUserBookPurchaseMap } from "@/lib/content/book-purchases";
 import { getExecutiveCommittee } from "@/lib/content/committee";
 import { getPublishedMustReadBooks } from "@/lib/content/must-read-actions";
 import {
+  getHomepageCommunity,
   getPublishedEvents,
   getPublishedMarketplace,
 } from "@/lib/content/queries";
 import { getResourceCategories } from "@/lib/content/resource-categories";
 
 export default async function HomePage() {
-  const [content, committee, events, mustRead, marketplace, context, resourceCategories] =
-    await Promise.all([
+  const [
+    content,
+    committee,
+    events,
+    mustRead,
+    marketplace,
+    context,
+    resourceCategories,
+    communityProjects,
+  ] = await Promise.all([
       getPublishedHomepage(),
       getExecutiveCommittee(),
       getPublishedEvents(6),
@@ -32,6 +41,7 @@ export default async function HomePage() {
       getPublishedMarketplace(6),
       getUserContext(),
       getResourceCategories(),
+      getHomepageCommunity(3),
     ]);
 
   const purchaseMap = context
@@ -70,7 +80,7 @@ export default async function HomePage() {
       <SectionDivider />
       <LeadershipSection members={committee} />
       <SectionDivider />
-      <CommunitySection items={content.community_work} />
+      <CommunitySection projects={communityProjects} />
       <SectionDivider />
       <EventsSection
         backgroundUrl={content.events_background_url}
