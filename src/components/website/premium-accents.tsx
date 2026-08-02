@@ -158,6 +158,4 @@ export function GoldHairline({ className }: { className?: string }) {
   );
 }
 
-/** Shared shiny gold CTA class name for Become a Member buttons. */
-export const GOLD_SHINY_BTN =
-  "gold-shiny-btn inline-flex h-11 items-center justify-center gap-2 rounded-lg px-5 text-sm font-bold text-white sm:h-14 sm:px-8 sm:text-base";
+export { GOLD_SHINY_BTN } from "@/lib/ui/gold-btn";

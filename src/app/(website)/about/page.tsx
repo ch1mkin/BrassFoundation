@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/website/page-shell";
 import { MaterialIcon } from "@/components/ui/material-icon";
-import { MembershipLink } from "@/components/membership/membership-link";
+import { GoldMembershipCta } from "@/components/membership/gold-membership-cta";
 import { LeadershipSection } from "@/components/website/executive-committee-section";
-import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { ABOUT_PAGE, CORE_VALUES } from "@/lib/constants";
 import { getExecutiveCommittee } from "@/lib/content/committee";
-import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -34,13 +32,8 @@ export default async function AboutPage() {
               {paragraph}
             </p>
           ))}
-          <div className="pt-4">
-            <MembershipLink
-              className={cn(GOLD_SHINY_BTN, "w-full shadow-lg sm:w-auto")}
-            >
-              <span>Become a Member</span>
-              <MaterialIcon name="person_add" className="text-[20px]" />
-            </MembershipLink>
+          <div className="flex justify-center pt-4 sm:justify-start">
+            <GoldMembershipCta className="w-full sm:w-auto" />
           </div>
         </article>
 
