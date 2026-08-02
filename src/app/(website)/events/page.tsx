@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageShell } from "@/components/website/page-shell";
 import {
   formatEventDate,
@@ -29,7 +28,7 @@ export default async function EventsPage() {
         {events.map((event) => {
           const { month, day } = formatEventDate(event);
           const href = event.slug
-            ? `/events/${encodeURIComponent(event.slug)}`
+            ? `/events/${encodeURIComponent(event.slug)}#register`
             : "/events";
           return (
             <div
@@ -71,15 +70,15 @@ export default async function EventsPage() {
                   </p>
                 ) : null}
               </div>
-              <Link
+              <a
                 href={href}
                 className={cn(
-                  "rounded-lg px-8 py-2.5 text-sm font-bold text-white transition-transform active:scale-95",
+                  "inline-flex min-h-11 touch-manipulation items-center justify-center rounded-lg px-8 py-2.5 text-sm font-bold text-white transition-transform active:scale-95",
                   event.tone === "secondary" ? "bg-secondary" : "bg-primary",
                 )}
               >
                 {event.registration_open ? "Register" : "View"}
-              </Link>
+              </a>
             </div>
           );
         })}

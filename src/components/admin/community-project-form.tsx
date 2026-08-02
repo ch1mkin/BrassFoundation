@@ -49,8 +49,9 @@ export function CommunityProjectForm({
           {editing ? "Edit project" : "Add project"}
         </h2>
         <p className="text-xs text-muted-foreground">
-          Published projects appear on the homepage Community section and
-          /community. Upload a cover image for the homepage cards.
+          Published + featured projects appear on the homepage Community
+          section. Upload a card thumbnail so the photo shows on those cards.
+          Homepage cards link to the Community Work page.
         </p>
         {editing ? <input type="hidden" name="id" value={project!.id} /> : null}
         <Input
@@ -109,7 +110,7 @@ export function CommunityProjectForm({
         />
         <FileOrUrlField
           name="cover_image_url"
-          label="Cover image (homepage card)"
+          label="Card thumbnail / cover image (homepage Community cards)"
           bucket="gallery"
           accept="image/*"
           folder="community"

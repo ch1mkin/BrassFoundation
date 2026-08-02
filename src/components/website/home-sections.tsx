@@ -363,10 +363,10 @@ export function CommunitySection({
         {items.map((project, i) => {
           const tone = project.badge_tone || "primary";
           return (
-            <Link
+            <a
               key={project.id || project.slug}
-              href={`/community/${project.slug}`}
-              className="group block"
+              href="/community"
+              className="group block touch-manipulation"
             >
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -414,7 +414,7 @@ export function CommunitySection({
                   <MaterialIcon name="arrow_right_alt" className="text-[18px]" />
                 </span>
               </motion.div>
-            </Link>
+            </a>
           );
         })}
       </div>
@@ -471,8 +471,8 @@ export function EventsSection({
               const day = String(starts.getDate()).padStart(2, "0");
               const tone =
                 event.tone === "secondary" ? "secondary" : "primary";
-              const href = event.slug
-                ? `/events/${encodeURIComponent(event.slug)}`
+              const registerHref = event.slug
+                ? `/events/${encodeURIComponent(event.slug)}#register`
                 : "/events";
               return (
                 <div
@@ -514,15 +514,15 @@ export function EventsSection({
                       </p>
                     ) : null}
                   </div>
-                  <Link
-                    href={href}
+                  <a
+                    href={registerHref}
                     className={cn(
-                      "rounded-lg px-8 py-2.5 text-sm font-bold text-white transition active:scale-95",
+                      "pointer-events-auto relative z-30 inline-flex min-h-11 touch-manipulation items-center justify-center rounded-lg px-8 py-2.5 text-sm font-bold text-white transition active:scale-95",
                       tone === "primary" ? "bg-primary" : "bg-secondary",
                     )}
                   >
                     {event.registration_open ? "Register" : "View"}
-                  </Link>
+                  </a>
                 </div>
               );
             })}
@@ -561,10 +561,10 @@ export function ResourcesSection({
               ? (item.tone as keyof typeof toneClass)
               : "primary";
           return (
-            <Link
+            <a
               key={item.slug}
               href={`/resources/${item.slug}`}
-              className="glass-card group rounded-xl p-3 transition hover:-translate-y-0.5 sm:rounded-2xl sm:p-6"
+              className="glass-card group touch-manipulation rounded-xl p-3 transition hover:-translate-y-0.5 sm:rounded-2xl sm:p-6"
             >
               <div
                 className={cn(
@@ -583,7 +583,7 @@ export function ResourcesSection({
               <p className="line-clamp-2 text-[11px] text-muted-foreground sm:text-sm">
                 {item.subtitle}
               </p>
-            </Link>
+            </a>
           );
         })}
       </div>

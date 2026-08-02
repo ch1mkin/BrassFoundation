@@ -59,15 +59,20 @@ export default async function EventDetailPage({ params }: Props) {
         </div>
 
         {canRegister ? (
-          <EventRegisterForm
-            eventId={event.id}
-            eventSlug={event.slug}
-            isLoggedIn={Boolean(context)}
-            defaultName={context?.profile?.full_name || undefined}
-            defaultEmail={context?.email || undefined}
-          />
+          <div id="register" className="scroll-mt-28">
+            <EventRegisterForm
+              eventId={event.id}
+              eventSlug={event.slug}
+              isLoggedIn={Boolean(context)}
+              defaultName={context?.profile?.full_name || undefined}
+              defaultEmail={context?.email || undefined}
+            />
+          </div>
         ) : (
-          <div className="glass-card rounded-2xl p-6 text-sm text-muted-foreground">
+          <div
+            id="register"
+            className="glass-card scroll-mt-28 rounded-2xl p-6 text-sm text-muted-foreground"
+          >
             {event.id.startsWith("fallback-")
               ? "Run the website content SQL migration to enable live registrations."
               : "Registration is closed for this event."}
