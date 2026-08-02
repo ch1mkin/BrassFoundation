@@ -9,6 +9,7 @@ import { MembershipLink } from "@/components/membership/membership-link";
 import {
   SectionOrnaments,
   GoldHairline,
+  GOLD_SHINY_BTN,
 } from "@/components/website/premium-accents";
 import {
   COMMUNITY_WORK,
@@ -516,7 +517,7 @@ export function MembershipCta({
   return (
     <section className="py-16 lg:py-20">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-20">
-        <div className="relative overflow-hidden rounded-[32px] bg-secondary p-10 text-secondary-foreground sm:p-16">
+        <div className="gold-radiant-card relative overflow-hidden rounded-[32px] bg-secondary p-10 text-secondary-foreground sm:p-16">
           <div className="relative z-10 flex flex-col items-center gap-12 lg:flex-row">
             <div className="lg:w-2/3">
               <h2 className="font-heading mb-6 text-4xl font-bold tracking-tight sm:text-5xl">
@@ -539,7 +540,12 @@ export function MembershipCta({
                   </div>
                 ))}
               </div>
-              <MembershipLink className="inline-flex rounded-xl bg-white px-10 py-4 text-lg font-bold text-secondary shadow-2xl transition hover:scale-105 active:scale-95">
+              <MembershipLink
+                className={cn(
+                  GOLD_SHINY_BTN,
+                  "h-auto rounded-xl px-10 py-4 text-lg shadow-2xl hover:scale-105 active:scale-95",
+                )}
+              >
                 Start Your Membership
               </MembershipLink>
             </div>

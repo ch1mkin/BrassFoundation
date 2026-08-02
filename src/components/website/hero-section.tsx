@@ -7,6 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { MembershipLink } from "@/components/membership/membership-link";
 import { useLocale } from "@/components/i18n/locale-provider";
+import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { cn } from "@/lib/utils";
 
 const HeroParticles = dynamic(
@@ -162,23 +163,12 @@ export function HeroSection({
           transition={{ delay: 0.45, duration: 0.6 }}
         >
           {joinHref === "/membership" ? (
-            <MembershipLink
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "h-14 rounded-lg bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90",
-              )}
-            >
+            <MembershipLink className={cn(GOLD_SHINY_BTN, "shadow-lg")}>
               {displayPrimary}
               <MaterialIcon name="person_add" className="text-[20px]" />
             </MembershipLink>
           ) : (
-            <a
-              href={joinHref}
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "h-14 rounded-lg bg-primary px-8 text-base font-bold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90",
-              )}
-            >
+            <a href={joinHref} className={cn(GOLD_SHINY_BTN, "shadow-lg")}>
               {displayPrimary}
               <MaterialIcon name="person_add" className="text-[20px]" />
             </a>

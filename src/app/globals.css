@@ -235,6 +235,206 @@
     -webkit-text-stroke: 1.15px rgba(255, 255, 255, 0.98);
     paint-order: stroke fill;
   }
+
+  /* Falling golden leaves */
+  .golden-leaf-fall {
+    animation-name: golden-leaf-fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform, opacity;
+  }
+
+  @keyframes golden-leaf-fall {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0) rotate(-12deg);
+    }
+    8% {
+      opacity: 0.95;
+    }
+    45% {
+      opacity: 0.85;
+      transform: translate3d(var(--leaf-sway, 24px), 45vh, 0)
+        rotate(calc(var(--leaf-spin, 120deg) * 0.45));
+    }
+    75% {
+      opacity: 0.45;
+      transform: translate3d(
+          calc(var(--leaf-sway, 24px) * -0.55),
+          78vh,
+          0
+        )
+        rotate(calc(var(--leaf-spin, 120deg) * 0.8));
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(calc(var(--leaf-sway, 24px) * 0.35), 110vh, 0)
+        rotate(var(--leaf-spin, 120deg));
+    }
+  }
+
+  /* Shiny gold membership CTA */
+  .gold-shiny-btn {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    color: #ffffff !important;
+    background: linear-gradient(
+      135deg,
+      #f7e2a1 0%,
+      #e8c15a 18%,
+      #d69a17 42%,
+      #b0780c 62%,
+      #f0d078 82%,
+      #c99212 100%
+    );
+    background-size: 200% 200%;
+    box-shadow:
+      0 4px 14px rgba(214, 154, 23, 0.45),
+      0 1px 0 rgba(255, 240, 190, 0.55) inset,
+      0 -1px 0 rgba(120, 70, 0, 0.25) inset;
+    animation: gold-shine-shift 4.5s ease-in-out infinite;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease,
+      filter 0.2s ease;
+  }
+
+  .gold-shiny-btn::before {
+    content: "";
+    position: absolute;
+    inset: -40% -60%;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.55) 48%,
+      rgba(255, 255, 255, 0.15) 52%,
+      transparent 65%
+    );
+    transform: translateX(-40%) rotate(8deg);
+    animation: gold-sheen-sweep 3.2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .gold-shiny-btn > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .gold-shiny-btn:hover {
+    filter: brightness(1.06);
+    box-shadow:
+      0 6px 22px rgba(214, 154, 23, 0.55),
+      0 1px 0 rgba(255, 240, 190, 0.65) inset;
+    transform: translateY(-1px);
+  }
+
+  .gold-shiny-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  @keyframes gold-shine-shift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes gold-sheen-sweep {
+    0%,
+    30% {
+      transform: translateX(-55%) rotate(8deg);
+      opacity: 0;
+    }
+    45% {
+      opacity: 1;
+    }
+    70%,
+    100% {
+      transform: translateX(55%) rotate(8deg);
+      opacity: 0;
+    }
+  }
+
+  /* Membership CTA card — golden radiating border */
+  .gold-radiant-card {
+    position: relative;
+    border-radius: 32px;
+    isolation: isolate;
+  }
+
+  .gold-radiant-card::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(
+      from var(--gold-angle, 0deg),
+      #8b5a00,
+      #f5d78a,
+      #d69a17,
+      #fff3c4,
+      #b0780c,
+      #f0d078,
+      #8b5a00
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: gold-border-spin 6s linear infinite;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .gold-radiant-card::after {
+    content: "";
+    position: absolute;
+    inset: -10px;
+    border-radius: inherit;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(214, 154, 23, 0.35) 0%,
+      rgba(214, 154, 23, 0.12) 40%,
+      transparent 70%
+    );
+    animation: gold-glow-pulse 3.5s ease-in-out infinite;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  @property --gold-angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+  }
+
+  @keyframes gold-border-spin {
+    to {
+      --gold-angle: 360deg;
+    }
+  }
+
+  @keyframes gold-glow-pulse {
+    0%,
+    100% {
+      opacity: 0.65;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+  }
 }
 
 /* Punjabi / Gurmukhi readability */
