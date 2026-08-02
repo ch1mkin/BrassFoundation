@@ -99,6 +99,9 @@ export default async function AdminGalleryPage({
                 <AdminDeleteButton
                   id={album.id}
                   action={deleteGalleryAlbumAction}
+                  label="Delete"
+                  pendingLabel="Deleting album…"
+                  confirmMessage={`Delete album “${album.heading || album.title}”? This cannot be undone.`}
                 />
               </div>
             ))}
