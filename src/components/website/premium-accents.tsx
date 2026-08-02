@@ -79,25 +79,25 @@ type LeafSpec = {
 };
 
 function buildLeaves(count: number, seed: number): LeafSpec[] {
-  // Deterministic-ish layout so SSR/client match
+  // Deterministic layout so SSR/client match — spaced across the section
   const leaves: LeafSpec[] = [];
   for (let i = 0; i < count; i++) {
-    const t = (i * 17 + seed * 13) % 100;
+    const slot = count === 1 ? 50 : 12 + (i / (count - 1)) * 76;
     leaves.push({
       id: i,
-      left: `${4 + ((t * 0.9) % 92)}%`,
-      size: 28 + ((i * 7 + seed) % 28),
-      delay: (i * 0.85 + seed * 0.3) % 8,
-      duration: 7 + ((i * 3 + seed) % 6),
-      sway: 18 + ((i * 11) % 36),
+      left: `${slot + ((seed + i) % 3) - 1}%`,
+      size: 22 + ((i * 5 + seed) % 10),
+      delay: i * 2.4 + seed * 0.4,
+      duration: 10 + ((i * 2 + seed) % 4),
+      sway: 14 + ((i * 9) % 18),
       flip: i % 2 === 0,
-      startTop: -8 - ((i * 5) % 18),
+      startTop: -6 - (i % 3) * 4,
     });
   }
   return leaves;
 }
 
-/** Realistic golden leaves that drift downward and fade out. */
+/** Sparse golden leaves that drift downward and fade out. */
 export function SectionOrnaments({
   className,
   density = "default",
@@ -105,7 +105,8 @@ export function SectionOrnaments({
   className?: string;
   density?: "default" | "rich";
 }) {
-  const count = density === "rich" ? 10 : 6;
+  // Keep leaf count low so sections stay elegant, not busy
+  const count = density === "rich" ? 4 : 3;
   const leaves = useMemo(
     () => buildLeaves(count, density === "rich" ? 2 : 1),
     [count, density],
@@ -114,7 +115,7 @@ export function SectionOrnaments({
   return (
     <div
       className={cn(
-        "pointer-events-none absolute inset-0 overflow-hidden",
+        "pointer-events-none absolute inset-0 overflow-hidden opacity-40",
         className,
       )}
       aria-hidden
@@ -137,14 +138,10 @@ export function SectionOrnaments({
           }
         >
           <GoldenLeaf
-            className={cn(
-              "h-full w-full",
-              leaf.flip && "scale-x-[-1]",
-            )}
+            className={cn("h-full w-full", leaf.flip && "scale-x-[-1]")}
           />
         </span>
       ))}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/35 to-transparent" />
     </div>
   );
 }

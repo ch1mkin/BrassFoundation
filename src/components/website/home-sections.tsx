@@ -7,7 +7,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { MembershipLink } from "@/components/membership/membership-link";
 import {
-  SectionOrnaments,
   GoldHairline,
   GOLD_SHINY_BTN,
 } from "@/components/website/premium-accents";
@@ -67,8 +66,7 @@ export function StatsSection({
           : "md:grid-cols-5";
 
   return (
-    <section className="relative overflow-hidden bg-surface-low py-16 lg:py-20">
-      <SectionOrnaments />
+    <section className="relative bg-surface-low py-16 lg:py-20">
       <div
         className={`relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-6 px-4 sm:px-6 lg:px-20 ${cols}`}
       >
@@ -202,8 +200,7 @@ export function AboutSection({
       : [];
 
   return (
-    <section className="relative overflow-hidden py-16 lg:py-20" id="about">
-      <SectionOrnaments density="rich" />
+    <section className="relative py-16 lg:py-20" id="about">
       <div className="relative z-10 mx-auto grid max-w-[1280px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-20">
         <QuoteVisionSlider quotes={quotes} />
         <div>

@@ -249,16 +249,16 @@
       opacity: 0;
       transform: translate3d(0, 0, 0) rotate(-12deg);
     }
-    8% {
-      opacity: 0.95;
+    10% {
+      opacity: 0.45;
     }
     45% {
-      opacity: 0.85;
+      opacity: 0.35;
       transform: translate3d(var(--leaf-sway, 24px), 45vh, 0)
         rotate(calc(var(--leaf-spin, 120deg) * 0.45));
     }
     75% {
-      opacity: 0.45;
+      opacity: 0.18;
       transform: translate3d(
           calc(var(--leaf-sway, 24px) * -0.55),
           78vh,

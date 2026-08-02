@@ -196,7 +196,7 @@ export function LeadershipSection({
 
   return (
     <section className="relative overflow-hidden bg-surface-high py-10 sm:py-14 lg:py-16">
-      <SectionOrnaments density="rich" />
+      <SectionOrnaments />
       <div className="relative z-10 mx-auto mb-8 max-w-[1280px] px-4 text-center sm:mb-10 sm:px-6 lg:px-20">
         <h2 className="font-heading mb-2 text-2xl font-semibold sm:text-3xl">
           Executive Committee
