@@ -217,11 +217,11 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
           }}
         >
           <div className="absolute right-0 bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
-            <p className="font-quote max-w-xl text-[1.5rem] font-medium italic leading-snug sm:text-[2.25rem] sm:leading-snug">
+            <p className="font-quote max-w-xl font-medium leading-snug">
               &ldquo;{current.quote}&rdquo;
             </p>
             {current.attribution ? (
-              <p className="mt-3 text-[1rem] font-medium text-white/90 sm:text-[1.25rem]">
+              <p className="font-quote-attr mt-3 font-medium text-white/90">
                 — {current.attribution}
               </p>
             ) : null}

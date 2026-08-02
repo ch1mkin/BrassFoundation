@@ -12,21 +12,24 @@ const OPTIONS: Array<{ id: Locale; label: string; lang?: string }> = [
 
 /** Compact EN | ਪੰਜਾਬੀ | हिन्दी toggle for the dark header */
 export function LanguageSwitcher({ className }: { className?: string }) {
-  const { locale, setLocale, t } = useLocale();
+  const { locale, setLocale, t, translating } = useLocale();
 
   return (
     <div
       className={cn(
         "notranslate inline-flex h-9 items-stretch overflow-hidden rounded-full bg-white/10 text-[11px] font-semibold tracking-wide",
+        translating && "pointer-events-none opacity-70",
         className,
       )}
       role="group"
       aria-label={t("lang.switchTo")}
+      aria-busy={translating}
     >
       {OPTIONS.map((opt) => (
         <button
           key={opt.id}
           type="button"
+          disabled={translating}
           onClick={() => locale !== opt.id && setLocale(opt.id)}
           className={cn(
             "px-2.5 transition sm:px-3",

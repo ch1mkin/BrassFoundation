@@ -6,9 +6,11 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { usePathname } from "next/navigation";
+import { PageLoader } from "@/components/brand/page-loader";
 import {
   DEFAULT_LOCALE,
   GOOGTRANS_COOKIE,
@@ -36,6 +38,7 @@ type LocaleContextValue = {
   setLocale: (next: Locale) => void;
   t: (key: MessageKey | string) => string;
   translations: Record<string, TranslationRow>;
+  translating: boolean;
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
@@ -66,6 +69,12 @@ function applyDocumentLocale(locale: Locale) {
   document.documentElement.classList.toggle("locale-en", locale === "en");
 }
 
+function loaderLabel(locale: Locale) {
+  if (locale === "pa") return "Translating to ਪੰਜਾਬੀ…";
+  if (locale === "hi") return "Translating to हिन्दी…";
+  return "Restoring English…";
+}
+
 export function LocaleProvider({
   children,
   initialLocale = DEFAULT_LOCALE,
@@ -77,7 +86,10 @@ export function LocaleProvider({
 }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
   const [translations, setTranslations] = useState(initialTranslations);
+  const [translating, setTranslating] = useState(false);
   const pathname = usePathname();
+  const skipInitialRouteTranslate = useRef(true);
+  const translateGen = useRef(0);
 
   useEffect(() => {
     setTranslations(initialTranslations);
@@ -98,50 +110,62 @@ export function LocaleProvider({
     };
   }, []);
 
-  useEffect(() => {
+  const runTranslate = useCallback(async (next: Locale, showLoader: boolean) => {
+    const gen = ++translateGen.current;
     clearGoogleTranslateArtifacts();
-    applyDocumentLocale(locale);
+    applyDocumentLocale(next);
     lockNonContentFromTranslate();
 
-    const observer = new MutationObserver(() => lockNonContentFromTranslate());
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    let cancelled = false;
-
-    async function run() {
-      const target = googleTranslateTarget(locale);
+    if (showLoader) setTranslating(true);
+    try {
+      const target = googleTranslateTarget(next);
       if (target) {
+        // Let the loader paint before heavy work
+        await new Promise((r) => window.setTimeout(r, 40));
+        if (gen !== translateGen.current) return;
         await translateWritingContent(target);
       } else {
         restoreWritingContent();
       }
+    } finally {
+      if (gen === translateGen.current) {
+        setTranslating(false);
+      }
     }
+  }, []);
+
+  // Locale / route changes: one full translate pass behind the loader
+  useEffect(() => {
+    const observer = new MutationObserver(() => lockNonContentFromTranslate());
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const isFirst = skipInitialRouteTranslate.current;
+    skipInitialRouteTranslate.current = false;
+
+    const target = googleTranslateTarget(locale);
+    // Loader when translating to PA/HI, restoring EN after first paint,
+    // or re-translating after navigation while in PA/HI.
+    const showLoader = Boolean(target) || (!isFirst && locale === "en");
 
     const timer = window.setTimeout(() => {
-      if (!cancelled) void run();
-    }, 80);
+      void runTranslate(locale, showLoader);
+    }, isFirst ? 120 : 40);
 
     return () => {
-      cancelled = true;
       window.clearTimeout(timer);
       observer.disconnect();
     };
-  }, [locale, pathname]);
+  }, [locale, pathname, runTranslate]);
 
-  const setLocale = useCallback((next: Locale) => {
-    const resolved = parseLocale(next);
-    writeCookie(LOCALE_COOKIE, resolved);
-    clearGoogleTranslateArtifacts();
-    applyDocumentLocale(resolved);
-    setLocaleState(resolved);
-    const target = googleTranslateTarget(resolved);
-    if (target) {
-      void translateWritingContent(target);
-    } else {
-      restoreWritingContent();
-      window.location.reload();
-    }
-  }, []);
+  const setLocale = useCallback(
+    (next: Locale) => {
+      const resolved = parseLocale(next);
+      if (resolved === locale || translating) return;
+      writeCookie(LOCALE_COOKIE, resolved);
+      setLocaleState(resolved);
+    },
+    [locale, translating],
+  );
 
   const t = useCallback(
     (key: MessageKey | string) => {
@@ -155,12 +179,21 @@ export function LocaleProvider({
   );
 
   const value = useMemo<LocaleContextValue>(
-    () => ({ locale, setLocale, t, translations }),
-    [locale, setLocale, t, translations],
+    () => ({ locale, setLocale, t, translations, translating }),
+    [locale, setLocale, t, translations, translating],
   );
 
   return (
-    <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
+    <LocaleContext.Provider value={value}>
+      {children}
+      {translating ? (
+        <PageLoader
+          fullScreen
+          label={loaderLabel(locale)}
+          className="pointer-events-auto z-[500] bg-background/90"
+        />
+      ) : null}
+    </LocaleContext.Provider>
   );
 }
 

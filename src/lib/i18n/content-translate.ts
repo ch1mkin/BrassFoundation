@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * Translate only writing content (headings + paragraphs/lists).
- * Never touches icons, buttons chrome, badges, or nav.
+ * Translate writing content (headings + paragraphs/lists) in parallel batches
+ * so the page updates as one complete pass after the loader.
  */
 
 const CONTENT_SELECTOR = [
@@ -18,6 +18,8 @@ const CONTENT_SELECTOR = [
   "main figcaption",
   "[data-i18n='content']",
 ].join(",");
+
+const BATCH_SIZE = 12;
 
 function shouldSkip(el: Element) {
   if (
@@ -94,8 +96,14 @@ function collectTargets(root: ParentNode = document) {
   }) as HTMLElement[];
 }
 
+/**
+ * Translate every content node, then apply all DOM updates together so the
+ * page flips language in one step (while a loader covers the interim).
+ */
 export async function translateWritingContent(target: "pa" | "hi" = "pa") {
   const targets = collectTargets();
+  const jobs: Array<{ el: HTMLElement; original: string }> = [];
+
   for (const el of targets) {
     const original =
       el.getAttribute("data-i18n-en") || (el.textContent || "").trim();
@@ -103,15 +111,30 @@ export async function translateWritingContent(target: "pa" | "hi" = "pa") {
     if (!el.getAttribute("data-i18n-en")) {
       el.setAttribute("data-i18n-en", original);
     }
-    try {
-      const translated = await cachedTranslate(original, target);
-      if (translated?.trim()) {
-        el.textContent = translated;
-        el.setAttribute("lang", target);
-      }
-    } catch {
-      // leave English on failure
-    }
+    jobs.push({ el, original });
+  }
+
+  const results: Array<{ el: HTMLElement; text: string }> = [];
+
+  for (let i = 0; i < jobs.length; i += BATCH_SIZE) {
+    const batch = jobs.slice(i, i + BATCH_SIZE);
+    const translated = await Promise.all(
+      batch.map(async ({ el, original }) => {
+        try {
+          const text = await cachedTranslate(original, target);
+          return { el, text: text?.trim() || original };
+        } catch {
+          return { el, text: original };
+        }
+      }),
+    );
+    results.push(...translated);
+  }
+
+  // Apply all at once after fetches complete
+  for (const { el, text } of results) {
+    el.textContent = text;
+    el.setAttribute("lang", target);
   }
 }
 

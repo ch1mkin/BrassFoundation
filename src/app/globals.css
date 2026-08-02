@@ -185,14 +185,26 @@
 
   .font-quote {
     font-family: var(--font-quote), ui-serif, Georgia, serif;
-    /* Locked rem sizes so locale body scale does not enlarge quotes */
-    font-size: 1.5rem;
-    line-height: 1.35;
+    /* Locked px sizes — rem + locale fonts must not change optical size */
+    font-size: 24px !important;
+    line-height: 1.35 !important;
+    font-style: italic;
   }
 
   @media (min-width: 640px) {
     .font-quote {
-      font-size: 2.25rem;
+      font-size: 36px !important;
+    }
+  }
+
+  .font-quote-attr {
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+  }
+
+  @media (min-width: 640px) {
+    .font-quote-attr {
+      font-size: 20px !important;
     }
   }
 
@@ -490,13 +502,24 @@ html.locale-pa .font-heading {
 
 html.locale-pa .font-quote {
   font-family: var(--font-gurmukhi), var(--font-quote), ui-serif, Georgia, serif;
-  font-size: 1.5rem;
-  line-height: 1.45;
+  font-size: 24px !important;
+  line-height: 1.35 !important;
+  font-style: normal;
 }
 
 @media (min-width: 640px) {
   html.locale-pa .font-quote {
-    font-size: 2.25rem;
+    font-size: 36px !important;
+  }
+}
+
+html.locale-pa .font-quote-attr {
+  font-size: 16px !important;
+}
+
+@media (min-width: 640px) {
+  html.locale-pa .font-quote-attr {
+    font-size: 20px !important;
   }
 }
 
@@ -525,13 +548,24 @@ html.locale-hi .font-heading {
 html.locale-hi .font-quote {
   font-family: var(--font-devanagari), var(--font-quote), ui-serif, Georgia,
     serif;
-  font-size: 1.5rem;
-  line-height: 1.45;
+  font-size: 24px !important;
+  line-height: 1.35 !important;
+  font-style: normal;
 }
 
 @media (min-width: 640px) {
   html.locale-hi .font-quote {
-    font-size: 2.25rem;
+    font-size: 36px !important;
+  }
+}
+
+html.locale-hi .font-quote-attr {
+  font-size: 16px !important;
+}
+
+@media (min-width: 640px) {
+  html.locale-hi .font-quote-attr {
+    font-size: 20px !important;
   }
 }
 
