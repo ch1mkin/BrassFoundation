@@ -64,39 +64,42 @@ export function StatsSection({
 }: {
   stats: HomepageContent["stats"];
 }) {
+  const count = stats.length;
   const cols =
-    stats.length <= 2
+    count <= 2
       ? "md:grid-cols-2"
-      : stats.length === 3
+      : count === 3
         ? "md:grid-cols-3"
-        : stats.length === 4
+        : count === 4
           ? "md:grid-cols-4"
-          : "md:grid-cols-5";
+          : count === 5
+            ? "md:grid-cols-5"
+            : "md:grid-cols-3 lg:grid-cols-6";
 
   return (
-    <section className="relative bg-surface-low py-16 lg:py-20">
+    <section className="relative bg-surface-low py-12 lg:py-16">
       <div
-        className={`relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-6 px-4 sm:px-6 lg:px-20 ${cols}`}
+        className={`relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-4 sm:px-6 lg:gap-3 lg:px-8 xl:px-12 ${cols}`}
       >
         {stats.map((stat, i) => (
           <div
             key={`${stat.label}-${i}`}
-            className="glass-card rounded-xl p-6 text-center transition hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(17,76,136,0.08)]"
+            className="glass-card rounded-xl px-2.5 py-3 text-center transition hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(17,76,136,0.08)] sm:px-3 sm:py-4"
           >
             <MaterialIcon
               name={stat.icon || "groups"}
               className={cn(
-                "mb-2 text-4xl",
+                "mb-1 text-2xl sm:text-[1.65rem]",
                 i % 3 === 0 && "text-primary",
                 i % 3 === 1 && "text-secondary",
                 i % 3 === 2 && "text-tertiary",
               )}
             />
-            <div className="font-heading text-2xl font-semibold text-foreground sm:text-3xl">
+            <div className="font-heading text-lg font-semibold text-foreground sm:text-xl lg:text-[1.35rem]">
               <AnimatedCounter value={stat.value} suffix={stat.suffix} />
             </div>
             <div
-              className="mt-1 text-sm font-medium text-muted-foreground"
+              className="mt-0.5 text-[11px] font-medium leading-snug text-muted-foreground sm:text-xs"
               data-i18n="content"
             >
               {stat.label}
