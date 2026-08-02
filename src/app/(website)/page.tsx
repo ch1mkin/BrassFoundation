@@ -50,6 +50,8 @@ export default async function HomePage() {
         secondaryHref={content.hero_cta_secondary_href}
         backgroundUrl={content.hero_background_url}
         backgroundMobileUrl={content.hero_background_mobile_url}
+        backgroundFrame={content.hero_bg_frame}
+        backgroundMobileFrame={content.hero_bg_mobile_frame}
         headlinePa={content.hero_headline_pa}
         subheadlinePa={content.hero_subheadline_pa}
         primaryLabelPa={content.hero_cta_primary_label_pa}

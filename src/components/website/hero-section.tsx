@@ -10,6 +10,11 @@ import { useLocale } from "@/components/i18n/locale-provider";
 import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { InstantImg } from "@/components/website/instant-img";
 import { SITE } from "@/lib/constants";
+import {
+  DEFAULT_HERO_FRAME,
+  heroFrameStyle,
+  type HeroImageFrame,
+} from "@/lib/cms/hero-frame";
 import { cn } from "@/lib/utils";
 
 const HeroParticles = dynamic(
@@ -28,6 +33,8 @@ type HeroSectionProps = {
   secondaryHref: string;
   backgroundUrl?: string | null;
   backgroundMobileUrl?: string | null;
+  backgroundFrame?: HeroImageFrame | null;
+  backgroundMobileFrame?: HeroImageFrame | null;
   headlinePa?: string | null;
   subheadlinePa?: string | null;
   primaryLabelPa?: string | null;
@@ -125,6 +132,8 @@ export function HeroSection({
   secondaryHref,
   backgroundUrl,
   backgroundMobileUrl,
+  backgroundFrame,
+  backgroundMobileFrame,
   headlinePa,
   subheadlinePa,
   primaryLabelPa,
@@ -144,6 +153,8 @@ export function HeroSection({
   const lines = displayHeadline.split("\n").filter(Boolean);
   const desktopBg = backgroundUrl?.trim() || null;
   const mobileBg = backgroundMobileUrl?.trim() || desktopBg;
+  const desktopFrame = backgroundFrame || DEFAULT_HERO_FRAME;
+  const mobileFrame = backgroundMobileFrame || DEFAULT_HERO_FRAME;
   const hasBg = Boolean(desktopBg || mobileBg);
   const adminPa = Boolean(
     locale === "pa" && (headlinePa?.trim() || subheadlinePa?.trim()),
@@ -162,24 +173,26 @@ export function HeroSection({
       {hasBg ? (
         <>
           {mobileBg ? (
-            <div className="pointer-events-none absolute inset-0 md:hidden">
+            <div className="pointer-events-none absolute inset-0 overflow-hidden md:hidden">
               <InstantImg
                 src={mobileBg}
                 alt=""
                 priority
-                className="h-full w-full object-cover object-center"
+                className="h-full w-full object-cover"
+                style={heroFrameStyle(mobileFrame)}
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface/80 to-transparent" />
             </div>
           ) : null}
 
           {desktopBg ? (
-            <div className="pointer-events-none absolute inset-0 hidden md:block">
+            <div className="pointer-events-none absolute inset-0 hidden overflow-hidden md:block">
               <InstantImg
                 src={desktopBg}
                 alt=""
                 priority
-                className="h-full w-full object-cover object-center"
+                className="h-full w-full object-cover"
+                style={heroFrameStyle(desktopFrame)}
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-surface/80 to-transparent" />
             </div>

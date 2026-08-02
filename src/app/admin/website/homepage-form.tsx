@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
+import { HeroBackgroundField } from "@/components/admin/hero-background-field";
 import { QuotesEditor } from "@/components/admin/quotes-editor";
 import { StatsEditor } from "@/components/admin/stats-editor";
 import { FormLock } from "@/components/ui/form-lock";
@@ -14,6 +15,7 @@ import {
   type CmsActionState,
 } from "@/lib/cms/actions";
 import type { HomepageContent } from "@/lib/cms/homepage";
+import { DEFAULT_HERO_FRAME } from "@/lib/cms/hero-frame";
 
 const initial: CmsActionState = {};
 
@@ -55,6 +57,9 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
     updateHomepageAction,
     initial,
   );
+  const [desktopHeroUrl, setDesktopHeroUrl] = useState(
+    content.hero_background_url || "",
+  );
 
   useEffect(() => {
     if (state.success) router.refresh();
@@ -65,21 +70,33 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
       <FormLock pending={pending} className="space-y-8">
         <section className="space-y-4 rounded-2xl bg-card p-6 shadow-soft">
           <h2 className="font-heading text-xl font-medium">Hero</h2>
-          <FileOrUrlField
-            name="hero_background_url"
-            label="Hero background image — desktop (upload or URL)"
+          <HeroBackgroundField
+            urlName="hero_background_url"
+            focusXName="hero_bg_focus_x"
+            focusYName="hero_bg_focus_y"
+            zoomName="hero_bg_zoom"
+            label="Hero background — desktop"
+            hint="Shown on tablet/desktop (md+). Drag to move, zoom to crop."
             bucket="gallery"
-            accept="image/*"
             folder="hero"
+            variant="desktop"
             defaultUrl={content.hero_background_url || undefined}
+            defaultFrame={content.hero_bg_frame || DEFAULT_HERO_FRAME}
+            onUrlChange={setDesktopHeroUrl}
           />
-          <FileOrUrlField
-            name="hero_background_mobile_url"
-            label="Hero background — mobile only (optional). If empty, desktop image is shown smaller/centered."
+          <HeroBackgroundField
+            urlName="hero_background_mobile_url"
+            focusXName="hero_bg_mobile_focus_x"
+            focusYName="hero_bg_mobile_focus_y"
+            zoomName="hero_bg_mobile_zoom"
+            label="Hero background — mobile"
+            hint="Optional separate image. If empty, the desktop image is reused on phones — you can still drag/zoom the mobile frame below."
             bucket="gallery"
-            accept="image/*"
             folder="hero-mobile"
+            variant="mobile"
             defaultUrl={content.hero_background_mobile_url || undefined}
+            defaultFrame={content.hero_bg_mobile_frame || DEFAULT_HERO_FRAME}
+            previewFallbackUrl={desktopHeroUrl || undefined}
           />
           <Field
             label="Eyebrow"

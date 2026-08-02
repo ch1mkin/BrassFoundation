@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
+import { clampHeroFocus, clampHeroZoom } from "@/lib/cms/hero-frame";
 
 export type CmsActionState = {
   error?: string;
@@ -12,6 +13,12 @@ export type CmsActionState = {
 const OPTIONAL_COLUMNS = [
   "hero_background_url",
   "hero_background_mobile_url",
+  "hero_bg_focus_x",
+  "hero_bg_focus_y",
+  "hero_bg_zoom",
+  "hero_bg_mobile_focus_x",
+  "hero_bg_mobile_focus_y",
+  "hero_bg_mobile_zoom",
   "hero_eyebrow_pa",
   "hero_headline_pa",
   "hero_subheadline_pa",
@@ -86,6 +93,16 @@ export async function updateHomepageAction(
       hero_background_mobile_url:
         String(formData.get("hero_background_mobile_url") || "").trim() ||
         null,
+      hero_bg_focus_x: clampHeroFocus(formData.get("hero_bg_focus_x")),
+      hero_bg_focus_y: clampHeroFocus(formData.get("hero_bg_focus_y")),
+      hero_bg_zoom: clampHeroZoom(formData.get("hero_bg_zoom")),
+      hero_bg_mobile_focus_x: clampHeroFocus(
+        formData.get("hero_bg_mobile_focus_x"),
+      ),
+      hero_bg_mobile_focus_y: clampHeroFocus(
+        formData.get("hero_bg_mobile_focus_y"),
+      ),
+      hero_bg_mobile_zoom: clampHeroZoom(formData.get("hero_bg_mobile_zoom")),
       hero_eyebrow_pa:
         String(formData.get("hero_eyebrow_pa") || "").trim() || null,
       hero_headline_pa:
@@ -159,7 +176,7 @@ export async function updateHomepageAction(
         revalidatePath("/admin");
         return {
           success:
-            "Homepage saved. Run migration 20260802000000_quotes_events_admin_bg.sql in Supabase so quotes and section backgrounds persist.",
+            "Homepage saved. Run migration 20260802080000_hero_image_framing.sql in Supabase so hero framing persists.",
         };
       }
     }

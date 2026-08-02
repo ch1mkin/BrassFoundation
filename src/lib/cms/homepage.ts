@@ -6,6 +6,13 @@ import {
   DEFAULT_HOMEPAGE,
   STATS,
 } from "@/lib/constants";
+import {
+  DEFAULT_HERO_FRAME,
+  parseHeroFrame,
+  type HeroImageFrame,
+} from "@/lib/cms/hero-frame";
+
+export type { HeroImageFrame };
 
 export type HomepageStat = {
   label: string;
@@ -40,6 +47,8 @@ export type HomepageContent = {
   hero_cta_secondary_href: string;
   hero_background_url: string | null;
   hero_background_mobile_url: string | null;
+  hero_bg_frame: HeroImageFrame;
+  hero_bg_mobile_frame: HeroImageFrame;
   hero_eyebrow_pa: string | null;
   hero_headline_pa: string | null;
   hero_subheadline_pa: string | null;
@@ -87,6 +96,8 @@ function fallbackHomepage(): HomepageContent {
     ...DEFAULT_HOMEPAGE,
     hero_background_url: null,
     hero_background_mobile_url: null,
+    hero_bg_frame: { ...DEFAULT_HERO_FRAME },
+    hero_bg_mobile_frame: { ...DEFAULT_HERO_FRAME },
     hero_eyebrow_pa: null,
     hero_headline_pa: null,
     hero_subheadline_pa: null,
@@ -155,6 +166,16 @@ export async function getPublishedHomepage(): Promise<HomepageContent> {
         data.hero_cta_secondary_href ?? DEFAULT_HOMEPAGE.hero_cta_secondary_href,
       hero_background_url: data.hero_background_url ?? null,
       hero_background_mobile_url: data.hero_background_mobile_url ?? null,
+      hero_bg_frame: parseHeroFrame({
+        focusX: data.hero_bg_focus_x,
+        focusY: data.hero_bg_focus_y,
+        zoom: data.hero_bg_zoom,
+      }),
+      hero_bg_mobile_frame: parseHeroFrame({
+        focusX: data.hero_bg_mobile_focus_x,
+        focusY: data.hero_bg_mobile_focus_y,
+        zoom: data.hero_bg_mobile_zoom,
+      }),
       hero_eyebrow_pa: data.hero_eyebrow_pa ?? null,
       hero_headline_pa: data.hero_headline_pa ?? null,
       hero_subheadline_pa: data.hero_subheadline_pa ?? null,
