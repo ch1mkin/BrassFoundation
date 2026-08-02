@@ -344,7 +344,7 @@ export function CommunitySection({
             educational empowerment.
           </p>
         </div>
-        <a
+        <Link
           href="/community"
           className={cn(
             buttonVariants({ variant: "secondary" }),
@@ -353,7 +353,7 @@ export function CommunitySection({
         >
           View All Work
           <MaterialIcon name="trending_flat" className="text-[18px]" />
-        </a>
+        </Link>
       </div>
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
         {projects.map((project, i) => (
@@ -527,7 +527,7 @@ export function ResourcesSection() {
         <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
           Digital Library & Resources
         </h2>
-        <a
+        <Link
           href="/resources"
           className={cn(
             buttonVariants({ variant: "outline" }),
@@ -535,7 +535,7 @@ export function ResourcesSection() {
           )}
         >
           View all
-        </a>
+        </Link>
       </div>
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-6 sm:px-6 md:grid-cols-4 lg:px-20">
         {RESOURCES_PREVIEW.map((item) => (
@@ -567,13 +567,13 @@ export function ResourcesSection() {
               >
                 {item.size}
               </span>
-              <a
+              <Link
                 href="/resources"
                 className="text-primary"
                 aria-label="View resources"
               >
                 <MaterialIcon name="download" className="text-[18px] sm:text-[24px]" />
-              </a>
+              </Link>
             </div>
           </div>
         ))}
@@ -589,7 +589,7 @@ export function MarketplaceSection() {
         <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
           Featured Books
         </h2>
-        <a
+        <Link
           href="/marketplace"
           className={cn(
             buttonVariants({ variant: "outline" }),
@@ -597,11 +597,11 @@ export function MarketplaceSection() {
           )}
         >
           View all
-        </a>
+        </Link>
       </div>
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-3 px-4 sm:grid-cols-2 sm:gap-6 sm:px-6 md:grid-cols-3 lg:px-20">
         {FEATURED_BOOKS.map((book) => (
-          <a
+          <Link
             key={book.title}
             href="/marketplace"
             className="block rounded-xl border border-border/40 bg-white p-4 transition hover:shadow-2xl sm:rounded-2xl sm:p-8"
@@ -626,7 +626,7 @@ export function MarketplaceSection() {
                 Buy Now
               </span>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </section>
@@ -660,7 +660,7 @@ export function MustReadSection({
             to open the book.
           </p>
         </div>
-        <a
+        <Link
           href="/must-read"
           className={cn(
             buttonVariants({ variant: "outline" }),
@@ -668,14 +668,14 @@ export function MustReadSection({
           )}
         >
           View all
-        </a>
+        </Link>
       </div>
       {!books.length ? (
         <p className="relative z-10 mx-auto max-w-[1280px] px-4 text-sm text-muted-foreground sm:px-6 lg:px-20">
           Books will appear here once published.{" "}
-          <a href="/must-read" className="font-semibold text-primary underline">
+          <Link href="/must-read" className="font-semibold text-primary underline">
             Open Must Read
-          </a>
+          </Link>
         </p>
       ) : (
         <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:gap-6 sm:px-6 md:grid-cols-3 lg:px-20">
