@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { PageShell } from "@/components/website/page-shell";
-import { getPublishedResources } from "@/lib/content/queries";
+import { RESOURCE_CATEGORIES } from "@/lib/constants";
+import { getResourceCategoryCounts } from "@/lib/content/queries";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Resources" };
+export const metadata: Metadata = { title: "Digital Library" };
 
 const toneClass = {
   primary: "text-primary group-hover:bg-primary group-hover:text-white",
@@ -14,72 +16,40 @@ const toneClass = {
 } as const;
 
 export default async function ResourcesPage() {
-  const resources = await getPublishedResources();
+  const counts = await getResourceCategoryCounts();
 
   return (
     <PageShell
       eyebrow="Resources"
       title="Digital Library & Resources"
-      description="Constitution, study material, books, PDFs, training content, and audio."
+      description="Browse Constitution texts, Ambedkar’s writings, rights kits, and leadership podcasts."
       wide
     >
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {resources.map((item) => {
-          const href = item.file_url || item.external_url;
-          const tone =
-            item.tone in toneClass
-              ? (item.tone as keyof typeof toneClass)
-              : "primary";
+        {RESOURCE_CATEGORIES.map((item) => {
+          const count = counts[item.slug] ?? 0;
           return (
-            <div key={item.id} className="glass-card group rounded-2xl p-5">
+            <Link
+              key={item.slug}
+              href={`/resources/${item.slug}`}
+              className="glass-card group rounded-2xl p-5 transition hover:-translate-y-0.5"
+            >
               <div
                 className={cn(
                   "mb-4 flex aspect-[3/4] items-center justify-center overflow-hidden rounded-xl bg-surface-highest transition-all duration-300",
-                  !item.thumbnail_url && toneClass[tone],
+                  toneClass[item.tone],
                 )}
               >
-                {item.thumbnail_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={item.thumbnail_url}
-                    alt={item.title}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <MaterialIcon name={item.icon || "menu_book"} className="text-5xl" />
-                )}
+                <MaterialIcon name={item.icon} className="text-5xl" />
               </div>
               <h2 className="font-heading text-lg font-semibold">{item.title}</h2>
-              {item.subtitle ? (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {item.subtitle}
-                </p>
-              ) : null}
-              <div className="mt-4 flex items-center justify-between">
-                {item.file_size_label ? (
-                  <span
-                    className="notranslate rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary"
-                    translate="no"
-                  >
-                    {item.file_size_label}
-                  </span>
-                ) : (
-                  <span />
-                )}
-                {href ? (
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`Open ${item.title}`}
-                  >
-                    <MaterialIcon name="download" className="text-primary" />
-                  </a>
-                ) : (
-                  <MaterialIcon name="lock" className="text-muted-foreground" />
-                )}
-              </div>
-            </div>
+              <p className="mt-1 text-sm text-muted-foreground">{item.subtitle}</p>
+              <p className="mt-4 text-xs font-semibold tracking-wide text-primary uppercase">
+                {count === 0
+                  ? "No materials yet"
+                  : `${count} material${count === 1 ? "" : "s"}`}
+              </p>
+            </Link>
           );
         })}
       </div>

@@ -10,6 +10,10 @@ import {
   membershipReceivedEmailHtml,
 } from "@/lib/email/templates";
 import { ContentActionState, slugify } from "@/lib/content/utils";
+import {
+  getResourceCategory,
+  isResourceCategorySlug,
+} from "@/lib/constants";
 
 async function requireAdmin(): Promise<
   { ok: true; userId: string } | { ok: false; error: string }
@@ -327,20 +331,32 @@ export async function upsertResourceAction(
     String(formData.get("slug") || "").trim() || slugify(title);
   if (!title) return { error: "Title is required." };
 
+  const category = String(formData.get("category") || "").trim();
+  if (!isResourceCategorySlug(category)) {
+    return { error: "Choose a valid library category." };
+  }
+
+  const cat = getResourceCategory(category)!;
+  const resourceType = String(formData.get("resource_type") || "pdf").trim();
+  const allowedTypes = new Set(["pdf", "video", "audio", "link", "other"]);
+  if (!allowedTypes.has(resourceType)) {
+    return { error: "Invalid resource type." };
+  }
+
   const payload = {
     title,
     slug,
     subtitle: String(formData.get("subtitle") || "").trim() || null,
     description: String(formData.get("description") || "").trim() || null,
-    category: String(formData.get("category") || "general").trim(),
-    resource_type: String(formData.get("resource_type") || "pdf").trim(),
+    category,
+    resource_type: resourceType,
     file_url: String(formData.get("file_url") || "").trim() || null,
     external_url: String(formData.get("external_url") || "").trim() || null,
     thumbnail_url: String(formData.get("thumbnail_url") || "").trim() || null,
     file_size_label:
       String(formData.get("file_size_label") || "").trim() || null,
-    icon: String(formData.get("icon") || "menu_book").trim(),
-    tone: String(formData.get("tone") || "primary").trim(),
+    icon: String(formData.get("icon") || cat.icon).trim() || cat.icon,
+    tone: String(formData.get("tone") || cat.tone).trim() || cat.tone,
     is_published: boolFromForm(formData, "is_published"),
     is_featured: boolFromForm(formData, "is_featured"),
     sort_order: Number(formData.get("sort_order") || 0),
@@ -354,7 +370,9 @@ export async function upsertResourceAction(
 
   if (error) return { error: error.message };
   revalidatePath("/resources");
+  revalidatePath(`/resources/${category}`);
   revalidatePath("/admin/resources");
+  revalidatePath("/");
   return { success: id ? "Resource updated." : "Resource created." };
 }
 
@@ -371,6 +389,15 @@ export async function deleteResourceAction(
   if (error) return { error: error.message };
   revalidatePath("/resources");
   revalidatePath("/admin/resources");
+  revalidatePath("/");
+  for (const cat of [
+    "constitution-of-india",
+    "ambedkars-writings",
+    "rights-awareness-kit",
+    "leadership-podcast",
+  ]) {
+    revalidatePath(`/resources/${cat}`);
+  }
   return { success: "Resource deleted." };
 }
 

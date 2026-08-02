@@ -23,8 +23,16 @@ export async function uploadFileClient(
     return { ok: false, error: "No file selected." };
   }
 
-  if (file.size > 10 * 1024 * 1024) {
-    return { ok: false, error: "Image must be under 10MB." };
+  const maxBytes =
+    bucket === "resources" ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+  if (file.size > maxBytes) {
+    return {
+      ok: false,
+      error:
+        bucket === "resources"
+          ? "File must be under 50MB."
+          : "File must be under 10MB.",
+    };
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -44,16 +52,33 @@ export async function uploadFileClient(
     }
 
     const ext = extFromName(file.name);
-    const safeExt = ["jpg", "jpeg", "png", "webp", "gif", "pdf"].includes(ext)
-      ? ext
-      : file.type.startsWith("image/")
-        ? "jpg"
-        : "bin";
+    const allowedExt = [
+      "jpg",
+      "jpeg",
+      "png",
+      "webp",
+      "gif",
+      "pdf",
+      "mp3",
+      "mpeg",
+      "mp4",
+    ];
+    let safeExt = allowedExt.includes(ext) ? ext : "bin";
+    if (safeExt === "bin") {
+      if (file.type.startsWith("image/")) safeExt = "jpg";
+      else if (file.type === "audio/mpeg" || file.type === "audio/mp3")
+        safeExt = "mp3";
+      else if (file.type === "application/pdf") safeExt = "pdf";
+    }
     const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`;
 
     const contentType =
       file.type ||
-      (safeExt === "pdf" ? "application/pdf" : `image/${safeExt === "jpg" ? "jpeg" : safeExt}`);
+      (safeExt === "pdf"
+        ? "application/pdf"
+        : safeExt === "mp3" || safeExt === "mpeg"
+          ? "audio/mpeg"
+          : `image/${safeExt === "jpg" ? "jpeg" : safeExt}`);
 
     const { error } = await supabase.storage.from(bucket).upload(path, file, {
       contentType,
@@ -73,7 +98,7 @@ export async function uploadFileClient(
       if (/mime|not allowed|invalid/i.test(msg)) {
         return {
           ok: false,
-          error: "File type not allowed. Use JPG, PNG, WEBP, or GIF.",
+          error: "File type not allowed for this bucket.",
         };
       }
       return { ok: false, error: msg };

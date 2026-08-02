@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   COMMUNITY_WORK,
   FEATURED_BOOKS,
-  RESOURCES_PREVIEW,
+  RESOURCE_CATEGORIES,
 } from "@/lib/constants";
 
 export type EventRow = {
@@ -38,6 +38,7 @@ export type ResourceRow = {
   title: string;
   subtitle: string | null;
   description: string | null;
+  category: string;
   file_size_label: string | null;
   icon: string;
   tone: string;
@@ -190,37 +191,70 @@ export async function getNewsBySlug(slug: string): Promise<NewsRow | null> {
 }
 
 export async function getPublishedResources(
-  limit = 40,
+  limit = 80,
 ): Promise<ResourceRow[]> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("resources")
       .select(
-        "id, slug, title, subtitle, description, file_size_label, icon, tone, file_url, external_url, thumbnail_url, resource_type",
+        "id, slug, title, subtitle, description, category, file_size_label, icon, tone, file_url, external_url, thumbnail_url, resource_type",
       )
       .eq("is_published", true)
       .order("sort_order", { ascending: true })
       .limit(limit);
 
-    if (error || !data?.length) {
-      return RESOURCES_PREVIEW.map((r, i) => ({
-        id: `fallback-resource-${i}`,
-        slug: r.title.toLowerCase().replace(/\s+/g, "-"),
-        title: r.title,
-        subtitle: r.subtitle,
-        description: null,
-        file_size_label: r.size,
-        icon: r.icon,
-        tone: r.tone,
-        file_url: null,
-        external_url: null,
-        resource_type: "pdf",
-      }));
-    }
-    return data;
+    if (error || !data) return [];
+    return data as ResourceRow[];
   } catch {
     return [];
+  }
+}
+
+export async function getPublishedResourcesByCategory(
+  category: string,
+  limit = 80,
+): Promise<ResourceRow[]> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("resources")
+      .select(
+        "id, slug, title, subtitle, description, category, file_size_label, icon, tone, file_url, external_url, thumbnail_url, resource_type",
+      )
+      .eq("is_published", true)
+      .eq("category", category)
+      .order("sort_order", { ascending: true })
+      .limit(limit);
+
+    if (error || !data) return [];
+    return data as ResourceRow[];
+  } catch {
+    return [];
+  }
+}
+
+/** Counts of published items per known library category */
+export async function getResourceCategoryCounts(): Promise<
+  Record<string, number>
+> {
+  const counts: Record<string, number> = Object.fromEntries(
+    RESOURCE_CATEGORIES.map((c) => [c.slug, 0]),
+  );
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("resources")
+      .select("category")
+      .eq("is_published", true);
+    if (error || !data) return counts;
+    for (const row of data) {
+      const key = String(row.category || "");
+      if (key in counts) counts[key] += 1;
+    }
+    return counts;
+  } catch {
+    return counts;
   }
 }
 

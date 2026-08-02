@@ -175,36 +175,58 @@ export const UPCOMING_EVENTS = [
   },
 ] as const;
 
-export const RESOURCES_PREVIEW = [
+export const RESOURCE_CATEGORIES = [
   {
+    slug: "constitution-of-india",
     title: "Constitution of India",
     subtitle: "Multi-language PDF Version",
-    size: "12MB",
     icon: "menu_book",
     tone: "primary" as const,
   },
   {
+    slug: "ambedkars-writings",
     title: "Ambedkar’s Writings",
-    subtitle: "Volume 1 - Educational Philosophy",
-    size: "8MB",
+    subtitle: "Educational Philosophy",
     icon: "history_edu",
     tone: "secondary" as const,
   },
   {
+    slug: "rights-awareness-kit",
     title: "Rights Awareness Kit",
     subtitle: "Guide for Rural Communities",
-    size: "15MB",
     icon: "gavel",
     tone: "tertiary" as const,
   },
   {
-    title: "Leadership Podcasts",
-    subtitle: "Audio Series - Season 1",
-    size: "240MB",
+    slug: "leadership-podcast",
+    title: "Leadership Podcast",
+    subtitle: "Audio Series",
     icon: "mic",
     tone: "brand" as const,
   },
 ] as const;
+
+export type ResourceCategorySlug =
+  (typeof RESOURCE_CATEGORIES)[number]["slug"];
+
+export function getResourceCategory(slug: string) {
+  return RESOURCE_CATEGORIES.find((c) => c.slug === slug) ?? null;
+}
+
+export function isResourceCategorySlug(
+  slug: string,
+): slug is ResourceCategorySlug {
+  return RESOURCE_CATEGORIES.some((c) => c.slug === slug);
+}
+
+/** @deprecated Prefer RESOURCE_CATEGORIES */
+export const RESOURCES_PREVIEW = RESOURCE_CATEGORIES.map((c) => ({
+  title: c.title,
+  subtitle: c.subtitle,
+  size: "",
+  icon: c.icon,
+  tone: c.tone,
+}));
 
 export const FEATURED_BOOKS = [
   { title: "Annihilation of Caste", price: "₹399", rating: 5, reviews: 452 },

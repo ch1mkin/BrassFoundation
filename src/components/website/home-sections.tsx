@@ -13,7 +13,7 @@ import {
 import {
   COMMUNITY_WORK,
   FEATURED_BOOKS,
-  RESOURCES_PREVIEW,
+  RESOURCE_CATEGORIES,
 } from "@/lib/constants";
 import type { HomepageContent, HomepageQuote } from "@/lib/cms/homepage";
 import type { EventRow } from "@/lib/content/queries";
@@ -538,10 +538,11 @@ export function ResourcesSection() {
         </Link>
       </div>
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-6 sm:px-6 md:grid-cols-4 lg:px-20">
-        {RESOURCES_PREVIEW.map((item) => (
-          <div
-            key={item.title}
-            className="glass-card group rounded-xl p-3 sm:rounded-2xl sm:p-6"
+        {RESOURCE_CATEGORIES.map((item) => (
+          <Link
+            key={item.slug}
+            href={`/resources/${item.slug}`}
+            className="glass-card group rounded-xl p-3 transition hover:-translate-y-0.5 sm:rounded-2xl sm:p-6"
           >
             <div
               className={cn(
@@ -557,25 +558,10 @@ export function ResourcesSection() {
             <h4 className="font-heading mb-0.5 line-clamp-2 text-sm font-semibold sm:mb-1 sm:text-lg">
               {item.title}
             </h4>
-            <p className="mb-2 line-clamp-2 text-[11px] text-muted-foreground sm:mb-4 sm:text-sm">
+            <p className="line-clamp-2 text-[11px] text-muted-foreground sm:text-sm">
               {item.subtitle}
             </p>
-            <div className="flex items-center justify-between gap-1">
-              <span
-                className="notranslate rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary sm:px-2 sm:py-1 sm:text-xs"
-                translate="no"
-              >
-                {item.size}
-              </span>
-              <Link
-                href="/resources"
-                className="text-primary"
-                aria-label="View resources"
-              >
-                <MaterialIcon name="download" className="text-[18px] sm:text-[24px]" />
-              </Link>
-            </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
