@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { PortalSidebar } from "@/components/portal/portal-sidebar";
-import { signOutAction } from "@/lib/auth/actions";
+import { PortalNavProvider } from "@/components/portal/portal-nav-provider";
 import { getUserContext } from "@/lib/auth/session";
 
 const NAV = [
@@ -26,16 +26,19 @@ export default async function MemberLayout({
   }
 
   return (
-    <div className="flex min-h-[100svh] bg-surface-low">
-      <PortalSidebar
-        title="Member Portal"
-        subtitle={context.profile?.full_name || context.email}
-        avatarUrl={context.profile?.avatar_url}
-        nav={NAV}
-        signOutAction={signOutAction}
-        storageKey="bf-member-sidebar-collapsed"
-      />
-      <main className="min-w-0 flex-1 p-6 pt-16 sm:p-8 md:pt-8">{children}</main>
-    </div>
+    <PortalNavProvider>
+      <div className="flex min-h-[100svh] bg-surface-low">
+        <PortalSidebar
+          title="Member Portal"
+          subtitle={context.profile?.full_name || context.email}
+          avatarUrl={context.profile?.avatar_url}
+          nav={NAV}
+          storageKey="bf-member-sidebar-collapsed"
+        />
+        <main className="min-w-0 flex-1 p-6 pt-16 sm:p-8 md:pt-8">
+          {children}
+        </main>
+      </div>
+    </PortalNavProvider>
   );
 }

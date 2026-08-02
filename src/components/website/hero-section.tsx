@@ -82,7 +82,8 @@ export function HeroSection({
                 alt=""
                 className="h-full w-full object-cover object-center"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#001c3a]/75 via-[#004f58]/55 to-surface" />
+              {/* Soft vignette only at the very bottom so the photo stays nearly full */}
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface/80 to-transparent" />
             </div>
           ) : null}
 
@@ -95,7 +96,7 @@ export function HeroSection({
                 alt=""
                 className="h-full w-full object-cover object-center"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#001c3a]/75 via-[#004f58]/55 to-surface" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-surface/80 to-transparent" />
             </div>
           ) : null}
         </>

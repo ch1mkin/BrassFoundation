@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
@@ -14,7 +13,6 @@ import {
   UPCOMING_EVENTS,
 } from "@/lib/constants";
 import type { HomepageContent } from "@/lib/cms/homepage";
-import type { ExecutiveMember } from "@/lib/content/committee";
 import { cn } from "@/lib/utils";
 
 function AnimatedCounter({
@@ -149,79 +147,14 @@ export function AboutSection({
               </div>
             ))}
           </div>
-          <Link
+          <a
             href="/about"
             className="inline-flex items-center gap-2 text-sm font-bold text-primary transition-all hover:gap-4"
           >
             READ MORE ABOUT OUR STORY
             <MaterialIcon name="arrow_forward" className="text-[18px]" />
-          </Link>
+          </a>
         </div>
-      </div>
-    </section>
-  );
-}
-
-export function LeadershipSection({
-  members,
-}: {
-  members: ExecutiveMember[];
-}) {
-  return (
-    <section className="bg-surface-high py-16 lg:py-20">
-      <div className="mx-auto mb-12 max-w-[1280px] px-4 text-center sm:px-6 lg:px-20">
-        <h2 className="font-heading mb-3 text-3xl font-semibold">
-          Executive Committee
-        </h2>
-        <p className="mx-auto max-w-2xl text-muted-foreground">
-          The committee guiding Brass Foundation&apos;s mission of education,
-          equality, and community development.
-        </p>
-      </div>
-      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:grid-cols-2 sm:px-6 md:grid-cols-3 lg:grid-cols-4 lg:px-20">
-        {members.map((member, i) => {
-          const initials = member.full_name
-            .replace(/^Sh\.\s*/i, "")
-            .replace(/^Adv\.\s*/i, "")
-            .split(" ")
-            .filter(Boolean)
-            .map((n) => n[0])
-            .slice(0, 2)
-            .join("")
-            .toUpperCase();
-
-          return (
-            <motion.div
-              key={member.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: Math.min(i * 0.04, 0.4) }}
-              className="text-center"
-            >
-              <div className="mx-auto mb-4 flex size-32 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-surface-highest shadow-lg">
-                {member.photo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={member.photo_url}
-                    alt={member.full_name}
-                    className="size-full object-cover"
-                  />
-                ) : (
-                  <span className="font-heading text-2xl font-bold text-primary/50">
-                    {initials || "—"}
-                  </span>
-                )}
-              </div>
-              <h3 className="font-heading text-lg font-semibold text-foreground">
-                {member.full_name}
-              </h3>
-              <p className="mt-1 text-sm font-medium text-primary">
-                {member.role_title}
-              </p>
-            </motion.div>
-          );
-        })}
       </div>
     </section>
   );
@@ -253,7 +186,7 @@ export function CommunitySection({
             educational empowerment.
           </p>
         </div>
-        <Link
+        <a
           href="/community"
           className={cn(
             buttonVariants({ variant: "secondary" }),
@@ -262,49 +195,52 @@ export function CommunitySection({
         >
           View All Work
           <MaterialIcon name="trending_flat" className="text-[18px]" />
-        </Link>
+        </a>
       </div>
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
         {projects.map((project, i) => (
-          <motion.div
+          <a
             key={project.slug}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.06 }}
-            className="group cursor-pointer"
+            href={`/community/${project.slug}`}
+            className="group block"
           >
-            <div className="relative mb-4 h-64 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-secondary/20 to-tertiary/20">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(17,181,201,0.35),transparent_55%)] transition-transform duration-500 group-hover:scale-110" />
-              {"badge" in project && project.badge ? (
-                <div className="absolute top-4 left-4">
-                  <span
-                    className={cn(
-                      "rounded-full px-4 py-1 text-xs font-semibold text-white",
-                      project.badgeTone === "error" && "bg-destructive",
-                      project.badgeTone === "primary" && "bg-primary",
-                      project.badgeTone === "secondary" && "bg-secondary",
-                    )}
-                  >
-                    {project.badge}
-                  </span>
-                </div>
-              ) : null}
-            </div>
-            <h3 className="font-heading mb-2 text-xl font-semibold">
-              {project.title}
-            </h3>
-            {"description" in project && project.description ? (
-              <p className="mb-4 text-muted-foreground">{project.description}</p>
-            ) : null}
-            <Link
-              href={`/community/${project.slug}`}
-              className="inline-flex items-center gap-2 font-bold text-primary transition-all hover:gap-4"
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.06 }}
             >
-              Read More
-              <MaterialIcon name="arrow_right_alt" className="text-[18px]" />
-            </Link>
-          </motion.div>
+              <div className="relative mb-4 h-64 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-secondary/20 to-tertiary/20">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(17,181,201,0.35),transparent_55%)] transition-transform duration-500 group-hover:scale-110" />
+                {"badge" in project && project.badge ? (
+                  <div className="absolute top-4 left-4">
+                    <span
+                      className={cn(
+                        "rounded-full px-4 py-1 text-xs font-semibold text-white",
+                        project.badgeTone === "error" && "bg-destructive",
+                        project.badgeTone === "primary" && "bg-primary",
+                        project.badgeTone === "secondary" && "bg-secondary",
+                      )}
+                    >
+                      {project.badge}
+                    </span>
+                  </div>
+                ) : null}
+              </div>
+              <h3 className="font-heading mb-2 text-xl font-semibold">
+                {project.title}
+              </h3>
+              {"description" in project && project.description ? (
+                <p className="mb-4 text-muted-foreground">
+                  {project.description}
+                </p>
+              ) : null}
+              <span className="inline-flex items-center gap-2 font-bold text-primary transition-all group-hover:gap-4">
+                Read More
+                <MaterialIcon name="arrow_right_alt" className="text-[18px]" />
+              </span>
+            </motion.div>
+          </a>
         ))}
       </div>
     </section>
@@ -347,7 +283,7 @@ export function EventsSection() {
                   <span data-i18n="content">{event.location}</span>
                 </p>
               </div>
-              <Link
+              <a
                 href="/events"
                 className={cn(
                   "rounded-lg px-8 py-2 text-sm font-bold text-white transition active:scale-95",
@@ -355,7 +291,7 @@ export function EventsSection() {
                 )}
               >
                 Register
-              </Link>
+              </a>
             </div>
           ))}
         </div>
@@ -402,9 +338,9 @@ export function ResourcesSection() {
               >
                 {item.size}
               </span>
-              <Link href="/resources" className="text-primary" aria-label="Download">
+              <a href="/resources" className="text-primary" aria-label="Download">
                 <MaterialIcon name="download" />
-              </Link>
+              </a>
             </div>
           </div>
         ))}
@@ -418,7 +354,7 @@ export function MarketplaceSection() {
     <section className="overflow-hidden py-16 lg:py-20">
       <div className="mx-auto mb-12 flex max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-20">
         <h2 className="font-heading text-3xl font-semibold">Featured Books</h2>
-        <Link
+        <a
           href="/marketplace"
           className={cn(
             buttonVariants({ variant: "outline" }),
@@ -426,13 +362,14 @@ export function MarketplaceSection() {
           )}
         >
           View all
-        </Link>
+        </a>
       </div>
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
         {FEATURED_BOOKS.map((book) => (
-          <div
+          <a
             key={book.title}
-            className="rounded-2xl border border-border/40 bg-white p-8 transition hover:shadow-2xl"
+            href="/marketplace"
+            className="block rounded-2xl border border-border/40 bg-white p-8 transition hover:shadow-2xl"
           >
             <div className="mb-4 flex h-72 items-center justify-center rounded-xl bg-surface-highest">
               <MaterialIcon
@@ -448,14 +385,11 @@ export function MarketplaceSection() {
               <span className="font-heading text-2xl font-semibold text-primary">
                 {book.price}
               </span>
-              <Link
-                href="/marketplace"
-                className="rounded-lg bg-primary px-6 py-2 text-sm font-bold text-white"
-              >
+              <span className="rounded-lg bg-primary px-6 py-2 text-sm font-bold text-white">
                 Buy Now
-              </Link>
+              </span>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </section>

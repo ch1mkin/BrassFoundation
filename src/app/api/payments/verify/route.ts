@@ -1,6 +1,8 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { attachMemberToOrgTree } from "@/lib/content/attach-org-member";
 import { verifyPaymentSignature } from "@/lib/payments/razorpay";
 
 async function issueMembershipId() {
@@ -62,7 +64,7 @@ export async function POST(request: Request) {
 
     if (order.purpose === "registration_fee" && applicationId) {
       const membershipId = await issueMembershipId();
-      await admin
+      const { data: application } = await admin
         .from("membership_applications")
         .update({
           status: "approved",
@@ -75,7 +77,9 @@ export async function POST(request: Request) {
             Date.now() + 365 * 24 * 60 * 60 * 1000,
           ).toISOString(),
         })
-        .eq("id", applicationId);
+        .eq("id", applicationId)
+        .select("full_name, user_id")
+        .single();
 
       await admin.from("transactions").insert({
         user_id: user.id,
@@ -88,6 +92,26 @@ export async function POST(request: Request) {
         status: "captured",
         description: "Membership registration fee (₹10)",
       });
+
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("full_name, avatar_url")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      await attachMemberToOrgTree({
+        userId: user.id,
+        fullName:
+          application?.full_name ||
+          profile?.full_name ||
+          user.email ||
+          "Member",
+        avatarUrl: profile?.avatar_url || null,
+        roleTitle: "Member",
+      });
+
+      revalidatePath("/admin/family");
+      revalidatePath("/member");
 
       return NextResponse.json({
         ok: true,

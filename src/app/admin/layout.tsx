@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { PortalSidebar } from "@/components/portal/portal-sidebar";
-import { signOutAction } from "@/lib/auth/actions";
+import { PortalNavProvider } from "@/components/portal/portal-nav-provider";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 
 const NAV = [
@@ -42,16 +42,19 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="notranslate flex min-h-[100svh] bg-surface-low">
-      <PortalSidebar
-        title="Admin Portal"
-        subtitle={`${context.email || ""} · ${context.roles.map((r) => r.name).join(", ") || "No roles"}`}
-        avatarUrl={context.profile?.avatar_url}
-        nav={NAV}
-        signOutAction={signOutAction}
-        storageKey="bf-admin-sidebar-collapsed"
-      />
-      <main className="min-w-0 flex-1 p-6 pt-16 sm:p-8 md:pt-8">{children}</main>
-    </div>
+    <PortalNavProvider>
+      <div className="notranslate flex min-h-[100svh] bg-surface-low">
+        <PortalSidebar
+          title="Admin Portal"
+          subtitle={`${context.email || ""} · ${context.roles.map((r) => r.name).join(", ") || "No roles"}`}
+          avatarUrl={context.profile?.avatar_url}
+          nav={NAV}
+          storageKey="bf-admin-sidebar-collapsed"
+        />
+        <main className="min-w-0 flex-1 p-6 pt-16 sm:p-8 md:pt-8">
+          {children}
+        </main>
+      </div>
+    </PortalNavProvider>
   );
 }

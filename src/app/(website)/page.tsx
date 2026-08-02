@@ -2,12 +2,13 @@ import {
   AboutSection,
   CommunitySection,
   EventsSection,
-  LeadershipSection,
   MarketplaceSection,
   MembershipCta,
   ResourcesSection,
   StatsSection,
 } from "@/components/website/home-sections";
+import { LeadershipSection } from "@/components/website/executive-committee-section";
+import { SectionDivider } from "@/components/website/section-divider";
 import { HeroSection } from "@/components/website/hero-section";
 import { getPublishedHomepage } from "@/lib/cms/homepage";
 import { getExecutiveCommittee } from "@/lib/content/committee";
@@ -35,18 +36,26 @@ export default async function HomePage() {
         primaryLabelPa={content.hero_cta_primary_label_pa}
         secondaryLabelPa={content.hero_cta_secondary_label_pa}
       />
+      <SectionDivider />
       <StatsSection stats={content.stats} />
+      <SectionDivider />
       <AboutSection
         eyebrow={content.about_eyebrow}
         headline={content.about_headline}
         body={content.about_body}
         values={content.core_values}
       />
+      <SectionDivider />
       <LeadershipSection members={committee} />
+      <SectionDivider />
       <CommunitySection items={content.community_work} />
+      <SectionDivider />
       <EventsSection />
+      <SectionDivider />
       <ResourcesSection />
+      <SectionDivider />
       <MarketplaceSection />
+      <SectionDivider />
       <MembershipCta
         headline={content.membership_headline}
         body={content.membership_body}

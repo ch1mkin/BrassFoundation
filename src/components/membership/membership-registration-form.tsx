@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
+import { InlineLoader, ButtonSpinner } from "@/components/ui/inline-loader";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/auth/password-input";
 import { SignaturePad } from "@/components/membership/signature-pad";
 import { SelfieField } from "@/components/membership/selfie-field";
 import { openRazorpayCheckout } from "@/components/membership/razorpay-checkout";
-import { ContributionSection } from "@/components/membership/contribution-section";
 import {
   MEMBERSHIP_CONSENT_TEXT,
   MEMBERSHIP_CONSENT_VERSION,
@@ -131,38 +131,47 @@ export function MembershipRegistrationForm({
 
   if (step === "done") {
     return (
-      <div className="space-y-8">
-        <div className="glass-card rounded-2xl p-8 text-center">
-          <p className="font-heading text-3xl font-semibold text-primary">
-            Welcome, member!
+      <div className="glass-card rounded-2xl p-8 text-center">
+        <p className="font-heading text-3xl font-semibold text-primary">
+          Welcome, member!
+        </p>
+        <p className="mt-3 text-muted-foreground">
+          Your registration payment is complete and membership is active.
+        </p>
+        {membershipId ? (
+          <p className="mt-4 text-sm font-semibold text-foreground">
+            Membership ID: {membershipId}
           </p>
-          <p className="mt-3 text-muted-foreground">
-            Your registration payment is complete and membership is active.
-          </p>
-          {membershipId ? (
-            <p className="mt-4 text-sm font-semibold text-foreground">
-              Membership ID: {membershipId}
-            </p>
-          ) : null}
+        ) : null}
+        <p className="mt-4 text-sm text-muted-foreground">
+          Set up a monthly contribution anytime from your member payments panel.
+        </p>
+        <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
             href="/member"
-            className="mt-6 inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-sm font-medium text-white"
+            className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-sm font-medium text-white"
           >
             Open member portal
           </a>
+          <a
+            href="/member/payments"
+            className="inline-flex h-12 items-center justify-center rounded-xl border border-border px-8 text-sm font-medium"
+          >
+            Set up monthly mandate
+          </a>
         </div>
-        <ContributionSection
-          defaultName={state.fullName}
-          defaultEmail={state.email}
-          defaultPhone={state.phone}
-        />
       </div>
     );
   }
 
   if (step === "pay") {
     return (
-      <div className="glass-card space-y-5 rounded-2xl p-6 sm:p-8">
+      <div className="glass-card relative space-y-5 rounded-2xl p-6 sm:p-8">
+        {paying ? (
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-[1px]">
+            <InlineLoader label="Opening secure payment…" />
+          </div>
+        ) : null}
         <h2 className="font-heading text-xl font-semibold">
           Pay registration fee (₹10)
         </h2>
@@ -179,17 +188,29 @@ export function MembershipRegistrationForm({
           type="button"
           size="lg"
           disabled={paying}
-          onClick={startPayment}
+          onClick={() => void startPayment()}
           className="h-12 rounded-xl bg-primary"
         >
-          {paying ? "Opening Razorpay…" : "Pay ₹10 & join"}
+          {paying ? (
+            <>
+              <ButtonSpinner />
+              Opening Razorpay…
+            </>
+          ) : (
+            "Pay ₹10 & join"
+          )}
         </Button>
       </div>
     );
   }
 
   return (
-    <form action={action} className="space-y-6">
+    <form action={action} className="relative space-y-6">
+      {pending ? (
+        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-[1px]">
+          <InlineLoader label="Creating your account…" />
+        </div>
+      ) : null}
       <FormLock pending={pending} className="space-y-6">
         <section className="glass-card space-y-4 rounded-2xl p-6 sm:p-8">
           <h2 className="font-heading text-xl font-semibold">
@@ -313,7 +334,14 @@ export function MembershipRegistrationForm({
           disabled={pending || !signature}
           className="h-12 rounded-xl bg-primary px-8"
         >
-          {pending ? "Creating account…" : "Continue to ₹10 payment"}
+          {pending ? (
+            <>
+              <ButtonSpinner />
+              Creating account…
+            </>
+          ) : (
+            "Continue to ₹10 payment"
+          )}
         </Button>
       </FormLock>
     </form>
