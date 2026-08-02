@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { PageShell } from "@/components/website/page-shell";
-import { RESOURCE_CATEGORIES } from "@/lib/constants";
 import { getResourceCategoryCounts } from "@/lib/content/queries";
+import { getResourceCategories } from "@/lib/content/resource-categories";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Digital Library" };
@@ -16,18 +16,25 @@ const toneClass = {
 } as const;
 
 export default async function ResourcesPage() {
-  const counts = await getResourceCategoryCounts();
+  const [categories, counts] = await Promise.all([
+    getResourceCategories(),
+    getResourceCategoryCounts(),
+  ]);
 
   return (
     <PageShell
       eyebrow="Resources"
       title="Digital Library & Resources"
-      description="Browse Constitution texts, Ambedkar’s writings, rights kits, and leadership podcasts."
+      description="Browse library categories — Constitution texts, writings, kits, podcasts, and more."
       wide
     >
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {RESOURCE_CATEGORIES.map((item) => {
+        {categories.map((item) => {
           const count = counts[item.slug] ?? 0;
+          const tone =
+            item.tone in toneClass
+              ? (item.tone as keyof typeof toneClass)
+              : "primary";
           return (
             <Link
               key={item.slug}
@@ -37,7 +44,7 @@ export default async function ResourcesPage() {
               <div
                 className={cn(
                   "mb-4 flex aspect-[3/4] items-center justify-center overflow-hidden rounded-xl bg-surface-highest transition-all duration-300",
-                  toneClass[item.tone],
+                  toneClass[tone],
                 )}
               >
                 <MaterialIcon name={item.icon} className="text-5xl" />

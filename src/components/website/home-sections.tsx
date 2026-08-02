@@ -12,11 +12,11 @@ import {
 } from "@/components/website/premium-accents";
 import {
   COMMUNITY_WORK,
-  RESOURCE_CATEGORIES,
 } from "@/lib/constants";
 import type { HomepageContent, HomepageQuote } from "@/lib/cms/homepage";
 import type { EventRow, MarketplaceRow } from "@/lib/content/queries";
 import type { BookPurchaseStatus } from "@/lib/content/book-purchases";
+import type { ResourceCategoryRow } from "@/lib/content/resource-categories";
 import { cn } from "@/lib/utils";
 import { InstantImg, preloadImages } from "@/components/website/instant-img";
 import { MustReadBookCard } from "@/components/website/must-read-book-card";
@@ -523,7 +523,11 @@ export function EventsSection({
   );
 }
 
-export function ResourcesSection() {
+export function ResourcesSection({
+  categories,
+}: {
+  categories: ResourceCategoryRow[];
+}) {
   const toneClass = {
     primary: "text-primary group-hover:bg-primary group-hover:text-white",
     secondary:
@@ -549,31 +553,37 @@ export function ResourcesSection() {
         </Link>
       </div>
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-6 sm:px-6 md:grid-cols-4 lg:px-20">
-        {RESOURCE_CATEGORIES.map((item) => (
-          <Link
-            key={item.slug}
-            href={`/resources/${item.slug}`}
-            className="glass-card group rounded-xl p-3 transition hover:-translate-y-0.5 sm:rounded-2xl sm:p-6"
-          >
-            <div
-              className={cn(
-                "mb-2 flex aspect-[3/4] max-h-36 w-full items-center justify-center rounded-lg bg-surface-highest transition-all duration-300 sm:mb-4 sm:max-h-none sm:rounded-xl",
-                toneClass[item.tone],
-              )}
+        {categories.map((item) => {
+          const tone =
+            item.tone in toneClass
+              ? (item.tone as keyof typeof toneClass)
+              : "primary";
+          return (
+            <Link
+              key={item.slug}
+              href={`/resources/${item.slug}`}
+              className="glass-card group rounded-xl p-3 transition hover:-translate-y-0.5 sm:rounded-2xl sm:p-6"
             >
-              <MaterialIcon
-                name={item.icon}
-                className="text-[36px] sm:text-[64px]"
-              />
-            </div>
-            <h4 className="font-heading mb-0.5 line-clamp-2 text-sm font-semibold sm:mb-1 sm:text-lg">
-              {item.title}
-            </h4>
-            <p className="line-clamp-2 text-[11px] text-muted-foreground sm:text-sm">
-              {item.subtitle}
-            </p>
-          </Link>
-        ))}
+              <div
+                className={cn(
+                  "mb-2 flex aspect-[3/4] max-h-36 w-full items-center justify-center rounded-lg bg-surface-highest transition-all duration-300 sm:mb-4 sm:max-h-none sm:rounded-xl",
+                  toneClass[tone],
+                )}
+              >
+                <MaterialIcon
+                  name={item.icon}
+                  className="text-[36px] sm:text-[64px]"
+                />
+              </div>
+              <h4 className="font-heading mb-0.5 line-clamp-2 text-sm font-semibold sm:mb-1 sm:text-lg">
+                {item.title}
+              </h4>
+              <p className="line-clamp-2 text-[11px] text-muted-foreground sm:text-sm">
+                {item.subtitle}
+              </p>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

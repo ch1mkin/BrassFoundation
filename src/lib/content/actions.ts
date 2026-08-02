@@ -9,11 +9,11 @@ import {
   eventRegistrationEmailHtml,
   membershipReceivedEmailHtml,
 } from "@/lib/email/templates";
-import {
-  getResourceCategory,
-  isResourceCategorySlug,
-} from "@/lib/constants";
 import { priceLabelToPaise } from "@/lib/content/book-purchases";
+import {
+  getResourceCategoryBySlug,
+  isValidResourceCategorySlug,
+} from "@/lib/content/resource-categories";
 import { ContentActionState, slugify } from "@/lib/content/utils";
 
 async function requireAdmin(): Promise<
@@ -333,11 +333,11 @@ export async function upsertResourceAction(
   if (!title) return { error: "Title is required." };
 
   const category = String(formData.get("category") || "").trim();
-  if (!isResourceCategorySlug(category)) {
+  if (!(await isValidResourceCategorySlug(category))) {
     return { error: "Choose a valid library category." };
   }
 
-  const cat = getResourceCategory(category)!;
+  const cat = await getResourceCategoryBySlug(category);
   const resourceType = String(formData.get("resource_type") || "pdf").trim();
   const allowedTypes = new Set(["pdf", "video", "audio", "link", "other"]);
   if (!allowedTypes.has(resourceType)) {
@@ -356,8 +356,14 @@ export async function upsertResourceAction(
     thumbnail_url: String(formData.get("thumbnail_url") || "").trim() || null,
     file_size_label:
       String(formData.get("file_size_label") || "").trim() || null,
-    icon: String(formData.get("icon") || cat.icon).trim() || cat.icon,
-    tone: String(formData.get("tone") || cat.tone).trim() || cat.tone,
+    icon:
+      String(formData.get("icon") || cat?.icon || "menu_book").trim() ||
+      cat?.icon ||
+      "menu_book",
+    tone:
+      String(formData.get("tone") || cat?.tone || "primary").trim() ||
+      cat?.tone ||
+      "primary",
     is_published: boolFromForm(formData, "is_published"),
     is_featured: boolFromForm(formData, "is_featured"),
     sort_order: Number(formData.get("sort_order") || 0),

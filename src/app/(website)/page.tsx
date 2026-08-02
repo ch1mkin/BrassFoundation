@@ -20,9 +20,10 @@ import {
   getPublishedEvents,
   getPublishedMarketplace,
 } from "@/lib/content/queries";
+import { getResourceCategories } from "@/lib/content/resource-categories";
 
 export default async function HomePage() {
-  const [content, committee, events, mustRead, marketplace, context] =
+  const [content, committee, events, mustRead, marketplace, context, resourceCategories] =
     await Promise.all([
       getPublishedHomepage(),
       getExecutiveCommittee(),
@@ -30,6 +31,7 @@ export default async function HomePage() {
       getPublishedMustReadBooks(),
       getPublishedMarketplace(6),
       getUserContext(),
+      getResourceCategories(),
     ]);
 
   const purchaseMap = context
@@ -73,7 +75,7 @@ export default async function HomePage() {
         events={events}
       />
       <SectionDivider />
-      <ResourcesSection />
+      <ResourcesSection categories={resourceCategories} />
       <SectionDivider />
       <MustReadSection books={mustRead} />
       <SectionDivider />

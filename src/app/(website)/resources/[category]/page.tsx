@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ResourceCategoryBrowser } from "@/components/website/resource-category-browser";
 import { PageShell } from "@/components/website/page-shell";
-import {
-  RESOURCE_CATEGORIES,
-  getResourceCategory,
-  isResourceCategorySlug,
-} from "@/lib/constants";
 import { getPublishedResourcesByCategory } from "@/lib/content/queries";
+import {
+  getResourceCategories,
+  getResourceCategoryBySlug,
+} from "@/lib/content/resource-categories";
 
 type Props = { params: Promise<{ category: string }> };
 
 export async function generateStaticParams() {
-  return RESOURCE_CATEGORIES.map((c) => ({ category: c.slug }));
+  const cats = await getResourceCategories();
+  return cats.map((c) => ({ category: c.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
-  const cat = getResourceCategory(category);
+  const cat = await getResourceCategoryBySlug(category);
   return {
     title: cat ? `${cat.title} · Digital Library` : "Digital Library",
   };
@@ -25,20 +25,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ResourceCategoryPage({ params }: Props) {
   const { category } = await params;
-  if (!isResourceCategorySlug(category)) notFound();
-
-  const cat = getResourceCategory(category)!;
-  const resources = await getPublishedResourcesByCategory(category);
+  const [cat, categories, resources] = await Promise.all([
+    getResourceCategoryBySlug(category),
+    getResourceCategories(),
+    getPublishedResourcesByCategory(category),
+  ]);
+  if (!cat) notFound();
 
   return (
     <PageShell
       eyebrow="Digital Library"
       title={cat.title}
-      description={cat.subtitle}
+      description={cat.subtitle || undefined}
       wide
     >
       <ResourceCategoryBrowser
         categorySlug={category}
+        categories={categories}
         resources={resources}
       />
     </PageShell>

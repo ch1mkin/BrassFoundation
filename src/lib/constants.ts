@@ -175,7 +175,7 @@ export const UPCOMING_EVENTS = [
   },
 ] as const;
 
-export const RESOURCE_CATEGORIES = [
+export const DEFAULT_RESOURCE_CATEGORIES = [
   {
     slug: "constitution-of-india",
     title: "Constitution of India",
@@ -206,21 +206,26 @@ export const RESOURCE_CATEGORIES = [
   },
 ] as const;
 
+/** @deprecated Prefer getResourceCategories() — kept for static fallbacks */
+export const RESOURCE_CATEGORIES = DEFAULT_RESOURCE_CATEGORIES;
+
 export type ResourceCategorySlug =
-  (typeof RESOURCE_CATEGORIES)[number]["slug"];
+  (typeof DEFAULT_RESOURCE_CATEGORIES)[number]["slug"];
 
 export function getResourceCategory(slug: string) {
-  return RESOURCE_CATEGORIES.find((c) => c.slug === slug) ?? null;
+  return (
+    DEFAULT_RESOURCE_CATEGORIES.find((c) => c.slug === slug) ?? null
+  );
 }
 
 export function isResourceCategorySlug(
   slug: string,
 ): slug is ResourceCategorySlug {
-  return RESOURCE_CATEGORIES.some((c) => c.slug === slug);
+  return DEFAULT_RESOURCE_CATEGORIES.some((c) => c.slug === slug);
 }
 
-/** @deprecated Prefer RESOURCE_CATEGORIES */
-export const RESOURCES_PREVIEW = RESOURCE_CATEGORIES.map((c) => ({
+/** @deprecated Prefer RESOURCE_CATEGORIES / DB categories */
+export const RESOURCES_PREVIEW = DEFAULT_RESOURCE_CATEGORIES.map((c) => ({
   title: c.title,
   subtitle: c.subtitle,
   size: "",

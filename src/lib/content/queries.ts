@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import {
   COMMUNITY_WORK,
-  RESOURCE_CATEGORIES,
 } from "@/lib/constants";
+import { getResourceCategories } from "@/lib/content/resource-categories";
 
 export type EventRow = {
   id: string;
@@ -238,8 +238,9 @@ export async function getPublishedResourcesByCategory(
 export async function getResourceCategoryCounts(): Promise<
   Record<string, number>
 > {
+  const cats = await getResourceCategories();
   const counts: Record<string, number> = Object.fromEntries(
-    RESOURCE_CATEGORIES.map((c) => [c.slug, 0]),
+    cats.map((c) => [c.slug, 0]),
   );
   try {
     const supabase = await createClient();
@@ -251,6 +252,7 @@ export async function getResourceCategoryCounts(): Promise<
     for (const row of data) {
       const key = String(row.category || "");
       if (key in counts) counts[key] += 1;
+      else counts[key] = (counts[key] || 0) + 1;
     }
     return counts;
   } catch {

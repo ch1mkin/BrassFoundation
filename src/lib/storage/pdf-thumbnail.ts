@@ -1,11 +1,13 @@
 "use client";
 
 import * as pdfjs from "pdfjs-dist";
-import { uploadAdminFile } from "@/lib/storage/upload";
+import { uploadFileClient } from "@/lib/storage/client-upload";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-export async function renderPdfFirstPageThumbnail(file: File): Promise<File | null> {
+export async function renderPdfFirstPageThumbnail(
+  file: File,
+): Promise<File | null> {
   try {
     const data = new Uint8Array(await file.arrayBuffer());
     const pdf = await pdfjs.getDocument({ data }).promise;
@@ -29,8 +31,11 @@ export async function renderPdfFirstPageThumbnail(file: File): Promise<File | nu
   }
 }
 
+/**
+ * Client-side PDF + thumbnail upload (avoids hanging server-action File uploads).
+ */
 export async function uploadPdfWithThumbnail(file: File, folder = "library") {
-  const pdfUpload = await uploadAdminFile("resources", file, folder);
+  const pdfUpload = await uploadFileClient("resources", file, folder);
   if (!pdfUpload.ok) return pdfUpload;
 
   const thumbFile = await renderPdfFirstPageThumbnail(file);
@@ -38,7 +43,7 @@ export async function uploadPdfWithThumbnail(file: File, folder = "library") {
     return { ...pdfUpload, thumbnailUrl: null as string | null };
   }
 
-  const thumbUpload = await uploadAdminFile(
+  const thumbUpload = await uploadFileClient(
     "resources",
     thumbFile,
     `${folder}/thumbs`,

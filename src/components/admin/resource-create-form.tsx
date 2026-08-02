@@ -1,17 +1,18 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { ButtonSpinner } from "@/components/ui/inline-loader";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
-import { RESOURCE_CATEGORIES } from "@/lib/constants";
+import type { ResourceCategoryRow } from "@/lib/content/resource-categories";
 import { upsertResourceAction } from "@/lib/content/actions";
 import type { ContentActionState } from "@/lib/content/utils";
 import { uploadFileClient } from "@/lib/storage/client-upload";
 import { uploadPdfWithThumbnail } from "@/lib/storage/pdf-thumbnail";
+import { formatBytes } from "@/lib/utils";
 
 const RESOURCE_TYPES = [
   { id: "pdf", label: "PDF" },
@@ -21,27 +22,39 @@ const RESOURCE_TYPES = [
   { id: "other", label: "Other" },
 ] as const;
 
-export function ResourceCreateForm() {
+export function ResourceCreateForm({
+  categories,
+}: {
+  categories: ResourceCategoryRow[];
+}) {
   const [state, action, pending] = useSafeFormAction(
     upsertResourceAction,
     {} as ContentActionState,
   );
-  const [category, setCategory] = useState(RESOURCE_CATEGORIES[0].slug);
+  const [category, setCategory] = useState(categories[0]?.slug || "");
   const [resourceType, setResourceType] = useState<string>("pdf");
   const [fileUrl, setFileUrl] = useState("");
   const [thumbUrl, setThumbUrl] = useState("");
+  const [sizeLabel, setSizeLabel] = useState("");
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploading, startUpload] = useTransition();
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (!category && categories[0]?.slug) {
+      setCategory(categories[0].slug);
+    }
+  }, [categories, category]);
 
   const selectedCategory = useMemo(
-    () => RESOURCE_CATEGORIES.find((c) => c.slug === category),
-    [category],
+    () => categories.find((c) => c.slug === category),
+    [categories, category],
   );
 
-  function onPdf(file: File | null) {
+  async function onPdf(file: File | null) {
     if (!file) return;
     setUploadError(null);
-    startUpload(async () => {
+    setUploading(true);
+    try {
       const result = await uploadPdfWithThumbnail(file, "library");
       if (!result.ok) {
         setUploadError(result.error);
@@ -50,13 +63,19 @@ export function ResourceCreateForm() {
       setFileUrl(result.url);
       if (result.thumbnailUrl) setThumbUrl(result.thumbnailUrl);
       setResourceType("pdf");
-    });
+      setSizeLabel(formatBytes(file.size));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "PDF upload failed.");
+    } finally {
+      setUploading(false);
+    }
   }
 
-  function onAudio(file: File | null) {
+  async function onAudio(file: File | null) {
     if (!file) return;
     setUploadError(null);
-    startUpload(async () => {
+    setUploading(true);
+    try {
       const result = await uploadFileClient("resources", file, "library");
       if (!result.ok) {
         setUploadError(result.error);
@@ -64,12 +83,31 @@ export function ResourceCreateForm() {
       }
       setFileUrl(result.url);
       setResourceType("audio");
-    });
+      setSizeLabel(formatBytes(file.size));
+    } catch (err) {
+      setUploadError(
+        err instanceof Error ? err.message : "Audio upload failed.",
+      );
+    } finally {
+      setUploading(false);
+    }
   }
 
   return (
-    <form action={action} className="glass-card space-y-4 rounded-2xl p-6">
-      <FormLock pending={pending || uploading} className="space-y-4">
+    <form
+      action={action}
+      className="glass-card space-y-4 rounded-2xl p-6"
+      onSubmit={(e) => {
+        if (uploading) {
+          e.preventDefault();
+        }
+      }}
+    >
+      <FormLock
+        pending={pending}
+        label="Saving…"
+        className="space-y-4"
+      >
         <h2 className="font-heading text-lg font-semibold">Add resource</h2>
 
         <label className="block space-y-1.5">
@@ -82,15 +120,12 @@ export function ResourceCreateForm() {
             value={category}
             onChange={(e) => {
               const next = e.target.value;
-              setCategory(next as typeof category);
-              const cat = RESOURCE_CATEGORIES.find((c) => c.slug === next);
-              if (cat?.slug === "leadership-podcast") {
-                setResourceType("audio");
-              }
+              setCategory(next);
+              if (next === "leadership-podcast") setResourceType("audio");
             }}
             className="h-10 w-full rounded-xl border border-input bg-white px-3 text-sm"
           >
-            {RESOURCE_CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <option key={cat.slug} value={cat.slug}>
                 {cat.title}
               </option>
@@ -141,8 +176,13 @@ export function ResourceCreateForm() {
           <input
             type="file"
             accept="application/pdf"
+            disabled={uploading || pending}
             className="block w-full text-xs"
-            onChange={(e) => onPdf(e.target.files?.[0] || null)}
+            onChange={(e) => {
+              const file = e.target.files?.[0] || null;
+              e.target.value = "";
+              void onPdf(file);
+            }}
           />
         </div>
 
@@ -153,13 +193,21 @@ export function ResourceCreateForm() {
           <input
             type="file"
             accept="audio/mpeg,audio/mp3,audio/*"
+            disabled={uploading || pending}
             className="block w-full text-xs"
-            onChange={(e) => onAudio(e.target.files?.[0] || null)}
+            onChange={(e) => {
+              const file = e.target.files?.[0] || null;
+              e.target.value = "";
+              void onAudio(file);
+            }}
           />
         </div>
 
         {uploading ? (
-          <p className="text-xs text-muted-foreground">Uploading file…</p>
+          <p className="flex items-center gap-2 text-xs text-muted-foreground">
+            <ButtonSpinner />
+            Uploading file… (this does not save the resource yet)
+          </p>
         ) : null}
         {uploadError ? (
           <p className="text-xs text-destructive">{uploadError}</p>
@@ -172,8 +220,10 @@ export function ResourceCreateForm() {
             className="mt-2 h-40 w-auto rounded-lg border border-border object-contain"
           />
         ) : null}
-        {fileUrl && !thumbUrl ? (
-          <p className="truncate text-xs text-success">File ready: {fileUrl}</p>
+        {fileUrl && !uploading ? (
+          <p className="truncate text-xs text-success">
+            File ready — click Create resource to save
+          </p>
         ) : null}
 
         <input type="hidden" name="file_url" value={fileUrl} />
@@ -198,6 +248,8 @@ export function ResourceCreateForm() {
         />
         <Input
           name="file_size_label"
+          value={sizeLabel}
+          onChange={(e) => setSizeLabel(e.target.value)}
           placeholder="Size label e.g. 12MB"
           className="h-10 rounded-xl"
         />
@@ -218,13 +270,18 @@ export function ResourceCreateForm() {
         ) : null}
         <Button
           type="submit"
-          disabled={pending || uploading}
+          disabled={pending || uploading || !category}
           className="rounded-xl bg-primary"
         >
-          {pending || uploading ? (
+          {pending ? (
             <>
               <ButtonSpinner />
-              {uploading ? "Uploading…" : "Saving…"}
+              Saving…
+            </>
+          ) : uploading ? (
+            <>
+              <ButtonSpinner />
+              Wait for upload…
             </>
           ) : (
             "Create resource"

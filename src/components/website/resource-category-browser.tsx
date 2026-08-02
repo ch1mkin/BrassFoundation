@@ -3,10 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
-import {
-  RESOURCE_CATEGORIES,
-  type ResourceCategorySlug,
-} from "@/lib/constants";
+import type { ResourceCategoryRow } from "@/lib/content/resource-categories";
 import type { ResourceRow } from "@/lib/content/queries";
 import { cn } from "@/lib/utils";
 
@@ -28,9 +25,11 @@ const toneClass = {
 
 export function ResourceCategoryBrowser({
   categorySlug,
+  categories,
   resources,
 }: {
-  categorySlug: ResourceCategorySlug;
+  categorySlug: string;
+  categories: ResourceCategoryRow[];
   resources: ResourceRow[];
 }) {
   const [query, setQuery] = useState("");
@@ -57,7 +56,7 @@ export function ResourceCategoryBrowser({
           role="navigation"
           aria-label="Library categories"
         >
-          {RESOURCE_CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <Link
               key={cat.slug}
               href={`/resources/${cat.slug}`}
