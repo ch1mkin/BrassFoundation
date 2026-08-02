@@ -64,7 +64,7 @@ export default async function HomePage() {
       <ResourcesSection />
       <SectionDivider />
       <MustReadSection books={mustRead} />
-      {mustRead.length ? <SectionDivider /> : null}
+      <SectionDivider />
       <MarketplaceSection />
       <SectionDivider />
       <MembershipCta
