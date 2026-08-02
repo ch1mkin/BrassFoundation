@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { InstantImg, preloadImages } from "@/components/website/instant-img";
 import { MustReadBookCard } from "@/components/website/must-read-book-card";
 import { BookBuyButton } from "@/components/marketplace/book-buy-button";
+import { ViewAllLink } from "@/components/website/view-all-link";
 
 function AnimatedCounter({
   value,
@@ -266,7 +267,7 @@ export function AboutSection({
   const valueRows =
     values?.length > 0
       ? values.map((v, i) => ({
-          title: v.title === "Community" ? "Fraternity" : v.title,
+          title: v.title,
           description: v.description,
           icon: i % 2 === 0 ? "visibility" : "rocket_launch",
         }))
@@ -345,16 +346,9 @@ export function CommunitySection({
             centres, mentorship, cultural programs, and collective growth.
           </p>
         </div>
-        <Link
-          href="/community"
-          className={cn(
-            buttonVariants({ variant: "secondary" }),
-            "relative z-20 rounded-lg bg-surface-highest font-bold text-primary hover:bg-surface-high",
-          )}
-        >
+        <ViewAllLink href="/community" withArrow className="rounded-lg">
           View All Work
-          <MaterialIcon name="trending_flat" className="text-[18px]" />
-        </Link>
+        </ViewAllLink>
       </div>
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
         {projects.map((project, i) => (
@@ -436,15 +430,9 @@ export function EventsSection({
           </h2>
           <GoldHairline className="mx-auto mb-0 sm:mx-0" />
         </div>
-        <Link
-          href="/events"
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "relative z-20 shrink-0 rounded-full border-white/40 bg-white/10 px-3 text-xs text-white hover:bg-white/20 hover:text-white sm:px-4 sm:text-sm",
-          )}
-        >
+        <ViewAllLink href="/events" dark>
           View all
-        </Link>
+        </ViewAllLink>
       </div>
       <div className="relative z-10 mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-20">
         {!events.length ? (
@@ -542,15 +530,7 @@ export function ResourcesSection({
         <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
           Digital Library & Resources
         </h2>
-        <Link
-          href="/resources"
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "relative z-20 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
-          )}
-        >
-          View all
-        </Link>
+        <ViewAllLink href="/resources">View all</ViewAllLink>
       </div>
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-6 sm:px-6 md:grid-cols-4 lg:px-20">
         {categories.map((item) => {
@@ -602,15 +582,7 @@ export function MarketplaceSection({
         <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
           Featured Books
         </h2>
-        <Link
-          href="/marketplace"
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "relative z-20 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
-          )}
-        >
-          View all
-        </Link>
+        <ViewAllLink href="/marketplace">View all</ViewAllLink>
       </div>
       {books.length === 0 ? (
         <p className="relative z-10 mx-auto max-w-[1280px] px-4 text-center text-muted-foreground sm:px-6 lg:px-20">
@@ -695,15 +667,7 @@ export function MustReadSection({
             to open the book.
           </p>
         </div>
-        <Link
-          href="/must-read"
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "relative shrink-0 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
-          )}
-        >
-          View all
-        </Link>
+        <ViewAllLink href="/must-read">View all</ViewAllLink>
       </div>
       {!books.length ? (
         <p className="relative z-10 mx-auto max-w-[1280px] px-4 text-sm text-muted-foreground sm:px-6 lg:px-20">
@@ -754,7 +718,7 @@ export function MembershipCta({
                 {[
                   "Exclusive Access to Digital Library",
                   "Volunteer Opportunities",
-                  "Direct Fraternity Impact",
+                  "Direct Community Impact",
                   "Skill Development Workshops",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2">

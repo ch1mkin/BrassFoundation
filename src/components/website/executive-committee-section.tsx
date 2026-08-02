@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import type { ExecutiveMember } from "@/lib/content/committee";
 import { buttonVariants } from "@/components/ui/button";
@@ -181,8 +180,12 @@ const ROW_COLS: Record<number, string> = {
  */
 export function LeadershipSection({
   members,
+  viewAllHref = "/about#executive-committee",
+  showViewAll = true,
 }: {
   members: ExecutiveMember[];
+  viewAllHref?: string;
+  showViewAll?: boolean;
 }) {
   const chair = members.find((m) => isChair(m.role_title));
   const vice = members.find((m) => isVice(m.role_title));
@@ -208,7 +211,10 @@ export function LeadershipSection({
   }, [photoKey]);
 
   return (
-    <section className="relative overflow-hidden bg-surface-high py-10 sm:py-14 lg:py-16">
+    <section
+      id="executive-committee"
+      className="relative overflow-hidden bg-surface-high py-10 sm:py-14 lg:py-16"
+    >
       <SectionOrnaments />
       <div className="relative z-10 mx-auto mb-8 flex max-w-[1280px] flex-col items-center justify-between gap-4 px-4 text-center sm:mb-10 sm:flex-row sm:items-end sm:px-6 sm:text-left lg:px-20">
         <div>
@@ -221,15 +227,17 @@ export function LeadershipSection({
             equality, and community development.
           </p>
         </div>
-        <Link
-          href="/about"
-          className={cn(
-            buttonVariants({ variant: "outline" }),
-            "relative z-20 shrink-0 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
-          )}
-        >
-          View all
-        </Link>
+        {showViewAll ? (
+          <a
+            href={viewAllHref}
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "pointer-events-auto relative z-30 shrink-0 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+            )}
+          >
+            View all
+          </a>
+        ) : null}
       </div>
 
       <div className="relative z-10 mx-auto flex max-w-[1280px] flex-col items-stretch gap-6 px-2 sm:gap-8 sm:px-6 lg:gap-10 lg:px-20">

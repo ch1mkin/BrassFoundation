@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "@/components/website/page-shell";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { MembershipLink } from "@/components/membership/membership-link";
+import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { ABOUT_PAGE, COMMUNITY_PAGE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -77,14 +79,12 @@ export default function CommunityPage() {
             </Link>{" "}
             page — {ABOUT_PAGE.headline}.
           </p>
-          <Link
-            href="/membership"
-            className={cn(
-              "mt-5 inline-flex rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white",
-            )}
+          <MembershipLink
+            className={cn(GOLD_SHINY_BTN, "mt-5 w-full shadow-lg sm:w-auto")}
           >
-            Become a Member
-          </Link>
+            <span>Become a Member</span>
+            <MaterialIcon name="person_add" className="text-[20px]" />
+          </MembershipLink>
         </div>
       </div>
     </PageShell>

@@ -34,9 +34,12 @@ export default async function AboutPage() {
               {paragraph}
             </p>
           ))}
-          <div className="pt-2">
-            <MembershipLink className={cn(GOLD_SHINY_BTN, "shadow-lg")}>
+          <div className="pt-4">
+            <MembershipLink
+              className={cn(GOLD_SHINY_BTN, "w-full shadow-lg sm:w-auto")}
+            >
               <span>Become a Member</span>
+              <MaterialIcon name="person_add" className="text-[20px]" />
             </MembershipLink>
           </div>
         </article>
@@ -65,7 +68,11 @@ export default async function AboutPage() {
         </section>
 
         <div className="-mx-4 sm:-mx-6 lg:-mx-20">
-          <LeadershipSection members={committee} />
+          <LeadershipSection
+            members={committee}
+            viewAllHref="#executive-committee"
+            showViewAll
+          />
         </div>
       </div>
     </PageShell>

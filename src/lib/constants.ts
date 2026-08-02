@@ -27,18 +27,13 @@ export const NAV_ITEMS: NavItem[] = [
     children: [
       {
         href: "/community",
-        label: "Fraternity",
-        description: "Chapters and local groups",
+        label: "Community",
+        description: "Initiatives, outreach, and collective growth",
       },
       {
         href: "/events",
         label: "Events",
         description: "Programs and gatherings",
-      },
-      {
-        href: "/must-read",
-        label: "Must Read",
-        description: "Essential books with PDF access",
       },
       {
         href: "/gallery",
@@ -74,7 +69,7 @@ export const NAV_ITEMS: NavItem[] = [
 
 export const NAV_LINKS = [
   { href: "/about", label: "About" },
-  { href: "/community", label: "Fraternity" },
+  { href: "/community", label: "Community" },
   { href: "/events", label: "Events" },
   { href: "/must-read", label: "Must Read" },
   { href: "/resources", label: "Resources" },
@@ -103,6 +98,12 @@ export const CORE_VALUES = [
     description:
       "Providing scholarships, mentorship, and educational materials to marginalized communities.",
     icon: "rocket_launch",
+  },
+  {
+    title: "Our Commitment",
+    description:
+      "Advancing equality, scientific thinking, and constitutional values so every learner can grow with dignity and opportunity.",
+    icon: "balance",
   },
 ] as const;
 
