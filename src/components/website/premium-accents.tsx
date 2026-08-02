@@ -105,8 +105,8 @@ export function SectionOrnaments({
   className?: string;
   density?: "default" | "rich";
 }) {
-  // Keep leaf count low so sections stay elegant, not busy
-  const count = density === "rich" ? 4 : 3;
+  // Keep leaf count modest so the section stays elegant
+  const count = density === "rich" ? 6 : 5;
   const leaves = useMemo(
     () => buildLeaves(count, density === "rich" ? 2 : 1),
     [count, density],
@@ -115,7 +115,7 @@ export function SectionOrnaments({
   return (
     <div
       className={cn(
-        "pointer-events-none absolute inset-0 overflow-hidden opacity-40",
+        "pointer-events-none absolute inset-0 overflow-hidden opacity-55",
         className,
       )}
       aria-hidden

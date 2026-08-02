@@ -17,14 +17,6 @@ export default function ContactPage() {
         <ContactForm />
         <div className="space-y-6">
           <div className="glass-card rounded-2xl p-6">
-            <h2 className="font-heading text-lg font-semibold">Office</h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              123 Foundation Way, Sector 45
-              <br />
-              Pune, Maharashtra — 411001
-            </p>
-          </div>
-          <div className="glass-card rounded-2xl p-6">
             <h2 className="font-heading text-lg font-semibold">Email</h2>
             <a
               href="mailto:contact@brassfoundation.org"

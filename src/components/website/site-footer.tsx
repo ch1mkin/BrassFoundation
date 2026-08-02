@@ -87,7 +87,7 @@ export function SiteFooter() {
             <li>
               <Link
                 href="/gallery"
-                className="text-xs font-semibold text-white/70 hover:text-brand"
+                className="text-xs font-semibold text-white/70 transition hover:text-brand"
               >
                 {t("footer.gallery")}
               </Link>
@@ -95,9 +95,25 @@ export function SiteFooter() {
             <li>
               <Link
                 href="/marketplace"
-                className="text-xs font-semibold text-white/70 hover:text-brand"
+                className="text-xs font-semibold text-white/70 transition hover:text-brand"
               >
                 {t("footer.marketplace")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/privacy"
+                className="text-xs font-semibold text-white/70 transition hover:text-brand"
+              >
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/terms"
+                className="text-xs font-semibold text-white/70 transition hover:text-brand"
+              >
+                Terms &amp; Conditions
               </Link>
             </li>
           </ul>
@@ -107,7 +123,6 @@ export function SiteFooter() {
           <h4 className="notranslate mb-4 text-xs font-semibold tracking-wide text-brand uppercase">
             {t("footer.contactUs")}
           </h4>
-          <p className="mb-4 text-xs font-semibold text-white/70">India</p>
           <a
             href="mailto:contact@brassfoundation.org"
             className="notranslate text-xs font-semibold text-white/70 hover:text-brand"
@@ -118,24 +133,40 @@ export function SiteFooter() {
       </div>
 
       <div className="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-4 border-t border-white/10 px-4 py-6 sm:flex-row sm:px-6 lg:px-20">
-        <span className="text-xs font-semibold text-white/55">
-          <span className="notranslate">
-            © {new Date().getFullYear()} {SITE.name}.
-          </span>{" "}
-          {t("footer.rights")}
-        </span>
-        <div className="flex gap-6">
+        <div className="flex flex-col items-center gap-1 text-center sm:items-start sm:text-left">
+          <span className="text-xs font-semibold text-white/55">
+            <span className="notranslate">
+              © {new Date().getFullYear()} {SITE.name}.
+            </span>{" "}
+            {t("footer.rights")}
+          </span>
+          <a
+            href="https://salhantech.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="notranslate text-xs font-semibold text-white/45 transition hover:text-brand"
+          >
+            Powered by Salhantech
+          </a>
+        </div>
+        <div className="flex flex-wrap justify-center gap-6">
+          <Link
+            href="/privacy"
+            className="text-xs font-semibold text-white/55 hover:text-brand"
+          >
+            Privacy Policy
+          </Link>
+          <Link
+            href="/terms"
+            className="text-xs font-semibold text-white/55 hover:text-brand"
+          >
+            Terms &amp; Conditions
+          </Link>
           <Link
             href="/contact"
             className="text-xs font-semibold text-white/55 hover:text-brand"
           >
             {t("footer.contact")}
-          </Link>
-          <Link
-            href="/gallery"
-            className="text-xs font-semibold text-white/55 hover:text-brand"
-          >
-            {t("footer.gallery")}
           </Link>
         </div>
       </div>
