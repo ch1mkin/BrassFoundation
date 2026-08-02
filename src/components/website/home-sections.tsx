@@ -19,6 +19,7 @@ import type { HomepageContent, HomepageQuote } from "@/lib/cms/homepage";
 import type { EventRow } from "@/lib/content/queries";
 import { cn } from "@/lib/utils";
 import { InstantImg, preloadImages } from "@/components/website/instant-img";
+import { MustReadBookCard } from "@/components/website/must-read-book-card";
 
 function AnimatedCounter({
   value,
@@ -343,16 +344,16 @@ export function CommunitySection({
             educational empowerment.
           </p>
         </div>
-        <Link
+        <a
           href="/community"
           className={cn(
             buttonVariants({ variant: "secondary" }),
-            "rounded-lg bg-surface-highest font-bold text-primary hover:bg-surface-high",
+            "relative z-20 rounded-lg bg-surface-highest font-bold text-primary hover:bg-surface-high",
           )}
         >
           View All Work
           <MaterialIcon name="trending_flat" className="text-[18px]" />
-        </Link>
+        </a>
       </div>
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
         {projects.map((project, i) => (
@@ -522,10 +523,19 @@ export function ResourcesSection() {
 
   return (
     <section className="relative bg-muted py-12 sm:py-16 lg:py-20" id="resources">
-      <div className="relative z-10 mx-auto mb-6 max-w-[1280px] px-4 sm:mb-12 sm:px-6 lg:px-20">
+      <div className="relative z-10 mx-auto mb-6 flex max-w-[1280px] items-center justify-between gap-3 px-4 sm:mb-12 sm:px-6 lg:px-20">
         <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
           Digital Library & Resources
         </h2>
+        <a
+          href="/resources"
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            "relative z-20 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+          )}
+        >
+          View all
+        </a>
       </div>
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-6 sm:px-6 md:grid-cols-4 lg:px-20">
         {RESOURCES_PREVIEW.map((item) => (
@@ -557,13 +567,13 @@ export function ResourcesSection() {
               >
                 {item.size}
               </span>
-              <Link
+              <a
                 href="/resources"
                 className="text-primary"
-                aria-label="Download"
+                aria-label="View resources"
               >
                 <MaterialIcon name="download" className="text-[18px] sm:text-[24px]" />
-              </Link>
+              </a>
             </div>
           </div>
         ))}
@@ -579,19 +589,19 @@ export function MarketplaceSection() {
         <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
           Featured Books
         </h2>
-        <Link
+        <a
           href="/marketplace"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+            "relative z-20 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
           )}
         >
           View all
-        </Link>
+        </a>
       </div>
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-3 px-4 sm:grid-cols-2 sm:gap-6 sm:px-6 md:grid-cols-3 lg:px-20">
         {FEATURED_BOOKS.map((book) => (
-          <Link
+          <a
             key={book.title}
             href="/marketplace"
             className="block rounded-xl border border-border/40 bg-white p-4 transition hover:shadow-2xl sm:rounded-2xl sm:p-8"
@@ -616,7 +626,7 @@ export function MarketplaceSection() {
                 Buy Now
               </span>
             </div>
-          </Link>
+          </a>
         ))}
       </div>
     </section>
@@ -635,11 +645,9 @@ export function MustReadSection({
     pdf_url: string;
   }>;
 }) {
-  if (!books.length) return null;
-
   return (
     <section className="bg-surface-low/60 py-12 sm:py-16 lg:py-20" id="must-read">
-      <div className="mx-auto mb-6 flex max-w-[1280px] flex-col items-start justify-between gap-4 px-4 sm:mb-12 sm:flex-row sm:items-end sm:px-6 lg:px-20">
+      <div className="relative z-10 mx-auto mb-6 flex max-w-[1280px] flex-col items-start justify-between gap-4 px-4 sm:mb-12 sm:flex-row sm:items-end sm:px-6 lg:px-20">
         <div className="max-w-xl">
           <p className="mb-2 text-sm font-semibold tracking-wide text-primary uppercase">
             Essential reading
@@ -648,68 +656,42 @@ export function MustReadSection({
             Books You Must Read
           </h2>
           <p className="mt-2 text-muted-foreground">
-            Curated titles with free PDF access — open a book and start reading.
+            Curated titles with free PDF access — tap ? for details, or Read PDF
+            to open the book.
           </p>
         </div>
-        <Link
+        <a
           href="/must-read"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+            "relative z-20 shrink-0 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
           )}
         >
           View all
-        </Link>
+        </a>
       </div>
-      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:gap-6 sm:px-6 md:grid-cols-3 lg:px-20">
-        {books.slice(0, 6).map((book, i) => (
-          <motion.a
-            key={book.id}
-            href={book.pdf_url}
-            target="_blank"
-            rel="noreferrer"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.05 }}
-            className="group flex gap-4 rounded-2xl border border-border/40 bg-white p-4 transition hover:shadow-lg sm:p-5"
-          >
-            <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-highest sm:size-24">
-              {book.cover_image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={book.cover_image_url}
-                  alt=""
-                  className="size-full object-cover transition duration-500 group-hover:scale-105"
-                />
-              ) : (
-                <MaterialIcon
-                  name="auto_stories"
-                  className="text-3xl text-primary/40"
-                />
-              )}
-              <span className="absolute right-1.5 bottom-1.5 flex size-7 items-center justify-center rounded-full bg-primary text-white shadow-md ring-2 ring-white">
-                <MaterialIcon name="menu_book" className="text-[16px]" />
-              </span>
-            </div>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-heading line-clamp-2 text-base font-semibold sm:text-lg">
-                {book.title}
-              </h3>
-              {book.author ? (
-                <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
-                  {book.author}
-                </p>
-              ) : null}
-              <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-primary">
-                <MaterialIcon name="menu_book" className="text-[18px]" />
-                Read PDF
-                <MaterialIcon name="open_in_new" className="text-[16px]" />
-              </span>
-            </div>
-          </motion.a>
-        ))}
-      </div>
+      {!books.length ? (
+        <p className="relative z-10 mx-auto max-w-[1280px] px-4 text-sm text-muted-foreground sm:px-6 lg:px-20">
+          Books will appear here once published.{" "}
+          <a href="/must-read" className="font-semibold text-primary underline">
+            Open Must Read
+          </a>
+        </p>
+      ) : (
+        <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-4 px-4 sm:grid-cols-2 sm:gap-6 sm:px-6 md:grid-cols-3 lg:px-20">
+          {books.slice(0, 6).map((book, i) => (
+            <motion.div
+              key={book.id}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <MustReadBookCard book={book} />
+            </motion.div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

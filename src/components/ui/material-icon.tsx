@@ -45,6 +45,7 @@ import {
   Image as ImageIcon,
   Globe,
   HelpCircle,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -103,6 +104,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   shopping_bag: ShoppingBag,
   sparkles: Sparkles,
   help: HelpCircle,
+  close: X,
 };
 
 function sizeFromClass(className?: string) {
