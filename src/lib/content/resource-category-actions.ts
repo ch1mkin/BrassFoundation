@@ -7,21 +7,6 @@ import { ContentActionState, slugify } from "@/lib/content/utils";
 
 const TONES = new Set(["primary", "secondary", "tertiary", "brand"]);
 
-const ICON_OPTIONS = [
-  "menu_book",
-  "history_edu",
-  "gavel",
-  "mic",
-  "school",
-  "auto_stories",
-  "headphones",
-  "video_library",
-  "folder",
-  "lightbulb",
-  "diversity_3",
-  "balance",
-] as const;
-
 export async function upsertResourceCategoryAction(
   _prev: ContentActionState,
   formData: FormData,
@@ -100,5 +85,3 @@ export async function deleteResourceCategoryAction(
   revalidatePath("/");
   return { success: "Category deleted." };
 }
-
-export { ICON_OPTIONS };

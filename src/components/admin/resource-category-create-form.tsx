@@ -1,17 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { ButtonSpinner } from "@/components/ui/inline-loader";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
-import {
-  ICON_OPTIONS,
-  upsertResourceCategoryAction,
-} from "@/lib/content/resource-category-actions";
+import { RESOURCE_CATEGORY_ICONS } from "@/lib/constants";
+import { upsertResourceCategoryAction } from "@/lib/content/resource-category-actions";
 import type { ContentActionState } from "@/lib/content/utils";
-import { useState } from "react";
 
 const TONES = [
   { id: "primary", label: "Primary" },
@@ -25,15 +23,15 @@ export function ResourceCategoryCreateForm() {
     upsertResourceCategoryAction,
     {} as ContentActionState,
   );
-  const [icon, setIcon] = useState<string>(ICON_OPTIONS[0]);
+  const [icon, setIcon] = useState<string>(RESOURCE_CATEGORY_ICONS[0]);
 
   return (
     <form action={action} className="glass-card space-y-4 rounded-2xl p-6">
       <FormLock pending={pending} className="space-y-4">
         <h2 className="font-heading text-lg font-semibold">Add category</h2>
         <p className="text-xs text-muted-foreground">
-          Categories appear on the homepage Digital Library and
-          /resources. Pick a Material icon name.
+          Categories appear on the homepage Digital Library and /resources. Pick
+          a Material icon name.
         </p>
         <Input
           name="title"
@@ -66,7 +64,7 @@ export function ResourceCategoryCreateForm() {
               onChange={(e) => setIcon(e.target.value)}
               className="h-10 flex-1 rounded-xl border border-input bg-white px-3 text-sm"
             >
-              {ICON_OPTIONS.map((name) => (
+              {RESOURCE_CATEGORY_ICONS.map((name) => (
                 <option key={name} value={name}>
                   {name}
                 </option>

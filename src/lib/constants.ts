@@ -206,6 +206,21 @@ export const DEFAULT_RESOURCE_CATEGORIES = [
   },
 ] as const;
 
+export const RESOURCE_CATEGORY_ICONS = [
+  "menu_book",
+  "history_edu",
+  "gavel",
+  "mic",
+  "school",
+  "auto_stories",
+  "headphones",
+  "video_library",
+  "folder",
+  "lightbulb",
+  "diversity_3",
+  "balance",
+] as const;
+
 /** @deprecated Prefer getResourceCategories() — kept for static fallbacks */
 export const RESOURCE_CATEGORIES = DEFAULT_RESOURCE_CATEGORIES;
 
