@@ -25,6 +25,7 @@ import { InstantImg, preloadImages } from "@/components/website/instant-img";
 import { MustReadBookCard } from "@/components/website/must-read-book-card";
 import { BookBuyButton } from "@/components/marketplace/book-buy-button";
 import { ViewAllLink } from "@/components/website/view-all-link";
+import { HardNavLink } from "@/components/website/hard-nav-link";
 
 function AnimatedCounter({
   value,
@@ -363,15 +364,10 @@ export function CommunitySection({
         {items.map((project, i) => {
           const tone = project.badge_tone || "primary";
           return (
-            <Link
+            <HardNavLink
               key={project.id || project.slug}
               href="/community"
-              prefetch={false}
-              className="group block touch-manipulation"
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.assign("/community");
-              }}
+              className="group block"
             >
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -419,7 +415,7 @@ export function CommunitySection({
                   <MaterialIcon name="arrow_right_alt" className="text-[18px]" />
                 </span>
               </motion.div>
-            </Link>
+            </HardNavLink>
           );
         })}
       </div>
@@ -519,15 +515,15 @@ export function EventsSection({
                       </p>
                     ) : null}
                   </div>
-                  <a
+                  <HardNavLink
                     href={registerHref}
                     className={cn(
-                      "pointer-events-auto relative z-30 inline-flex min-h-11 touch-manipulation items-center justify-center rounded-lg px-8 py-2.5 text-sm font-bold text-white transition active:scale-95",
+                      "pointer-events-auto relative z-30 inline-flex min-h-11 items-center justify-center rounded-lg px-8 py-2.5 text-sm font-bold text-white transition active:scale-95",
                       tone === "primary" ? "bg-primary" : "bg-secondary",
                     )}
                   >
                     {event.registration_open ? "Register" : "View"}
-                  </a>
+                  </HardNavLink>
                 </div>
               );
             })}
@@ -566,15 +562,10 @@ export function ResourcesSection({
               ? (item.tone as keyof typeof toneClass)
               : "primary";
           return (
-            <Link
+            <HardNavLink
               key={item.slug}
               href={`/resources/${item.slug}`}
-              prefetch={false}
-              className="glass-card group touch-manipulation rounded-xl p-3 transition hover:-translate-y-0.5 sm:rounded-2xl sm:p-6"
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.assign(`/resources/${item.slug}`);
-              }}
+              className="glass-card group rounded-xl p-3 transition hover:-translate-y-0.5 sm:rounded-2xl sm:p-6"
             >
               <div
                 className={cn(
@@ -593,7 +584,7 @@ export function ResourcesSection({
               <p className="line-clamp-2 text-[11px] text-muted-foreground sm:text-sm">
                 {item.subtitle}
               </p>
-            </Link>
+            </HardNavLink>
           );
         })}
       </div>

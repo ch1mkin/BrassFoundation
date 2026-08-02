@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/website/page-shell";
+import { HardNavLink } from "@/components/website/hard-nav-link";
 import {
   formatEventDate,
   getPublishedEvents,
@@ -70,20 +71,15 @@ export default async function EventsPage() {
                   </p>
                 ) : null}
               </div>
-              <Link
+              <HardNavLink
                 href={href}
-                prefetch={false}
                 className={cn(
-                  "inline-flex min-h-11 touch-manipulation items-center justify-center rounded-lg px-8 py-2.5 text-sm font-bold text-white transition-transform active:scale-95",
+                  "inline-flex min-h-11 items-center justify-center rounded-lg px-8 py-2.5 text-sm font-bold text-white transition-transform active:scale-95",
                   event.tone === "secondary" ? "bg-secondary" : "bg-primary",
                 )}
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.assign(href);
-                }}
               >
                 {event.registration_open ? "Register" : "View"}
-              </Link>
+              </HardNavLink>
             </div>
           );
         })}
