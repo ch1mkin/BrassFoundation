@@ -185,6 +185,28 @@
 
   .font-quote {
     font-family: var(--font-quote), ui-serif, Georgia, serif;
+    /* Locked rem sizes so locale body scale does not enlarge quotes */
+    font-size: 1.5rem;
+    line-height: 1.35;
+  }
+
+  @media (min-width: 640px) {
+    .font-quote {
+      font-size: 2.25rem;
+    }
+  }
+
+  @keyframes logo-slogan-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .logo-slogan-spin {
+    animation: logo-slogan-spin 28s linear infinite;
   }
 
   .shadow-soft {
@@ -451,7 +473,6 @@ html.locale-pa body {
   line-height: 1.75;
   letter-spacing: 0.015em;
   word-spacing: 0.04em;
-  font-size: 1.02rem;
 }
 
 html.locale-pa h1,
@@ -469,7 +490,49 @@ html.locale-pa .font-heading {
 
 html.locale-pa .font-quote {
   font-family: var(--font-gurmukhi), var(--font-quote), ui-serif, Georgia, serif;
-  line-height: 1.6;
+  font-size: 1.5rem;
+  line-height: 1.45;
+}
+
+@media (min-width: 640px) {
+  html.locale-pa .font-quote {
+    font-size: 2.25rem;
+  }
+}
+
+/* Hindi / Devanagari readability */
+html.locale-hi body {
+  font-family: var(--font-devanagari), var(--font-body), ui-sans-serif,
+    system-ui, sans-serif;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+  word-spacing: 0.03em;
+}
+
+html.locale-hi h1,
+html.locale-hi h2,
+html.locale-hi h3,
+html.locale-hi h4,
+html.locale-hi h5,
+html.locale-hi h6,
+html.locale-hi .font-heading {
+  font-family: var(--font-devanagari), var(--font-heading), ui-sans-serif,
+    system-ui, sans-serif;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+
+html.locale-hi .font-quote {
+  font-family: var(--font-devanagari), var(--font-quote), ui-serif, Georgia,
+    serif;
+  font-size: 1.5rem;
+  line-height: 1.45;
+}
+
+@media (min-width: 640px) {
+  html.locale-hi .font-quote {
+    font-size: 2.25rem;
+  }
 }
 
 /* Prefer <MaterialIcon /> (Lucide). Bare Material Symbol spans are locked from translate. */

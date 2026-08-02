@@ -28,7 +28,6 @@ function shouldSkip(el: Element) {
     return true;
   }
   if (el.closest("header, footer, nav, .notranslate, [translate='no']")) {
-    // Allow explicit content markers even inside chrome if needed
     if (el.getAttribute("data-i18n") === "content") return false;
     if (el.closest("header, footer, nav")) return true;
   }
@@ -49,16 +48,22 @@ function isMostlyCodeOrId(text: string) {
   if (/^[\d+\s.,₹$%+-]+$/.test(text)) return true;
   if (/^\d+(\.\d+)?\s*(mb|kb|gb)$/i.test(text)) return true;
   if (/^[A-Z0-9._%+-]+@[A-Z0-9.-]+$/i.test(text)) return true;
-  // Single material icon token without underscore (mic, event, school, groups)
-  if (/^(mic|event|school|groups|download|lock|mail|send|menu|home|star)$/i.test(text)) {
+  if (
+    /^(mic|event|school|groups|download|lock|mail|send|menu|home|star)$/i.test(
+      text,
+    )
+  ) {
     return true;
   }
   return false;
 }
 
-async function translateText(text: string): Promise<string> {
+async function translateText(
+  text: string,
+  target: "pa" | "hi",
+): Promise<string> {
   const url =
-    "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pa&dt=t&q=" +
+    `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${target}&dt=t&q=` +
     encodeURIComponent(text);
   const res = await fetch(url);
   if (!res.ok) throw new Error("translate failed");
@@ -68,10 +73,10 @@ async function translateText(text: string): Promise<string> {
 
 const cache = new Map<string, string>();
 
-async function cachedTranslate(text: string) {
-  const key = text.trim();
+async function cachedTranslate(text: string, target: "pa" | "hi") {
+  const key = `${target}::${text.trim()}`;
   if (cache.has(key)) return cache.get(key)!;
-  const translated = await translateText(key);
+  const translated = await translateText(text.trim(), target);
   cache.set(key, translated);
   return translated;
 }
@@ -83,14 +88,13 @@ function collectTargets(root: ParentNode = document) {
     const text = (el.textContent || "").trim();
     if (text.length < 2) return false;
     if (isMostlyCodeOrId(text)) return false;
-    // Skip if element contains an icon child — translate would scramble ligatures
     if (el.querySelector(".material-symbols-outlined, [data-icon], svg.lucide"))
       return false;
     return true;
   }) as HTMLElement[];
 }
 
-export async function translateWritingContent() {
+export async function translateWritingContent(target: "pa" | "hi" = "pa") {
   const targets = collectTargets();
   for (const el of targets) {
     const original =
@@ -100,10 +104,10 @@ export async function translateWritingContent() {
       el.setAttribute("data-i18n-en", original);
     }
     try {
-      const pa = await cachedTranslate(original);
-      if (pa?.trim()) {
-        el.textContent = pa;
-        el.setAttribute("lang", "pa");
+      const translated = await cachedTranslate(original, target);
+      if (translated?.trim()) {
+        el.textContent = translated;
+        el.setAttribute("lang", target);
       }
     } catch {
       // leave English on failure

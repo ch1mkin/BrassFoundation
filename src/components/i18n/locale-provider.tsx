@@ -13,6 +13,8 @@ import {
   DEFAULT_LOCALE,
   GOOGTRANS_COOKIE,
   LOCALE_COOKIE,
+  googleTranslateTarget,
+  localeHtmlLang,
   type Locale,
   parseLocale,
 } from "@/lib/i18n/config";
@@ -23,11 +25,17 @@ import {
   translateWritingContent,
 } from "@/lib/i18n/content-translate";
 
+export type TranslationRow = {
+  en: string;
+  pa: string | null;
+  hi?: string | null;
+};
+
 type LocaleContextValue = {
   locale: Locale;
   setLocale: (next: Locale) => void;
   t: (key: MessageKey | string) => string;
-  translations: Record<string, { en: string; pa: string | null }>;
+  translations: Record<string, TranslationRow>;
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
@@ -44,7 +52,6 @@ function clearCookie(name: string) {
 function clearGoogleTranslateArtifacts() {
   clearCookie(GOOGTRANS_COOKIE);
   clearCookie("googtrans");
-  // Remove leftover GT DOM chrome if any old session injected it
   document
     .querySelectorAll(".goog-te-banner-frame, .skiptranslate, #goog-gt-tt")
     .forEach((el) => el.remove());
@@ -53,8 +60,9 @@ function clearGoogleTranslateArtifacts() {
 }
 
 function applyDocumentLocale(locale: Locale) {
-  document.documentElement.lang = locale === "pa" ? "pa" : "en";
+  document.documentElement.lang = localeHtmlLang(locale);
   document.documentElement.classList.toggle("locale-pa", locale === "pa");
+  document.documentElement.classList.toggle("locale-hi", locale === "hi");
   document.documentElement.classList.toggle("locale-en", locale === "en");
 }
 
@@ -65,7 +73,7 @@ export function LocaleProvider({
 }: {
   children: React.ReactNode;
   initialLocale?: Locale;
-  initialTranslations?: Record<string, { en: string; pa: string | null }>;
+  initialTranslations?: Record<string, TranslationRow>;
 }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
   const [translations, setTranslations] = useState(initialTranslations);
@@ -91,7 +99,6 @@ export function LocaleProvider({
   }, []);
 
   useEffect(() => {
-    // Never use full-page Google Translate — it breaks icon fonts.
     clearGoogleTranslateArtifacts();
     applyDocumentLocale(locale);
     lockNonContentFromTranslate();
@@ -102,14 +109,14 @@ export function LocaleProvider({
     let cancelled = false;
 
     async function run() {
-      if (locale === "pa") {
-        await translateWritingContent();
+      const target = googleTranslateTarget(locale);
+      if (target) {
+        await translateWritingContent(target);
       } else {
         restoreWritingContent();
       }
     }
 
-    // Wait a tick for page content to paint (and on route changes)
     const timer = window.setTimeout(() => {
       if (!cancelled) void run();
     }, 80);
@@ -127,9 +134,9 @@ export function LocaleProvider({
     clearGoogleTranslateArtifacts();
     applyDocumentLocale(resolved);
     setLocaleState(resolved);
-    // Soft switch without full reload when possible
-    if (resolved === "pa") {
-      void translateWritingContent();
+    const target = googleTranslateTarget(resolved);
+    if (target) {
+      void translateWritingContent(target);
     } else {
       restoreWritingContent();
       window.location.reload();
@@ -139,9 +146,8 @@ export function LocaleProvider({
   const t = useCallback(
     (key: MessageKey | string) => {
       const row = translations[key];
-      if (locale === "pa") {
-        if (row?.pa?.trim()) return row.pa;
-      }
+      if (locale === "pa" && row?.pa?.trim()) return row.pa;
+      if (locale === "hi" && row?.hi?.trim()) return row.hi;
       if (row?.en?.trim()) return row.en;
       return translateBuiltin(locale, key as MessageKey);
     },
@@ -170,7 +176,9 @@ export function pickLocalized(
   locale: Locale,
   en: string,
   pa?: string | null,
+  hi?: string | null,
 ) {
   if (locale === "pa" && pa?.trim()) return pa;
+  if (locale === "hi" && hi?.trim()) return hi;
   return en;
 }

@@ -18,6 +18,8 @@ export type MessageKey =
   | "nav.memberPortal"
   | "nav.adminPortal"
   | "nav.signOut"
+  | "nav.mustRead"
+  | "nav.fraternity"
   | "footer.blurb"
   | "footer.quickLinks"
   | "footer.community"
@@ -31,7 +33,8 @@ export type MessageKey =
   | "footer.newsletterJoin"
   | "lang.switchTo"
   | "lang.english"
-  | "lang.punjabi";
+  | "lang.punjabi"
+  | "lang.hindi";
 
 const en: Record<MessageKey, string> = {
   "nav.home": "Home",
@@ -51,6 +54,8 @@ const en: Record<MessageKey, string> = {
   "nav.memberPortal": "Member portal",
   "nav.adminPortal": "Admin portal",
   "nav.signOut": "Sign out",
+  "nav.mustRead": "Must Read",
+  "nav.fraternity": "Fraternity",
   "footer.blurb":
     "Empowering the marginalized through the light of knowledge and unity.",
   "footer.quickLinks": "Quick Links",
@@ -66,9 +71,9 @@ const en: Record<MessageKey, string> = {
   "lang.switchTo": "Language",
   "lang.english": "English",
   "lang.punjabi": "ਪੰਜਾਬੀ",
+  "lang.hindi": "हिन्दी",
 };
 
-/** Hand-tuned Gurmukhi for chrome (nav/footer) — page body uses auto-translate */
 const pa: Record<MessageKey, string> = {
   "nav.home": "ਘਰ",
   "nav.about": "ਬਾਰੇ",
@@ -87,6 +92,8 @@ const pa: Record<MessageKey, string> = {
   "nav.memberPortal": "ਮੈਂਬਰ ਪੋਰਟਲ",
   "nav.adminPortal": "ਐਡਮਿਨ ਪੋਰਟਲ",
   "nav.signOut": "ਸਾਈਨ ਆਉਟ",
+  "nav.mustRead": "ਜ਼ਰੂਰੀ ਪੜ੍ਹੋ",
+  "nav.fraternity": "ਭਾਈਚਾਰਾ",
   "footer.blurb":
     "ਗਿਆਨ ਅਤੇ ਏਕਤਾ ਦੀ ਰੋਸ਼ਨੀ ਨਾਲ ਪਿਛੜੇ ਵਰਗਾਂ ਨੂੰ ਸਸ਼ਕਤ ਬਣਾਉਣਾ।",
   "footer.quickLinks": "ਤੇਜ਼ ਲਿੰਕ",
@@ -102,9 +109,48 @@ const pa: Record<MessageKey, string> = {
   "lang.switchTo": "ਭਾਸ਼ਾ",
   "lang.english": "English",
   "lang.punjabi": "ਪੰਜਾਬੀ",
+  "lang.hindi": "हिन्दी",
 };
 
-const catalogs: Record<Locale, Record<MessageKey, string>> = { en, pa };
+const hi: Record<MessageKey, string> = {
+  "nav.home": "होम",
+  "nav.about": "परिचय",
+  "nav.explore": "खोजें",
+  "nav.learn": "सीखें",
+  "nav.community": "समुदाय",
+  "nav.resources": "संसाधन",
+  "nav.events": "कार्यक्रम",
+  "nav.gallery": "गैलरी",
+  "nav.news": "समाचार",
+  "nav.blog": "ब्लॉग",
+  "nav.marketplace": "बाजार",
+  "nav.contact": "संपर्क",
+  "nav.login": "लॉगिन",
+  "nav.becomeMember": "सदस्य बनें",
+  "nav.memberPortal": "सदस्य पोर्टल",
+  "nav.adminPortal": "एडमिन पोर्टल",
+  "nav.signOut": "साइन आउट",
+  "nav.mustRead": "अवश्य पढ़ें",
+  "nav.fraternity": "बिरादरी",
+  "footer.blurb":
+    "ज्ञान और एकता के प्रकाश से वंचित वर्गों को सशक्त बनाना।",
+  "footer.quickLinks": "त्वरित लिंक",
+  "footer.community": "समुदाय",
+  "footer.contactUs": "हमसे संपर्क करें",
+  "footer.becomeMember": "सदस्य बनें",
+  "footer.gallery": "गैलरी",
+  "footer.marketplace": "बाजार",
+  "footer.contact": "संपर्क",
+  "footer.rights": "सर्वाधिकार सुरक्षित।",
+  "footer.newsletterPlaceholder": "अपडेट के लिए ईमेल",
+  "footer.newsletterJoin": "जुड़ें",
+  "lang.switchTo": "भाषा",
+  "lang.english": "English",
+  "lang.punjabi": "ਪੰਜਾਬੀ",
+  "lang.hindi": "हिन्दी",
+};
+
+const catalogs: Record<Locale, Record<MessageKey, string>> = { en, pa, hi };
 
 export function t(locale: Locale, key: MessageKey | string): string {
   const catalog = catalogs[locale] as Record<string, string>;
@@ -118,6 +164,7 @@ export const NAV_MESSAGE_KEYS: Record<string, MessageKey> = {
   Explore: "nav.explore",
   Learn: "nav.learn",
   Community: "nav.community",
+  Fraternity: "nav.fraternity",
   Resources: "nav.resources",
   Events: "nav.events",
   Gallery: "nav.gallery",
@@ -125,4 +172,5 @@ export const NAV_MESSAGE_KEYS: Record<string, MessageKey> = {
   Blog: "nav.blog",
   Marketplace: "nav.marketplace",
   Contact: "nav.contact",
+  "Must Read": "nav.mustRead",
 };

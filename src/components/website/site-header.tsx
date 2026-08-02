@@ -110,12 +110,13 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
   return (
     <header className="pointer-events-auto fixed top-0 z-[200] w-full border-b border-white/10 bg-[#0B1C28]/95 shadow-md backdrop-blur-md">
       {/* Compact bar: logo + hamburger on small screens; full nav from lg up */}
-      <div className="mx-auto flex h-16 max-w-[1280px] items-center gap-2 px-3 sm:h-20 sm:gap-4 sm:px-6 lg:px-20">
-        <div className="min-w-0 flex-1 overflow-hidden">
+      <div className="mx-auto flex h-[5.5rem] max-w-[1280px] items-center gap-2 px-3 sm:h-20 sm:gap-4 sm:px-6 lg:h-20 lg:px-20">
+        <div className="flex min-w-0 flex-1 items-center overflow-visible">
           <BrandLogo
             size="sm"
             priority
             showWordmark
+            circularSloganMobile
             wordmarkClassName="notranslate font-heading truncate text-base font-bold text-white sm:text-xl"
           />
         </div>

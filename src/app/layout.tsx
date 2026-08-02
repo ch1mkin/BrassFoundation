@@ -2,12 +2,17 @@ import type { Metadata } from "next";
 import {
   Cormorant_Garamond,
   Inter,
+  Noto_Sans_Devanagari,
   Noto_Sans_Gurmukhi,
   Poppins,
 } from "next/font/google";
 import { cookies } from "next/headers";
 import { Providers } from "@/components/providers";
-import { LOCALE_COOKIE, parseLocale } from "@/lib/i18n/config";
+import {
+  LOCALE_COOKIE,
+  localeHtmlLang,
+  parseLocale,
+} from "@/lib/i18n/config";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -35,6 +40,13 @@ const cormorant = Cormorant_Garamond({
 const gurmukhi = Noto_Sans_Gurmukhi({
   variable: "--font-gurmukhi",
   subsets: ["gurmukhi"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const devanagari = Noto_Sans_Devanagari({
+  variable: "--font-devanagari",
+  subsets: ["devanagari"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
@@ -69,10 +81,17 @@ export default async function RootLayout({
     supabaseOrigin = null;
   }
 
+  const localeClass =
+    locale === "pa"
+      ? "locale-pa"
+      : locale === "hi"
+        ? "locale-hi"
+        : "locale-en";
+
   return (
     <html
-      lang={locale === "pa" ? "pa" : "en"}
-      className={locale === "pa" ? "locale-pa" : "locale-en"}
+      lang={localeHtmlLang(locale)}
+      className={localeClass}
       suppressHydrationWarning
     >
       <head>
@@ -84,7 +103,7 @@ export default async function RootLayout({
         ) : null}
       </head>
       <body
-        className={`${poppins.variable} ${inter.variable} ${cormorant.variable} ${gurmukhi.variable} antialiased`}
+        className={`${poppins.variable} ${inter.variable} ${cormorant.variable} ${gurmukhi.variable} ${devanagari.variable} antialiased`}
       >
         <Providers initialLocale={locale}>{children}</Providers>
       </body>

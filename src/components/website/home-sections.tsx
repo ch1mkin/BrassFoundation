@@ -217,11 +217,11 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
           }}
         >
           <div className="absolute right-0 bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
-            <p className="font-quote max-w-xl text-2xl font-medium italic leading-snug sm:text-4xl sm:leading-snug">
+            <p className="font-quote max-w-xl text-[1.5rem] font-medium italic leading-snug sm:text-[2.25rem] sm:leading-snug">
               &ldquo;{current.quote}&rdquo;
             </p>
             {current.attribution ? (
-              <p className="mt-3 text-base font-medium text-white/90 sm:text-xl">
+              <p className="mt-3 text-[1rem] font-medium text-white/90 sm:text-[1.25rem]">
                 — {current.attribution}
               </p>
             ) : null}
@@ -348,7 +348,7 @@ export function CommunitySection({
           href="/community"
           className={cn(
             buttonVariants({ variant: "secondary" }),
-            "relative z-20 rounded-lg bg-surface-highest font-bold text-primary hover:bg-surface-high",
+            "relative rounded-lg bg-surface-highest font-bold text-primary hover:bg-surface-high",
           )}
         >
           View All Work
@@ -531,7 +531,7 @@ export function ResourcesSection() {
           href="/resources"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "relative z-20 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+            "relative rounded-full px-3 text-xs sm:px-4 sm:text-sm",
           )}
         >
           View all
@@ -593,7 +593,7 @@ export function MarketplaceSection() {
           href="/marketplace"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "relative z-20 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+            "relative rounded-full px-3 text-xs sm:px-4 sm:text-sm",
           )}
         >
           View all
@@ -664,7 +664,7 @@ export function MustReadSection({
           href="/must-read"
           className={cn(
             buttonVariants({ variant: "outline" }),
-            "relative z-20 shrink-0 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+            "relative shrink-0 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
           )}
         >
           View all

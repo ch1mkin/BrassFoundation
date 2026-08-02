@@ -14,7 +14,12 @@ const initial: TranslationActionState = {};
 export function TranslationsAdmin({
   rows,
 }: {
-  rows: Array<{ key: string; en: string; pa: string | null }>;
+  rows: Array<{
+    key: string;
+    en: string;
+    pa: string | null;
+    hi?: string | null;
+  }>;
 }) {
   const [state, action, pending] = useSafeFormAction(
     upsertTranslationAction,
@@ -29,8 +34,8 @@ export function TranslationsAdmin({
             Add / update translation
           </h2>
           <p className="text-sm text-muted-foreground">
-            Fill Punjabi for instant switch. If Punjabi is empty, Google
-            Translate is used as fallback for page body text.
+            Fill Punjabi and Hindi for instant chrome switch. Empty fields fall
+            back to Google Translate for page body text.
           </p>
           <Input
             name="key"
@@ -50,6 +55,12 @@ export function TranslationsAdmin({
             className="h-10 rounded-xl"
             lang="pa"
           />
+          <Input
+            name="hi"
+            placeholder="हिन्दी (optional)"
+            className="h-10 rounded-xl"
+            lang="hi"
+          />
           {state.error ? (
             <p className="text-sm text-destructive">{state.error}</p>
           ) : null}
@@ -63,12 +74,13 @@ export function TranslationsAdmin({
       </form>
 
       <div className="overflow-x-auto rounded-2xl bg-card shadow-soft">
-        <table className="w-full min-w-[640px] text-left text-sm">
+        <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b border-border bg-surface-low text-xs tracking-wide text-muted-foreground uppercase">
             <tr>
               <th className="px-4 py-3">Key</th>
               <th className="px-4 py-3">English</th>
               <th className="px-4 py-3">Punjabi</th>
+              <th className="px-4 py-3">Hindi</th>
             </tr>
           </thead>
           <tbody>
@@ -78,6 +90,13 @@ export function TranslationsAdmin({
                 <td className="px-4 py-3">{row.en}</td>
                 <td className="px-4 py-3" lang="pa">
                   {row.pa || (
+                    <span className="text-muted-foreground">
+                      (Google fallback)
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3" lang="hi">
+                  {row.hi || (
                     <span className="text-muted-foreground">
                       (Google fallback)
                     </span>

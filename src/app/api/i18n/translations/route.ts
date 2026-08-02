@@ -6,15 +6,36 @@ export async function GET() {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("ui_translations")
-      .select("key, en, pa");
+      .select("key, en, pa, hi");
 
     if (error) {
-      return NextResponse.json({ translations: {} });
+      // hi column may not exist yet — fall back without it
+      const fallback = await supabase
+        .from("ui_translations")
+        .select("key, en, pa");
+      if (fallback.error) {
+        return NextResponse.json({ translations: {} });
+      }
+      const translations: Record<
+        string,
+        { en: string; pa: string | null; hi: string | null }
+      > = {};
+      for (const row of fallback.data || []) {
+        translations[row.key] = { en: row.en, pa: row.pa, hi: null };
+      }
+      return NextResponse.json({ translations });
     }
 
-    const translations: Record<string, { en: string; pa: string | null }> = {};
+    const translations: Record<
+      string,
+      { en: string; pa: string | null; hi: string | null }
+    > = {};
     for (const row of data || []) {
-      translations[row.key] = { en: row.en, pa: row.pa };
+      translations[row.key] = {
+        en: row.en,
+        pa: row.pa,
+        hi: row.hi ?? null,
+      };
     }
     return NextResponse.json({ translations });
   } catch {
