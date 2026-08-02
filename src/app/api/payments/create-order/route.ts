@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
     let amountPaise = body.amountPaise;
     const applicationId = body.applicationId || null;
-    let marketplaceItemId = body.marketplaceItemId || null;
+    const marketplaceItemId = body.marketplaceItemId || null;
     let bookTitle = "";
 
     if (purpose === "registration_fee") {
