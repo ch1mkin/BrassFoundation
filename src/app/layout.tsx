@@ -61,12 +61,28 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const locale = parseLocale(cookieStore.get(LOCALE_COOKIE)?.value);
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  let supabaseOrigin: string | null = null;
+  try {
+    supabaseOrigin = supabaseUrl ? new URL(supabaseUrl).origin : null;
+  } catch {
+    supabaseOrigin = null;
+  }
+
   return (
     <html
       lang={locale === "pa" ? "pa" : "en"}
       className={locale === "pa" ? "locale-pa" : "locale-en"}
       suppressHydrationWarning
     >
+      <head>
+        {supabaseOrigin ? (
+          <>
+            <link rel="preconnect" href={supabaseOrigin} />
+            <link rel="dns-prefetch" href={supabaseOrigin} />
+          </>
+        ) : null}
+      </head>
       <body
         className={`${poppins.variable} ${inter.variable} ${cormorant.variable} ${gurmukhi.variable} antialiased`}
       >

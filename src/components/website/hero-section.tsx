@@ -8,6 +8,7 @@ import { MaterialIcon } from "@/components/ui/material-icon";
 import { MembershipLink } from "@/components/membership/membership-link";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
+import { InstantImg } from "@/components/website/instant-img";
 import { cn } from "@/lib/utils";
 
 const HeroParticles = dynamic(
@@ -77,10 +78,10 @@ export function HeroSection({
           {/* Mobile: full-bleed cover across the hero viewport */}
           {mobileBg ? (
             <div className="pointer-events-none absolute inset-0 md:hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <InstantImg
                 src={mobileBg}
                 alt=""
+                priority
                 className="h-full w-full object-cover object-center"
               />
               {/* Soft vignette only at the very bottom so the photo stays nearly full */}
@@ -91,10 +92,10 @@ export function HeroSection({
           {/* Desktop: edge-to-edge cover */}
           {desktopBg ? (
             <div className="pointer-events-none absolute inset-0 hidden md:block">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <InstantImg
                 src={desktopBg}
                 alt=""
+                priority
                 className="h-full w-full object-cover object-center"
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-surface/80 to-transparent" />

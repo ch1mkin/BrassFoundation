@@ -18,6 +18,7 @@ import {
 } from "@/lib/constants";
 import type { HomepageContent, HomepageQuote } from "@/lib/cms/homepage";
 import { cn } from "@/lib/utils";
+import { InstantImg, preloadImages } from "@/components/website/instant-img";
 
 function AnimatedCounter({
   value,
@@ -115,6 +116,14 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
+  const imageKey = slides.map((s) => s.image_url || "").join("|");
+
+  // Prefetch every slide image so swipes feel instant
+  useEffect(() => {
+    preloadImages(slides.map((s) => s.image_url));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by imageKey
+  }, [imageKey]);
+
   useEffect(() => {
     if (slides.length <= 1) return;
     const id = window.setInterval(() => {
@@ -164,13 +173,39 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
       aria-roledescription="carousel"
       aria-label="Vision quotes"
     >
+      {/* Keep all backgrounds mounted so they load once and swap instantly */}
+      {slides.map((slide, i) => (
+        <div
+          key={`bg-${i}-${slide.image_url || "gradient"}`}
+          className={cn(
+            "absolute inset-0 transition-opacity duration-300",
+            i === index ? "opacity-100" : "pointer-events-none opacity-0",
+          )}
+          aria-hidden={i !== index}
+        >
+          {slide.image_url ? (
+            <InstantImg
+              src={slide.image_url}
+              alt=""
+              priority={i === 0}
+              className="pointer-events-none size-full object-cover"
+              draggable={false}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-secondary/70 to-primary/40" />
+          )}
+        </div>
+      ))}
+
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+
       <AnimatePresence mode="wait">
         <motion.div
           key={index}
           initial={{ opacity: 0, x: 24 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -24 }}
-          transition={{ duration: 0.35 }}
+          transition={{ duration: 0.3 }}
           className="absolute inset-0 select-none"
           drag={slides.length > 1 ? "x" : false}
           dragConstraints={{ left: 0, right: 0 }}
@@ -180,18 +215,6 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
             else if (info.offset.x > 50) go(-1);
           }}
         >
-          {current.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={current.image_url}
-              alt=""
-              className="pointer-events-none size-full object-cover"
-              draggable={false}
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-secondary/70 to-primary/40" />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
           <div className="absolute right-0 bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
             <p className="font-quote max-w-md text-base font-medium italic sm:text-xl">
               &ldquo;{current.quote}&rdquo;
@@ -393,10 +416,10 @@ export function EventsSection({
     >
       {backgroundUrl ? (
         <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <InstantImg
             src={backgroundUrl}
             alt=""
+            priority
             className="absolute inset-0 size-full object-cover opacity-35"
           />
           <div className="absolute inset-0 bg-foreground/75" />

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { InstantImg, preloadImages } from "@/components/website/instant-img";
 import { cn } from "@/lib/utils";
 
 type Album = {
@@ -28,6 +29,15 @@ export function PublicGallery({
   albums: Album[];
   media: Media[];
 }) {
+  const mediaKey = useMemo(
+    () => media.map((m) => m.media_url).join("|"),
+    [media],
+  );
+
+  useEffect(() => {
+    preloadImages(media.map((m) => m.media_url));
+  }, [mediaKey, media]);
+
   return (
     <div className="space-y-16">
       {albums.map((album) => {
@@ -82,12 +92,12 @@ export function PublicGallery({
 
             {showGrid && gridItems.length > 0 ? (
               <div className="mt-6 columns-1 gap-4 sm:columns-2 lg:columns-3">
-                {gridItems.map((item) => (
+                {gridItems.map((item, i) => (
                   <figure key={item.id} className="mb-4 break-inside-avoid">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <InstantImg
                       src={item.media_url}
                       alt={item.title || item.caption || "Gallery"}
+                      priority={i < 6}
                       className="w-full rounded-2xl object-cover"
                     />
                     {item.caption || item.title ? (
@@ -115,18 +125,34 @@ export function PublicGallery({
 function AlbumSlider({ items }: { items: Media[] }) {
   const [index, setIndex] = useState(0);
   const current = items[index];
+  const urlsKey = useMemo(
+    () => items.map((i) => i.media_url).join("|"),
+    [items],
+  );
+
+  useEffect(() => {
+    preloadImages(items.map((i) => i.media_url));
+  }, [urlsKey, items]);
 
   if (!current) return null;
 
   return (
     <div className="mt-6">
       <div className="relative overflow-hidden rounded-2xl bg-surface-high">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={current.media_url}
-          alt={current.title || "Slide"}
-          className="max-h-[480px] w-full object-contain"
-        />
+        {items.map((item, i) => (
+          <InstantImg
+            key={item.id}
+            src={item.media_url}
+            alt={item.title || "Slide"}
+            priority={i === 0}
+            className={cn(
+              "max-h-[480px] w-full object-contain",
+              i === index
+                ? "relative"
+                : "pointer-events-none absolute inset-0 opacity-0",
+            )}
+          />
+        ))}
       </div>
       <div className="mt-3 flex items-center justify-between gap-3">
         <button
@@ -160,6 +186,11 @@ function AlbumSlider({ items }: { items: Media[] }) {
           Next
         </button>
       </div>
+      {current.caption || current.title ? (
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          {current.caption || current.title}
+        </p>
+      ) : null}
     </div>
   );
 }

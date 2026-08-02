@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageShell } from "@/components/website/page-shell";
+import { InstantImg } from "@/components/website/instant-img";
 import { createClient } from "@/lib/supabase/server";
 import { MaterialIcon } from "@/components/ui/material-icon";
 
@@ -27,17 +28,17 @@ export default async function BlogIndexPage() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {data.map((post) => (
+          {data.map((post, i) => (
             <Link
               key={post.id}
               href={`/blog/${post.slug}`}
               className="glass-card overflow-hidden rounded-2xl transition hover:-translate-y-0.5"
             >
               {post.cover_image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <InstantImg
                   src={post.cover_image_url}
                   alt=""
+                  priority={i < 3}
                   className="h-44 w-full object-cover"
                 />
               ) : (

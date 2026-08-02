@@ -6,7 +6,9 @@ import {
   GoldHairline,
   SectionOrnaments,
 } from "@/components/website/premium-accents";
+import { InstantImg, preloadImages } from "@/components/website/instant-img";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 
 function initialsFor(name: string) {
   return name
@@ -23,9 +25,11 @@ function initialsFor(name: string) {
 function MemberTile({
   member,
   size,
+  priority = false,
 }: {
   member: ExecutiveMember;
   size: "lg" | "md" | "sm";
+  priority?: boolean;
 }) {
   const photo =
     size === "lg"
@@ -60,10 +64,10 @@ function MemberTile({
         )}
       >
         {member.photo_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <InstantImg
             src={member.photo_url}
             alt={member.full_name}
+            priority={priority}
             className="size-full object-cover"
           />
         ) : (
@@ -194,6 +198,13 @@ export function LeadershipSection({
   const sizes = pyramidRowSizes(rest.length);
   const rows = splitIntoRows(rest, sizes);
 
+  const photoKey = members.map((m) => m.photo_url || "").join("|");
+
+  useEffect(() => {
+    preloadImages(members.map((m) => m.photo_url));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by photoKey
+  }, [photoKey]);
+
   return (
     <section className="relative overflow-hidden bg-surface-high py-10 sm:py-14 lg:py-16">
       <SectionOrnaments />
@@ -211,7 +222,7 @@ export function LeadershipSection({
       <div className="relative z-10 mx-auto flex max-w-[1280px] flex-col items-stretch gap-6 px-2 sm:gap-8 sm:px-6 lg:gap-10 lg:px-20">
         {chair ? (
           <div className="mx-auto grid w-full max-w-xs grid-cols-1 justify-items-center">
-            <MemberTile member={chair} size="lg" />
+            <MemberTile member={chair} size="lg" priority />
           </div>
         ) : null}
 
@@ -227,7 +238,7 @@ export function LeadershipSection({
             )}
           >
             {officers.map((m) => (
-              <MemberTile key={m.id} member={m} size="md" />
+              <MemberTile key={m.id} member={m} size="md" priority />
             ))}
           </div>
         ) : null}
