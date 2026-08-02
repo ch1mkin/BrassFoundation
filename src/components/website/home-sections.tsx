@@ -261,8 +261,7 @@ export function CommunitySection({
       }));
 
   return (
-    <section className="relative overflow-hidden py-16 lg:py-20" id="community">
-      <SectionOrnaments />
+    <section className="relative py-16 lg:py-20" id="community">
       <div className="relative z-10 mx-auto mb-12 flex max-w-[1280px] flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-end lg:px-20">
         <div className="max-w-xl">
           <h2 className="font-heading mb-3 text-3xl font-semibold">
@@ -355,7 +354,6 @@ export function EventsSection({
           <div className="absolute inset-0 bg-foreground/75" />
         </>
       ) : null}
-      <SectionOrnaments className="text-gold opacity-80" />
       <div className="relative z-10 mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-20">
         <h2 className="font-heading mb-3 text-center text-3xl font-semibold">
           Upcoming Events
@@ -417,8 +415,7 @@ export function ResourcesSection() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-muted py-16 lg:py-20" id="resources">
-      <SectionOrnaments />
+    <section className="relative bg-muted py-16 lg:py-20" id="resources">
       <div className="relative z-10 mx-auto mb-12 max-w-[1280px] px-4 sm:px-6 lg:px-20">
         <h2 className="font-heading text-3xl font-semibold">
           Digital Library & Resources
