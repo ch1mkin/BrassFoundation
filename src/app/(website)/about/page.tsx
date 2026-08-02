@@ -53,7 +53,7 @@ export default async function AboutPage() {
                 </div>
                 <div>
                   <h3 className="font-heading text-lg font-semibold">
-                    {item.title === "Community" ? "Fraternity" : item.title}
+                    {item.title}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
                     {item.description}
