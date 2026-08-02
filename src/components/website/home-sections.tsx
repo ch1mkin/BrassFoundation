@@ -363,10 +363,15 @@ export function CommunitySection({
         {items.map((project, i) => {
           const tone = project.badge_tone || "primary";
           return (
-            <a
+            <Link
               key={project.id || project.slug}
               href="/community"
+              prefetch={false}
               className="group block touch-manipulation"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.assign("/community");
+              }}
             >
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -414,7 +419,7 @@ export function CommunitySection({
                   <MaterialIcon name="arrow_right_alt" className="text-[18px]" />
                 </span>
               </motion.div>
-            </a>
+            </Link>
           );
         })}
       </div>
@@ -561,10 +566,15 @@ export function ResourcesSection({
               ? (item.tone as keyof typeof toneClass)
               : "primary";
           return (
-            <a
+            <Link
               key={item.slug}
               href={`/resources/${item.slug}`}
+              prefetch={false}
               className="glass-card group touch-manipulation rounded-xl p-3 transition hover:-translate-y-0.5 sm:rounded-2xl sm:p-6"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.assign(`/resources/${item.slug}`);
+              }}
             >
               <div
                 className={cn(
@@ -583,7 +593,7 @@ export function ResourcesSection({
               <p className="line-clamp-2 text-[11px] text-muted-foreground sm:text-sm">
                 {item.subtitle}
               </p>
-            </a>
+            </Link>
           );
         })}
       </div>
