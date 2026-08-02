@@ -337,7 +337,7 @@ export function CommunitySection({
       <div className="relative z-10 mx-auto mb-12 flex max-w-[1280px] flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-end lg:px-20">
         <div className="max-w-xl">
           <h2 className="font-heading mb-3 text-3xl font-semibold">
-            Our Fraternity Initiatives
+            Our Community Initiatives
           </h2>
           <p className="text-muted-foreground">
             We believe in holistic development, ranging from health awareness to
