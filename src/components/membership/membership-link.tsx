@@ -1,11 +1,11 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * Native link to the public membership registration page.
- * No preventDefault — browser navigation must always work.
+ * Link to the public membership registration page.
  */
 export function MembershipLink({
   className,
@@ -19,13 +19,13 @@ export function MembershipLink({
   style?: CSSProperties;
 }) {
   return (
-    <a
+    <Link
       href="/membership"
       className={cn(className)}
       style={style}
       onClick={onClick}
     >
       {children}
-    </a>
+    </Link>
   );
 }

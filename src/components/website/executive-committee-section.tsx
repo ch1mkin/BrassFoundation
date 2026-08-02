@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import type { ExecutiveMember } from "@/lib/content/committee";
 import { buttonVariants } from "@/components/ui/button";
@@ -228,7 +229,7 @@ export function LeadershipSection({
           </p>
         </div>
         {showViewAll ? (
-          <a
+          <Link
             href={viewAllHref}
             className={cn(
               buttonVariants({ variant: "outline" }),
@@ -236,7 +237,7 @@ export function LeadershipSection({
             )}
           >
             View all
-          </a>
+          </Link>
         ) : null}
       </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { MembershipLink } from "@/components/membership/membership-link";
 import { NewsletterForm } from "@/components/website/newsletter-form";
@@ -20,9 +21,9 @@ function FooterLink({
   className?: string;
 }) {
   return (
-    <a href={href} className={cn(linkClass, className)}>
+    <Link href={href} className={cn(linkClass, className)}>
       {children}
-    </a>
+    </Link>
   );
 }
 
@@ -33,7 +34,7 @@ export function SiteFooter() {
     <footer className="relative z-20 w-full bg-[#0B1C28] text-white">
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-4 py-16 sm:px-6 md:grid-cols-4 lg:px-20">
         <div className="flex flex-col gap-4">
-          <a href="/" className="inline-flex items-center gap-2">
+          <Link href="/" className="inline-flex items-center gap-2">
             <Image
               src="/brand/logo.png"
               alt=""
@@ -44,7 +45,7 @@ export function SiteFooter() {
             <span className="notranslate font-heading text-lg font-bold text-white">
               {SITE.name}
             </span>
-          </a>
+          </Link>
           <p className="notranslate text-sm leading-relaxed text-white/70">
             {t("footer.blurb")}
           </p>

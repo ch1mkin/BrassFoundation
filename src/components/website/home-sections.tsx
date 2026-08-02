@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { MembershipLink } from "@/components/membership/membership-link";
 import {
