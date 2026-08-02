@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 type CalEvent = {
@@ -13,10 +12,16 @@ type CalEvent = {
 
 export function EventCalendar({
   events,
-  createHrefBase = "/admin/events",
+  selectedDate,
+  editingId,
+  onSelectDate,
+  onEditEvent,
 }: {
   events: CalEvent[];
-  createHrefBase?: string;
+  selectedDate?: string | null;
+  editingId?: string | null;
+  onSelectDate: (dateYmd: string) => void;
+  onEditEvent: (id: string) => void;
 }) {
   const [cursor, setCursor] = useState(() => {
     const now = new Date();
@@ -56,12 +61,11 @@ export function EventCalendar({
     year: "numeric",
   });
 
-  function dayHref(date: Date) {
+  function toYmd(date: Date) {
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, "0");
     const dd = String(date.getDate()).padStart(2, "0");
-    // Use date-only param — more reliable than encoding T/colon in some browsers
-    return `${createHrefBase}?date=${yyyy}-${mm}-${dd}#event-form`;
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   return (
@@ -104,8 +108,10 @@ export function EventCalendar({
           }
           const key = `${cell.date.getFullYear()}-${cell.date.getMonth()}-${cell.date.getDate()}`;
           const dayEvents = byDay.get(key) || [];
+          const ymd = toYmd(cell.date);
           const isToday =
             new Date().toDateString() === cell.date.toDateString();
+          const isSelected = selectedDate === ymd && !editingId;
 
           return (
             <div
@@ -113,27 +119,35 @@ export function EventCalendar({
               className={cn(
                 "relative min-h-24 rounded-lg border border-border/40 p-1.5 text-left transition hover:border-primary hover:bg-primary/5",
                 isToday && "border-primary/50 bg-primary/5",
+                isSelected && "border-primary bg-primary/10 ring-2 ring-primary/30",
               )}
             >
-              <Link
-                href={dayHref(cell.date)}
+              <button
+                type="button"
                 className="absolute inset-0 z-0 rounded-lg"
                 aria-label={`Create event on ${cell.date.toDateString()}`}
+                onClick={() => onSelectDate(ymd)}
               />
-              <span className="relative z-10 text-xs font-semibold pointer-events-none">
+              <span className="relative z-10 pointer-events-none text-xs font-semibold">
                 {cell.date.getDate()}
               </span>
               <div className="relative z-10 mt-1 space-y-0.5">
                 {dayEvents.slice(0, 3).map((ev) => (
-                  <Link
+                  <button
                     key={ev.id}
-                    href={`${createHrefBase}?edit=${ev.id}#event-form`}
-                    className="block truncate rounded bg-primary/15 px-1 py-0.5 text-[10px] font-medium text-primary hover:bg-primary/30"
+                    type="button"
+                    className={cn(
+                      "block w-full truncate rounded bg-primary/15 px-1 py-0.5 text-left text-[10px] font-medium text-primary hover:bg-primary/30",
+                      editingId === ev.id && "ring-1 ring-primary",
+                    )}
                     title={`Edit: ${ev.title}`}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditEvent(ev.id);
+                    }}
                   >
                     {ev.title}
-                  </Link>
+                  </button>
                 ))}
                 {dayEvents.length > 3 ? (
                   <div className="pointer-events-none text-[10px] text-muted-foreground">
@@ -146,7 +160,7 @@ export function EventCalendar({
         })}
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        Click a date to create an event. Click an event name to edit it.
+        Click a date to fill the form below. Click an event name to edit it.
       </p>
     </div>
   );

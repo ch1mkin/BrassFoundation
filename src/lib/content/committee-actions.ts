@@ -49,16 +49,27 @@ export async function upsertExecutiveMemberAction(
   return { success: id ? "Member updated." : "Member added." };
 }
 
-export async function upsertExecutiveMemberFormAction(formData: FormData) {
-  await upsertExecutiveMemberAction({}, formData);
+export async function upsertExecutiveMemberFormAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
+  return upsertExecutiveMemberAction(_prev, formData);
 }
 
-export async function deleteExecutiveMemberAction(formData: FormData) {
+export async function deleteExecutiveMemberAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
   const auth = await requireAdmin();
-  if (!auth) return;
-  const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!auth) return { error: "Unauthorized." };
+  const id = String(formData.get("id") || "").trim();
+  if (!id) return { error: "Missing id." };
   const supabase = await createClient();
-  await supabase.from("executive_committee").delete().eq("id", id);
+  const { error } = await supabase
+    .from("executive_committee")
+    .delete()
+    .eq("id", id);
+  if (error) return { error: error.message };
   revalidateCommittee();
+  return { success: "Member removed." };
 }

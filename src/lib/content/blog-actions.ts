@@ -53,13 +53,20 @@ export async function upsertBlogAction(
   return { success: id ? "Blog updated." : "Blog published." };
 }
 
-export async function deleteBlogAction(formData: FormData) {
+export async function deleteBlogAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
   const context = await getUserContext();
-  if (!context || !canAccessAdmin(context)) return;
-  const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!context || !canAccessAdmin(context)) {
+    return { error: "Unauthorized." };
+  }
+  const id = String(formData.get("id") || "").trim();
+  if (!id) return { error: "Missing id." };
   const supabase = await createClient();
-  await supabase.from("blog_posts").delete().eq("id", id);
+  const { error } = await supabase.from("blog_posts").delete().eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/blog");
   revalidatePath("/admin/blogs");
+  return { success: "Blog deleted." };
 }

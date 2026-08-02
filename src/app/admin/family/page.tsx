@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
+import { AdminLockedForm } from "@/components/admin/admin-locked-form";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
+import { OrgTree } from "@/components/admin/org-tree";
 import {
   deleteOrgNodeAction,
   upsertOrgNodeFormAction,
 } from "@/lib/content/gallery-org-actions";
 import { createClient } from "@/lib/supabase/server";
-import { OrgTree } from "@/components/admin/org-tree";
 
 export const metadata: Metadata = { title: "Admin · Family" };
 
@@ -65,7 +67,8 @@ export default async function AdminFamilyPage() {
 
       {error ? (
         <p className="glass-card rounded-2xl p-6 text-sm text-destructive">
-          Run <code>20260801050000_uploads_org_gallery.sql</code>. ({error.message})
+          Run <code>20260801050000_uploads_org_gallery.sql</code>. (
+          {error.message})
         </p>
       ) : (
         <OrgTree nodes={nodes || []} />
@@ -74,7 +77,11 @@ export default async function AdminFamilyPage() {
       <div className="grid gap-8 lg:grid-cols-2">
         <div className="glass-card space-y-4 rounded-2xl p-6">
           <h2 className="font-heading text-lg font-semibold">Add person</h2>
-          <form action={upsertOrgNodeFormAction} className="space-y-3">
+          <AdminLockedForm
+            action={upsertOrgNodeFormAction}
+            submitLabel="Add to family tree"
+            className="space-y-3"
+          >
             <input
               name="full_name"
               required
@@ -106,13 +113,7 @@ export default async function AdminFamilyPage() {
               accept="image/*"
               folder="org"
             />
-            <button
-              type="submit"
-              className="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white"
-            >
-              Add to family tree
-            </button>
-          </form>
+          </AdminLockedForm>
         </div>
 
         <div className="space-y-2">
@@ -135,15 +136,12 @@ export default async function AdminFamilyPage() {
                   </p>
                 </div>
               </div>
-              <form action={deleteOrgNodeAction}>
-                <input type="hidden" name="id" value={node.id} />
-                <button
-                  type="submit"
-                  className="text-xs font-semibold text-destructive"
-                >
-                  Remove
-                </button>
-              </form>
+              <AdminDeleteButton
+                id={node.id}
+                action={deleteOrgNodeAction}
+                label="Remove"
+                pendingLabel="Removing…"
+              />
             </div>
           ))}
         </div>

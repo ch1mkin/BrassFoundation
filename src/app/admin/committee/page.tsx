@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
+import { AdminLockedForm } from "@/components/admin/admin-locked-form";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import {
   deleteExecutiveMemberAction,
@@ -36,7 +38,11 @@ export default async function AdminCommitteePage() {
       <div className="grid gap-8 lg:grid-cols-2">
         <div className="glass-card space-y-4 rounded-2xl p-6">
           <h2 className="font-heading text-lg font-semibold">Add member</h2>
-          <form action={upsertExecutiveMemberFormAction} className="space-y-3">
+          <AdminLockedForm
+            action={upsertExecutiveMemberFormAction}
+            submitLabel="Add member"
+            className="space-y-3"
+          >
             <input
               name="full_name"
               required
@@ -63,13 +69,7 @@ export default async function AdminCommitteePage() {
               accept="image/*"
               folder="committee"
             />
-            <button
-              type="submit"
-              className="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white"
-            >
-              Add member
-            </button>
-          </form>
+          </AdminLockedForm>
         </div>
 
         <div className="space-y-3">
@@ -101,19 +101,17 @@ export default async function AdminCommitteePage() {
                     <p className="text-xs text-primary">{member.role_title}</p>
                   </div>
                 </div>
-                <form action={deleteExecutiveMemberAction}>
-                  <input type="hidden" name="id" value={member.id} />
-                  <button
-                    type="submit"
-                    className="text-xs font-semibold text-destructive"
-                  >
-                    Remove
-                  </button>
-                </form>
+                <AdminDeleteButton
+                  id={member.id}
+                  action={deleteExecutiveMemberAction}
+                  label="Remove"
+                  pendingLabel="Removing…"
+                />
               </div>
 
-              <form
+              <AdminLockedForm
                 action={upsertExecutiveMemberFormAction}
+                submitLabel="Save photo"
                 className="space-y-2 border-t border-border/50 pt-3"
               >
                 <input type="hidden" name="id" value={member.id} />
@@ -136,13 +134,7 @@ export default async function AdminCommitteePage() {
                   folder="committee"
                   defaultUrl={member.photo_url || undefined}
                 />
-                <button
-                  type="submit"
-                  className="rounded-lg bg-primary/90 px-4 py-2 text-xs font-medium text-white"
-                >
-                  Save photo
-                </button>
-              </form>
+              </AdminLockedForm>
             </div>
           ))}
         </div>

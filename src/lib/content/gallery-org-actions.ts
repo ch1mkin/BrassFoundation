@@ -51,15 +51,20 @@ export async function upsertGalleryAlbumAction(
   return { success: id ? "Album updated." : "Album created." };
 }
 
-export async function deleteGalleryAlbumAction(formData: FormData) {
+export async function deleteGalleryAlbumAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
   const auth = await requireAdmin();
-  if (!auth) return;
-  const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!auth) return { error: "Unauthorized." };
+  const id = String(formData.get("id") || "").trim();
+  if (!id) return { error: "Missing id." };
   const supabase = await createClient();
-  await supabase.from("gallery_albums").delete().eq("id", id);
+  const { error } = await supabase.from("gallery_albums").delete().eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/gallery");
   revalidatePath("/admin/gallery");
+  return { success: "Album deleted." };
 }
 
 export async function addGalleryImageAction(
@@ -218,24 +223,38 @@ export async function upsertOrgNodeAction(
   return { success: id ? "Node updated." : "Node added." };
 }
 
-export async function deleteOrgNodeAction(formData: FormData) {
+export async function deleteOrgNodeAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
   const auth = await requireAdmin();
-  if (!auth) return;
-  const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!auth) return { error: "Unauthorized." };
+  const id = String(formData.get("id") || "").trim();
+  if (!id) return { error: "Missing id." };
   const supabase = await createClient();
-  await supabase.from("org_nodes").delete().eq("id", id);
+  const { error } = await supabase.from("org_nodes").delete().eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/admin/family");
+  return { success: "Node removed." };
 }
 
-export async function upsertOrgNodeFormAction(formData: FormData) {
-  await upsertOrgNodeAction({}, formData);
+export async function upsertOrgNodeFormAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
+  return upsertOrgNodeAction(_prev, formData);
 }
 
-export async function addGalleryImageFormAction(formData: FormData) {
-  await addGalleryImageAction({}, formData);
+export async function addGalleryImageFormAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
+  return addGalleryImageAction(_prev, formData);
 }
 
-export async function setMemberStatusFormAction(formData: FormData) {
-  await setMemberStatusAction({}, formData);
+export async function setMemberStatusFormAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
+  return setMemberStatusAction(_prev, formData);
 }

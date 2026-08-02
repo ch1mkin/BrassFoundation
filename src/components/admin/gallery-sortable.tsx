@@ -20,7 +20,8 @@ import {
   reorderGalleryMediaAction,
   updateGalleryMediaTargetAction,
 } from "@/lib/content/gallery-org-actions";
-import { deleteGalleryMediaAction as deleteLegacy } from "@/lib/content/actions";
+import { deleteGalleryMediaAction } from "@/lib/content/actions";
+import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 
 type MediaItem = {
   id: string;
@@ -75,12 +76,7 @@ function SortableCard({
           <option value="grid">Grid</option>
           <option value="slider">Slider</option>
         </select>
-        <form action={deleteLegacy}>
-          <input type="hidden" name="id" value={item.id} />
-          <button type="submit" className="text-xs font-semibold text-destructive">
-            Delete
-          </button>
-        </form>
+        <AdminDeleteButton id={item.id} action={deleteGalleryMediaAction} />
       </div>
     </div>
   );

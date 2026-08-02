@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { EventsAdminPanel } from "@/components/admin/events-admin-panel";
 import { createClient } from "@/lib/supabase/server";
 
@@ -41,16 +40,7 @@ export default async function AdminEventsPage() {
         </p>
       ) : null}
 
-      <Suspense
-        fallback={
-          <p className="text-sm text-muted-foreground">Loading events…</p>
-        }
-      >
-        <EventsAdminPanel
-          events={data || []}
-          registrationCounts={counts}
-        />
-      </Suspense>
+      <EventsAdminPanel events={data || []} registrationCounts={counts} />
 
       <div>
         <h2 className="font-heading mb-4 text-lg font-semibold">

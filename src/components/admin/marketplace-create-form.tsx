@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { ButtonSpinner } from "@/components/ui/inline-loader";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { upsertMarketplaceAction } from "@/lib/content/actions";
@@ -50,7 +51,14 @@ export function MarketplaceCreateForm() {
       {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
       {state.success ? <p className="text-sm text-success">{state.success}</p> : null}
       <Button type="submit" disabled={pending} className="rounded-xl bg-primary">
-        {pending ? "Saving…" : "Create item"}
+        {pending ? (
+          <>
+            <ButtonSpinner />
+            Saving…
+          </>
+        ) : (
+          "Create item"
+        )}
       </Button>
       </FormLock>
     </form>

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
+import { AdminLockedForm } from "@/components/admin/admin-locked-form";
 import { AlbumEditor } from "@/components/admin/album-editor";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { GallerySortableGrid } from "@/components/admin/gallery-sortable";
@@ -34,13 +36,15 @@ export default async function AdminGalleryPage({
         .select("id, title, media_url, display_target, sort_order")
         .eq("album_id", selectedId)
         .order("sort_order", { ascending: true })
-    : { data: [] as Array<{
-        id: string;
-        title: string | null;
-        media_url: string;
-        display_target: string;
-        sort_order: number;
-      }> };
+    : {
+        data: [] as Array<{
+          id: string;
+          title: string | null;
+          media_url: string;
+          display_target: string;
+          sort_order: number;
+        }>,
+      };
 
   return (
     <div className="space-y-8">
@@ -92,15 +96,10 @@ export default async function AdminGalleryPage({
                     {album.display_mode}
                   </span>
                 </a>
-                <form action={deleteGalleryAlbumAction}>
-                  <input type="hidden" name="id" value={album.id} />
-                  <button
-                    type="submit"
-                    className="text-xs font-semibold text-destructive"
-                  >
-                    Delete
-                  </button>
-                </form>
+                <AdminDeleteButton
+                  id={album.id}
+                  action={deleteGalleryAlbumAction}
+                />
               </div>
             ))}
           </div>
@@ -109,53 +108,50 @@ export default async function AdminGalleryPage({
         <div className="space-y-6">
           {selectedId ? (
             <>
-              <form
-                action={addGalleryImageFormAction}
-                className="glass-card space-y-4 rounded-2xl p-6"
-              >
+              <div className="glass-card space-y-4 rounded-2xl p-6">
                 <h2 className="font-heading text-lg font-semibold">
                   Add image to album
                 </h2>
-                <input type="hidden" name="album_id" value={selectedId} />
-                <input
-                  name="title"
-                  placeholder="Caption / title"
-                  className="h-10 w-full rounded-xl border border-input bg-white px-3 text-sm"
-                />
-                <FileOrUrlField
-                  name="media_url"
-                  label="Image file or URL"
-                  bucket="gallery"
-                  accept="image/*"
-                  folder={`albums/${selectedId}`}
-                />
-                <label className="block space-y-1 text-sm">
-                  <span className="text-muted-foreground">Show in</span>
-                  <select
-                    name="display_target"
-                    defaultValue="grid"
-                    className="h-10 w-full rounded-xl border border-input bg-white px-3"
-                  >
-                    <option value="grid">Grid</option>
-                    <option value="slider">Slider</option>
-                  </select>
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    name="is_published"
-                    defaultChecked
-                    className="size-4"
-                  />
-                  Published
-                </label>
-                <button
-                  type="submit"
-                  className="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white"
+                <AdminLockedForm
+                  action={addGalleryImageFormAction}
+                  submitLabel="Add image"
+                  className="space-y-4"
                 >
-                  Add image
-                </button>
-              </form>
+                  <input type="hidden" name="album_id" value={selectedId} />
+                  <input
+                    name="title"
+                    placeholder="Caption / title"
+                    className="h-10 w-full rounded-xl border border-input bg-white px-3 text-sm"
+                  />
+                  <FileOrUrlField
+                    name="media_url"
+                    label="Image file or URL"
+                    bucket="gallery"
+                    accept="image/*"
+                    folder={`albums/${selectedId}`}
+                  />
+                  <label className="block space-y-1 text-sm">
+                    <span className="text-muted-foreground">Show in</span>
+                    <select
+                      name="display_target"
+                      defaultValue="grid"
+                      className="h-10 w-full rounded-xl border border-input bg-white px-3"
+                    >
+                      <option value="grid">Grid</option>
+                      <option value="slider">Slider</option>
+                    </select>
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      name="is_published"
+                      defaultChecked
+                      className="size-4"
+                    />
+                    Published
+                  </label>
+                </AdminLockedForm>
+              </div>
 
               <GallerySortableGrid
                 albumId={selectedId}

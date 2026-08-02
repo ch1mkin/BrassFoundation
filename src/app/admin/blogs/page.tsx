@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 import { BlogEditorForm } from "@/components/admin/blog-editor-form";
 import { deleteBlogAction } from "@/lib/content/blog-actions";
 import { createClient } from "@/lib/supabase/server";
@@ -56,15 +57,7 @@ export default async function AdminBlogsPage({
                   >
                     Edit
                   </a>
-                  <form action={deleteBlogAction}>
-                    <input type="hidden" name="id" value={post.id} />
-                    <button
-                      type="submit"
-                      className="text-xs font-semibold text-destructive"
-                    >
-                      Delete
-                    </button>
-                  </form>
+                  <AdminDeleteButton id={post.id} action={deleteBlogAction} />
                 </div>
               </div>
             </div>

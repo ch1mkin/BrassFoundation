@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { ButtonSpinner } from "@/components/ui/inline-loader";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { upsertGalleryAlbumAction } from "@/lib/content/gallery-org-actions";
 import type { ContentActionState } from "@/lib/content/utils";
@@ -120,7 +121,16 @@ export function AlbumEditor({ album }: { album: Album | null }) {
           <p className="text-sm text-success">{state.success}</p>
         ) : null}
         <Button type="submit" disabled={pending} className="rounded-xl bg-primary">
-          {pending ? "Saving…" : editing ? "Save album changes" : "Create album"}
+          {pending ? (
+            <>
+              <ButtonSpinner />
+              Saving…
+            </>
+          ) : editing ? (
+            "Save album changes"
+          ) : (
+            "Create album"
+          )}
         </Button>
         </FormLock>
       </form>

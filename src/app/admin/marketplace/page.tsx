@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 import { MarketplaceCreateForm } from "@/components/admin/marketplace-create-form";
 import { deleteMarketplaceAction } from "@/lib/content/actions";
 import { createClient } from "@/lib/supabase/server";
@@ -38,15 +39,10 @@ export default async function AdminMarketplacePage() {
                     {row.file_url ? " · PDF" : ""}
                   </p>
                 </div>
-                <form action={deleteMarketplaceAction}>
-                  <input type="hidden" name="id" value={row.id} />
-                  <button
-                    type="submit"
-                    className="text-xs font-semibold text-destructive"
-                  >
-                    Delete
-                  </button>
-                </form>
+                <AdminDeleteButton
+                  id={row.id}
+                  action={deleteMarketplaceAction}
+                />
               </div>
             </div>
           ))}

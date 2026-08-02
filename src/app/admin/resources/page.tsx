@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 import { ResourceCreateForm } from "@/components/admin/resource-create-form";
 import { deleteResourceAction } from "@/lib/content/actions";
 import { createClient } from "@/lib/supabase/server";
@@ -38,15 +39,7 @@ export default async function AdminResourcesPage() {
                     {row.file_url ? " · file attached" : ""}
                   </p>
                 </div>
-                <form action={deleteResourceAction}>
-                  <input type="hidden" name="id" value={row.id} />
-                  <button
-                    type="submit"
-                    className="text-xs font-semibold text-destructive"
-                  >
-                    Delete
-                  </button>
-                </form>
+                <AdminDeleteButton id={row.id} action={deleteResourceAction} />
               </div>
             </div>
           ))}

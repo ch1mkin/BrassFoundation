@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminContentForm } from "@/components/admin/content-form";
+import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 import {
   deleteCommunityAction,
   upsertCommunityAction,
@@ -54,12 +55,7 @@ export default async function AdminCommunityPage() {
                     {row.badge ? ` · ${row.badge}` : ""}
                   </p>
                 </div>
-                <form action={deleteCommunityAction}>
-                  <input type="hidden" name="id" value={row.id} />
-                  <button type="submit" className="text-xs font-semibold text-destructive">
-                    Delete
-                  </button>
-                </form>
+                <AdminDeleteButton id={row.id} action={deleteCommunityAction} />
               </div>
             </div>
           ))}

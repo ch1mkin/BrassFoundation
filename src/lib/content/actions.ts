@@ -295,15 +295,20 @@ export async function upsertNewsAction(
   return { success: id ? "News updated." : "News created." };
 }
 
-export async function deleteNewsAction(formData: FormData) {
+export async function deleteNewsAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
   const auth = await requireAdmin();
-  if (!auth.ok) return;
-  const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!auth.ok) return { error: auth.error };
+  const id = String(formData.get("id") || "").trim();
+  if (!id) return { error: "Missing id." };
   const supabase = await createClient();
-  await supabase.from("news_posts").delete().eq("id", id);
+  const { error } = await supabase.from("news_posts").delete().eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/news");
   revalidatePath("/admin/news");
+  return { success: "Post deleted." };
 }
 
 export async function upsertResourceAction(
@@ -350,15 +355,20 @@ export async function upsertResourceAction(
   return { success: id ? "Resource updated." : "Resource created." };
 }
 
-export async function deleteResourceAction(formData: FormData) {
+export async function deleteResourceAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
   const auth = await requireAdmin();
-  if (!auth.ok) return;
-  const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!auth.ok) return { error: auth.error };
+  const id = String(formData.get("id") || "").trim();
+  if (!id) return { error: "Missing id." };
   const supabase = await createClient();
-  await supabase.from("resources").delete().eq("id", id);
+  const { error } = await supabase.from("resources").delete().eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/resources");
   revalidatePath("/admin/resources");
+  return { success: "Resource deleted." };
 }
 
 export async function upsertCommunityAction(
@@ -402,15 +412,23 @@ export async function upsertCommunityAction(
   return { success: id ? "Project updated." : "Project created." };
 }
 
-export async function deleteCommunityAction(formData: FormData) {
+export async function deleteCommunityAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
   const auth = await requireAdmin();
-  if (!auth.ok) return;
-  const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!auth.ok) return { error: auth.error };
+  const id = String(formData.get("id") || "").trim();
+  if (!id) return { error: "Missing id." };
   const supabase = await createClient();
-  await supabase.from("community_projects").delete().eq("id", id);
+  const { error } = await supabase
+    .from("community_projects")
+    .delete()
+    .eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/community");
   revalidatePath("/admin/community");
+  return { success: "Project deleted." };
 }
 
 export async function upsertMarketplaceAction(
@@ -456,15 +474,23 @@ export async function upsertMarketplaceAction(
   return { success: id ? "Item updated." : "Item created." };
 }
 
-export async function deleteMarketplaceAction(formData: FormData) {
+export async function deleteMarketplaceAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
   const auth = await requireAdmin();
-  if (!auth.ok) return;
-  const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!auth.ok) return { error: auth.error };
+  const id = String(formData.get("id") || "").trim();
+  if (!id) return { error: "Missing id." };
   const supabase = await createClient();
-  await supabase.from("marketplace_items").delete().eq("id", id);
+  const { error } = await supabase
+    .from("marketplace_items")
+    .delete()
+    .eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/marketplace");
   revalidatePath("/admin/marketplace");
+  return { success: "Item deleted." };
 }
 
 export async function addGalleryMediaAction(
@@ -493,13 +519,18 @@ export async function addGalleryMediaAction(
   return { success: "Media added." };
 }
 
-export async function deleteGalleryMediaAction(formData: FormData) {
+export async function deleteGalleryMediaAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
   const auth = await requireAdmin();
-  if (!auth.ok) return;
-  const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!auth.ok) return { error: auth.error };
+  const id = String(formData.get("id") || "").trim();
+  if (!id) return { error: "Missing id." };
   const supabase = await createClient();
-  await supabase.from("gallery_media").delete().eq("id", id);
+  const { error } = await supabase.from("gallery_media").delete().eq("id", id);
+  if (error) return { error: error.message };
   revalidatePath("/gallery");
   revalidatePath("/admin/gallery");
+  return { success: "Media deleted." };
 }

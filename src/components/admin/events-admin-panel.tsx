@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminContentForm } from "@/components/admin/content-form";
-import { DeleteEventButton } from "@/components/admin/delete-event-button";
+import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 import { EventCalendar } from "@/components/admin/event-calendar";
-import { upsertEventAction } from "@/lib/content/actions";
+import { deleteEventAction, upsertEventAction } from "@/lib/content/actions";
 
 export type AdminEventRow = {
   id: string;
@@ -22,27 +20,6 @@ export type AdminEventRow = {
   cover_image_url: string | null;
 };
 
-function normalizeDatetimeLocal(raw: string | null) {
-  if (!raw) return "";
-  const cleaned = decodeURIComponent(raw).trim();
-  // Full datetime-local
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(cleaned)) {
-    return cleaned.slice(0, 16);
-  }
-  // Date-only from calendar (YYYY-MM-DD) → default 10:00 local
-  if (/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) {
-    return `${cleaned}T10:00`;
-  }
-  const parsed = new Date(cleaned);
-  if (Number.isNaN(parsed.getTime())) return "";
-  const yyyy = parsed.getFullYear();
-  const mm = String(parsed.getMonth() + 1).padStart(2, "0");
-  const dd = String(parsed.getDate()).padStart(2, "0");
-  const hh = String(parsed.getHours()).padStart(2, "0");
-  const min = String(parsed.getMinutes()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
-}
-
 function toDatetimeLocal(iso: string) {
   const parsed = new Date(iso);
   if (Number.isNaN(parsed.getTime())) return "";
@@ -54,6 +31,20 @@ function toDatetimeLocal(iso: string) {
   return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
 }
 
+function dateToStartsAt(ymd: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return "";
+  return `${ymd}T10:00`;
+}
+
+function scrollToForm() {
+  requestAnimationFrame(() => {
+    document.getElementById("event-form")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
+}
+
 export function EventsAdminPanel({
   events,
   registrationCounts,
@@ -61,28 +52,51 @@ export function EventsAdminPanel({
   events: AdminEventRow[];
   registrationCounts: Record<string, number>;
 }) {
-  const searchParams = useSearchParams();
-  const editId = searchParams.get("edit");
-  const dateParam = searchParams.get("date");
+  const [editId, setEditId] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  /** Bumps form remount when user re-clicks same date/edit. */
+  const [formNonce, setFormNonce] = useState(0);
 
   const editing = useMemo(
     () => (editId ? events.find((e) => e.id === editId) || null : null),
     [editId, events],
   );
 
+  // If the edited event was deleted, clear edit mode
+  useEffect(() => {
+    if (editId && !events.some((e) => e.id === editId)) {
+      setEditId(null);
+    }
+  }, [editId, events]);
+
   const defaultStarts = editing
     ? toDatetimeLocal(editing.starts_at)
-    : normalizeDatetimeLocal(dateParam);
-  const dateLabel =
-    !editing && defaultStarts ? defaultStarts.slice(0, 10) : null;
+    : selectedDate
+      ? dateToStartsAt(selectedDate)
+      : "";
 
-  useEffect(() => {
-    if (!editId && !dateParam) return;
-    const el = document.getElementById("event-form");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [editId, dateParam]);
+  const dateLabel =
+    !editing && selectedDate ? selectedDate : null;
+
+  const onSelectDate = useCallback((ymd: string) => {
+    setEditId(null);
+    setSelectedDate(ymd);
+    setFormNonce((n) => n + 1);
+    scrollToForm();
+  }, []);
+
+  const onEditEvent = useCallback((id: string) => {
+    setSelectedDate(null);
+    setEditId(id);
+    setFormNonce((n) => n + 1);
+    scrollToForm();
+  }, []);
+
+  const clearForm = useCallback(() => {
+    setEditId(null);
+    setSelectedDate(null);
+    setFormNonce((n) => n + 1);
+  }, []);
 
   return (
     <>
@@ -93,6 +107,10 @@ export function EventsAdminPanel({
           starts_at: e.starts_at,
           slug: e.slug,
         }))}
+        selectedDate={selectedDate}
+        editingId={editId}
+        onSelectDate={onSelectDate}
+        onEditEvent={onEditEvent}
       />
 
       <div className="grid gap-8 lg:grid-cols-2">
@@ -102,12 +120,13 @@ export function EventsAdminPanel({
               <p className="text-sm font-medium text-primary">
                 Editing: {editing.title}
               </p>
-              <Link
-                href="/admin/events"
+              <button
+                type="button"
+                onClick={clearForm}
                 className="text-xs font-semibold text-muted-foreground hover:text-primary"
               >
                 Cancel · New event
-              </Link>
+              </button>
             </div>
           ) : dateLabel ? (
             <p className="text-sm text-muted-foreground">
@@ -117,15 +136,12 @@ export function EventsAdminPanel({
           ) : null}
 
           <AdminContentForm
-            formKey={
-              editing?.id ||
-              (defaultStarts ? `date-${defaultStarts}` : "new-event")
-            }
+            formKey={`${editing?.id || selectedDate || "new"}-${formNonce}`}
             formId="event-form"
-            resetPathOnSuccess="/admin/events"
+            onSuccess={clearForm}
             title={
               editing
-                ? `Edit event`
+                ? "Edit event"
                 : dateLabel
                   ? `New event on ${dateLabel}`
                   : "Add event"
@@ -222,13 +238,14 @@ export function EventsAdminPanel({
                   </p>
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-2">
-                  <Link
-                    href={`/admin/events?edit=${row.id}#event-form`}
+                  <button
+                    type="button"
+                    onClick={() => onEditEvent(row.id)}
                     className="text-xs font-semibold text-primary hover:underline"
                   >
                     Edit
-                  </Link>
-                  <DeleteEventButton id={row.id} />
+                  </button>
+                  <AdminDeleteButton id={row.id} action={deleteEventAction} />
                 </div>
               </div>
             </div>

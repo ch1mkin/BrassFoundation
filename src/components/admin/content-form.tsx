@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { ButtonSpinner } from "@/components/ui/inline-loader";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import type { ContentActionState } from "@/lib/content/utils";
 
@@ -26,6 +27,7 @@ export function AdminContentForm({
   formKey,
   resetPathOnSuccess,
   formId,
+  onSuccess,
 }: {
   title: string;
   action: (
@@ -40,6 +42,7 @@ export function AdminContentForm({
   /** After a successful create/update, navigate here (clears query params). */
   resetPathOnSuccess?: string;
   formId?: string;
+  onSuccess?: () => void;
 }) {
   const router = useRouter();
   const [state, formAction, pending] = useSafeFormAction(action, {});
@@ -47,19 +50,20 @@ export function AdminContentForm({
   useEffect(() => {
     if (!state.success) return;
     router.refresh();
+    onSuccess?.();
     if (resetPathOnSuccess) {
       router.replace(resetPathOnSuccess);
     }
-  }, [state.success, router, resetPathOnSuccess]);
+  }, [state.success, router, resetPathOnSuccess, onSuccess]);
 
   return (
     <form
       key={formKey || "content-form"}
       id={formId}
       action={formAction}
-      className="glass-card space-y-4 rounded-2xl p-6"
+      className="glass-card relative space-y-4 rounded-2xl p-6"
     >
-      <FormLock pending={pending} className="space-y-4">
+      <FormLock pending={pending} className="space-y-4" label="Saving…">
         <h2 className="font-heading text-lg font-semibold">{title}</h2>
         {hidden
           ? Object.entries(hidden).map(([k, v]) => (
@@ -133,7 +137,14 @@ export function AdminContentForm({
           disabled={pending}
           className="rounded-xl bg-primary"
         >
-          {pending ? "Saving…" : submitLabel}
+          {pending ? (
+            <>
+              <ButtonSpinner />
+              Saving…
+            </>
+          ) : (
+            submitLabel
+          )}
         </Button>
       </FormLock>
     </form>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminContentForm } from "@/components/admin/content-form";
+import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 import { deleteNewsAction, upsertNewsAction } from "@/lib/content/actions";
 import { createClient } from "@/lib/supabase/server";
 
@@ -54,12 +55,7 @@ export default async function AdminNewsPage() {
                     {row.is_pinned ? " · Pinned" : ""}
                   </p>
                 </div>
-                <form action={deleteNewsAction}>
-                  <input type="hidden" name="id" value={row.id} />
-                  <button type="submit" className="text-xs font-semibold text-destructive">
-                    Delete
-                  </button>
-                </form>
+                <AdminDeleteButton id={row.id} action={deleteNewsAction} />
               </div>
             </div>
           ))}

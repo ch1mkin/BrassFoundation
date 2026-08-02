@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
+import { ButtonSpinner } from "@/components/ui/inline-loader";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { upsertResourceAction } from "@/lib/content/actions";
@@ -114,7 +115,14 @@ export function ResourceCreateForm() {
         disabled={pending || uploading}
         className="rounded-xl bg-primary"
       >
-        {pending ? "Saving…" : "Create resource"}
+        {pending || uploading ? (
+          <>
+            <ButtonSpinner />
+            {uploading ? "Uploading…" : "Saving…"}
+          </>
+        ) : (
+          "Create resource"
+        )}
       </Button>
       </FormLock>
     </form>
