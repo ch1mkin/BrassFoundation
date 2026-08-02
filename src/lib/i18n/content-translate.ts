@@ -19,10 +19,14 @@ const CONTENT_SELECTOR = [
   "[data-i18n='content']",
 ].join(",");
 
-const SKIP_SELECTOR =
-  ".notranslate, [translate='no'], .material-symbols-outlined, script, style, code, pre, kbd, samp, svg, input, textarea, select, [data-no-i18n], [data-icon]";
-
 function shouldSkip(el: Element) {
+  if (
+    el.closest(
+      ".notranslate, [translate='no'], .material-symbols-outlined, script, style, code, pre, kbd, samp, svg, input, textarea, select, [data-no-i18n], [data-icon]",
+    )
+  ) {
+    return true;
+  }
   if (el.closest("header, footer, nav, .notranslate, [translate='no']")) {
     // Allow explicit content markers even inside chrome if needed
     if (el.getAttribute("data-i18n") === "content") return false;

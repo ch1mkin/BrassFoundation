@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
@@ -147,13 +148,13 @@ export function AboutSection({
               </div>
             ))}
           </div>
-          <a
+          <Link
             href="/about"
             className="inline-flex items-center gap-2 text-sm font-bold text-primary transition-all hover:gap-4"
           >
             READ MORE ABOUT OUR STORY
             <MaterialIcon name="arrow_forward" className="text-[18px]" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>
@@ -186,7 +187,7 @@ export function CommunitySection({
             educational empowerment.
           </p>
         </div>
-        <a
+        <Link
           href="/community"
           className={cn(
             buttonVariants({ variant: "secondary" }),
@@ -195,11 +196,11 @@ export function CommunitySection({
         >
           View All Work
           <MaterialIcon name="trending_flat" className="text-[18px]" />
-        </a>
+        </Link>
       </div>
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
         {projects.map((project, i) => (
-          <a
+          <Link
             key={project.slug}
             href={`/community/${project.slug}`}
             className="group block"
@@ -240,7 +241,7 @@ export function CommunitySection({
                 <MaterialIcon name="arrow_right_alt" className="text-[18px]" />
               </span>
             </motion.div>
-          </a>
+          </Link>
         ))}
       </div>
     </section>
@@ -283,7 +284,7 @@ export function EventsSection() {
                   <span data-i18n="content">{event.location}</span>
                 </p>
               </div>
-              <a
+              <Link
                 href="/events"
                 className={cn(
                   "rounded-lg px-8 py-2 text-sm font-bold text-white transition active:scale-95",
@@ -291,7 +292,7 @@ export function EventsSection() {
                 )}
               >
                 Register
-              </a>
+              </Link>
             </div>
           ))}
         </div>
@@ -338,9 +339,9 @@ export function ResourcesSection() {
               >
                 {item.size}
               </span>
-              <a href="/resources" className="text-primary" aria-label="Download">
+              <Link href="/resources" className="text-primary" aria-label="Download">
                 <MaterialIcon name="download" />
-              </a>
+              </Link>
             </div>
           </div>
         ))}
@@ -354,7 +355,7 @@ export function MarketplaceSection() {
     <section className="overflow-hidden py-16 lg:py-20">
       <div className="mx-auto mb-12 flex max-w-[1280px] items-center justify-between px-4 sm:px-6 lg:px-20">
         <h2 className="font-heading text-3xl font-semibold">Featured Books</h2>
-        <a
+        <Link
           href="/marketplace"
           className={cn(
             buttonVariants({ variant: "outline" }),
@@ -362,11 +363,11 @@ export function MarketplaceSection() {
           )}
         >
           View all
-        </a>
+        </Link>
       </div>
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
         {FEATURED_BOOKS.map((book) => (
-          <a
+          <Link
             key={book.title}
             href="/marketplace"
             className="block rounded-2xl border border-border/40 bg-white p-8 transition hover:shadow-2xl"
@@ -389,7 +390,7 @@ export function MarketplaceSection() {
                 Buy Now
               </span>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </section>
