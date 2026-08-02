@@ -70,8 +70,8 @@ function HeroLogoWithSlogan({ hasBg }: { hasBg: boolean }) {
         <text
           className="fill-current uppercase"
           style={{
-            fontSize: 12,
-            letterSpacing: "0.22em",
+            fontSize: 16,
+            letterSpacing: "0.16em",
             fontWeight: 700,
           }}
         >
