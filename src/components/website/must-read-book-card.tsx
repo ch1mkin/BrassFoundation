@@ -162,19 +162,7 @@ export function MustReadBookCard({
             </button>
           </div>
           <div className="flex flex-1 flex-col p-5">
-            <div className="flex items-start gap-2">
-              <h2 className="font-heading min-w-0 flex-1 text-lg font-semibold">
-                {book.title}
-              </h2>
-              <button
-                type="button"
-                onClick={() => setOpen(true)}
-                className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border border-primary/20 text-primary hover:bg-primary/10"
-                aria-label={`About ${book.title}`}
-              >
-                <MaterialIcon name="help" className="text-[16px]" />
-              </button>
-            </div>
+            <h2 className="font-heading text-lg font-semibold">{book.title}</h2>
             {book.author ? (
               <p className="mt-1 text-sm text-muted-foreground">{book.author}</p>
             ) : null}
@@ -232,20 +220,9 @@ export function MustReadBookCard({
           </button>
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-start gap-2">
-            <h3 className="font-heading line-clamp-2 min-w-0 flex-1 text-base font-semibold sm:text-lg">
-              {book.title}
-            </h3>
-            <button
-              type="button"
-              onClick={() => setOpen(true)}
-              className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border border-primary/25 text-primary hover:bg-primary/10"
-              aria-label={`About ${book.title}`}
-              title="About this book"
-            >
-              <MaterialIcon name="help" className="text-[16px]" />
-            </button>
-          </div>
+          <h3 className="font-heading line-clamp-2 text-base font-semibold sm:text-lg">
+            {book.title}
+          </h3>
           {book.author ? (
             <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
               {book.author}
