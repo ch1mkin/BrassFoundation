@@ -75,7 +75,10 @@ function HeroLogoWithSlogan({ hasBg }: { hasBg: boolean }) {
           />
         </defs>
         <text
-          className="fill-current uppercase"
+          className={cn(
+            "uppercase",
+            hasBg ? "hero-slogan-arc" : "fill-current",
+          )}
           style={{
             fontSize: 16,
             letterSpacing: "0.16em",
@@ -181,7 +184,8 @@ export function HeroSection({
                 className="h-full w-full object-cover"
                 style={heroFrameStyle(mobileFrame)}
               />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-surface/80 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-surface/80" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,28,58,0.15)_0%,rgba(0,28,58,0.45)_70%)]" />
             </div>
           ) : null}
 
@@ -194,7 +198,8 @@ export function HeroSection({
                 className="h-full w-full object-cover"
                 style={heroFrameStyle(desktopFrame)}
               />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-surface/80 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-surface/80" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,28,58,0.12)_0%,rgba(0,28,58,0.4)_72%)]" />
             </div>
           ) : null}
         </>
@@ -217,7 +222,7 @@ export function HeroSection({
           <motion.h1
             className={cn(
               "font-heading mx-auto mb-6 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-[48px] lg:leading-[1.1]",
-              hasBg ? "hero-headline text-white" : "text-foreground",
+              hasBg ? "hero-headline" : "text-foreground",
               adminPa && "notranslate",
             )}
             initial={{ opacity: 0, y: 16 }}
@@ -245,7 +250,7 @@ export function HeroSection({
           <motion.p
             className={cn(
               "mx-auto mb-10 max-w-2xl text-lg leading-relaxed",
-              hasBg ? "text-white" : "text-muted-foreground",
+              hasBg ? "hero-subheadline" : "text-muted-foreground",
               adminPa && "notranslate",
             )}
             initial={{ opacity: 0, y: 16 }}
