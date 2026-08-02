@@ -3,7 +3,7 @@ export const SITE = {
   tagline: "Education · Empowerment · Equality",
   slogan: "Education to Prosperity",
   description:
-    "Brass Foundation is dedicated to education, equality, leadership and community development inspired by the vision of Dr. B. R. Ambedkar.",
+    "Bhim Rao Ambedkar Social Service Foundation (BRASS Foundation) advances education, equality, scientific thinking, constitutional values, and community empowerment.",
   logo: "/brand/logo.png",
 } as const;
 
@@ -259,6 +259,19 @@ export const FEATURED_BOOKS = [
   { title: "Waiting for a Visa", price: "₹199", rating: 5, reviews: 210 },
 ] as const;
 
+export const ABOUT_PAGE = {
+  eyebrow: "About Us",
+  title: "About Us",
+  headline: "Building an Educated, Empowered, and Equal Society",
+  paragraphs: [
+    "Bhim Rao Ambedkar Social Service Foundation popularly known as BRASS Foundation, is a non-profit social organization dedicated to advancing education, equality, scientific thinking, constitutional values, and community empowerment. Inspired by the first pillar of Dr. B. R. Ambedkar's timeless message—\"Educate, Organize, Agitate\", we believe that education is the most powerful instrument for creating an enlightened, inclusive, and progressive society.",
+    "Founded on the principle that every individual deserves access to quality education regardless of their social or economic background, BRASS Foundation works tirelessly to provide free educational support to poor and marginalized communities. Our mission extends beyond academics—we strive to cultivate scientific thinking, moral values, leadership, and social responsibility among the youth, empowering them to become informed citizens and catalysts for positive change.",
+    "Through a network of study centres, educational initiatives, mentorship programs, community outreach activities, cultural events, and leadership development opportunities, we continue to create pathways for learning, growth, and social transformation.",
+    "What began as a small initiative with a single study centre has today evolved into a growing movement that supports more than 150 students across over 10 locations. Alongside academic assistance, we provide career guidance, mentorship, personality development, and value-based education, helping students build brighter futures while contributing meaningfully to society.",
+    "At BRASS Foundation, we believe that education is not merely the acquisition of knowledge—it is the foundation of dignity, equality, self-respect, and lasting social progress. Every child educated, every mind awakened, and every life empowered brings us one step closer to realizing the vision of a society built on justice, opportunity, and human dignity for all.",
+  ],
+} as const;
+
 export const DEFAULT_ABOUT_QUOTES = [
   {
     quote:
@@ -277,10 +290,10 @@ export const DEFAULT_HOMEPAGE = {
   hero_cta_primary_href: "/membership",
   hero_cta_secondary_label: "Explore Resources",
   hero_cta_secondary_href: "/resources",
-  about_eyebrow: "Our Mission & Vision",
-  about_headline: "Our Mission & Vision",
+  about_eyebrow: "About Us",
+  about_headline: "Building an Educated, Empowered, and Equal Society",
   about_body:
-    "Inspired by the profound legacy of Dr. B.R. Ambedkar, we strive to break down barriers to education and equality. Brass Foundation is more than an organization; it's a movement toward intellectual freedom.",
+    "Bhim Rao Ambedkar Social Service Foundation popularly known as BRASS Foundation, is a non-profit social organization dedicated to advancing education, equality, scientific thinking, constitutional values, and community empowerment. Inspired by the first pillar of Dr. B. R. Ambedkar's timeless message—\"Educate, Organize, Agitate\", we believe that education is the most powerful instrument for creating an enlightened, inclusive, and progressive society.",
   membership_headline: "Become Part of the Movement",
   membership_body:
     "Join thousands of members dedicated to propagating the ideas of equality and justice through education.",
