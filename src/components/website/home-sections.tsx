@@ -1,19 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { MembershipLink } from "@/components/membership/membership-link";
 import {
+  SectionOrnaments,
+  GoldHairline,
+} from "@/components/website/premium-accents";
+import {
   COMMUNITY_WORK,
-  CORE_VALUES,
   FEATURED_BOOKS,
   RESOURCES_PREVIEW,
   UPCOMING_EVENTS,
 } from "@/lib/constants";
-import type { HomepageContent } from "@/lib/cms/homepage";
+import type { HomepageContent, HomepageQuote } from "@/lib/cms/homepage";
 import { cn } from "@/lib/utils";
 
 function AnimatedCounter({
@@ -63,9 +66,10 @@ export function StatsSection({
           : "md:grid-cols-5";
 
   return (
-    <section className="bg-surface-low py-16 lg:py-20">
+    <section className="relative overflow-hidden bg-surface-low py-16 lg:py-20">
+      <SectionOrnaments />
       <div
-        className={`mx-auto grid max-w-[1280px] grid-cols-2 gap-6 px-4 sm:px-6 lg:px-20 ${cols}`}
+        className={`relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-6 px-4 sm:px-6 lg:px-20 ${cols}`}
       >
         {stats.map((stat, i) => (
           <div
@@ -97,29 +101,112 @@ export function StatsSection({
   );
 }
 
+function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
+  const slides =
+    quotes.length > 0
+      ? quotes
+      : [
+          {
+            quote:
+              "Education is the most powerful weapon which you can use to change the world.",
+            attribution: "Dr. B. R. Ambedkar",
+          },
+        ];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % slides.length);
+    }, 6500);
+    return () => window.clearInterval(id);
+  }, [slides.length]);
+
+  const current = slides[index]!;
+
+  return (
+    <div className="relative aspect-video overflow-hidden rounded-2xl bg-surface-highest shadow-2xl">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={index}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.55 }}
+          className="absolute inset-0"
+        >
+          {current.image_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={current.image_url}
+              alt=""
+              className="size-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-secondary/70 to-primary/40" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+          <div className="absolute right-0 bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
+            <p className="font-quote max-w-md text-lg font-medium italic sm:text-xl">
+              &ldquo;{current.quote}&rdquo;
+            </p>
+            {current.attribution ? (
+              <p className="mt-2 text-sm font-medium text-white/80">
+                — {current.attribution}
+              </p>
+            ) : null}
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      {slides.length > 1 ? (
+        <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Show quote ${i + 1}`}
+              onClick={() => setIndex(i)}
+              className={cn(
+                "size-2 rounded-full transition",
+                i === index ? "bg-gold" : "bg-white/45 hover:bg-white/70",
+              )}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function AboutSection({
   headline,
   body,
+  values,
+  quotes,
 }: {
   eyebrow: string;
   headline: string;
   body: string;
   values: HomepageContent["core_values"];
+  quotes: HomepageQuote[];
 }) {
+  const valueRows =
+    values?.length > 0
+      ? values.map((v, i) => ({
+          title: v.title,
+          description: v.description,
+          icon: i % 2 === 0 ? "visibility" : "rocket_launch",
+        }))
+      : [];
+
   return (
-    <section className="py-16 lg:py-20" id="about">
-      <div className="mx-auto grid max-w-[1280px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-20">
-        <div className="relative aspect-video overflow-hidden rounded-2xl bg-surface-highest shadow-2xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-secondary/70 to-primary/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-          <div className="absolute right-0 bottom-6 left-6 text-white">
-            <p className="font-heading max-w-md text-lg font-medium italic sm:text-xl">
-              &ldquo;Education is the most powerful weapon which you can use to
-              change the world.&rdquo;
-            </p>
-          </div>
-        </div>
+    <section className="relative overflow-hidden py-16 lg:py-20" id="about">
+      <SectionOrnaments density="rich" />
+      <div className="relative z-10 mx-auto grid max-w-[1280px] items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-20">
+        <QuoteVisionSlider quotes={quotes} />
         <div>
+          <GoldHairline className="mb-4 ml-0" />
           <h2 className="font-heading mb-6 text-3xl font-semibold text-foreground">
             {headline}
           </h2>
@@ -127,7 +214,7 @@ export function AboutSection({
             {body}
           </p>
           <div className="mb-8 space-y-6">
-            {CORE_VALUES.map((item) => (
+            {valueRows.map((item) => (
               <div key={item.title} className="flex gap-4">
                 <div
                   className={cn(
@@ -176,8 +263,9 @@ export function CommunitySection({
       }));
 
   return (
-    <section className="py-16 lg:py-20" id="community">
-      <div className="mx-auto mb-12 flex max-w-[1280px] flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-end lg:px-20">
+    <section className="relative overflow-hidden py-16 lg:py-20" id="community">
+      <SectionOrnaments />
+      <div className="relative z-10 mx-auto mb-12 flex max-w-[1280px] flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-end lg:px-20">
         <div className="max-w-xl">
           <h2 className="font-heading mb-3 text-3xl font-semibold">
             Our Community Initiatives
@@ -198,7 +286,7 @@ export function CommunitySection({
           <MaterialIcon name="trending_flat" className="text-[18px]" />
         </Link>
       </div>
-      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
+      <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
         {projects.map((project, i) => (
           <Link
             key={project.slug}
@@ -248,18 +336,38 @@ export function CommunitySection({
   );
 }
 
-export function EventsSection() {
+export function EventsSection({
+  backgroundUrl,
+}: {
+  backgroundUrl?: string | null;
+}) {
   return (
-    <section className="bg-foreground py-16 text-background lg:py-20" id="events">
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-20">
-        <h2 className="font-heading mb-12 text-center text-3xl font-semibold">
+    <section
+      className="relative overflow-hidden bg-foreground py-16 text-background lg:py-20"
+      id="events"
+    >
+      {backgroundUrl ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={backgroundUrl}
+            alt=""
+            className="absolute inset-0 size-full object-cover opacity-35"
+          />
+          <div className="absolute inset-0 bg-foreground/75" />
+        </>
+      ) : null}
+      <SectionOrnaments className="text-gold opacity-80" />
+      <div className="relative z-10 mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-20">
+        <h2 className="font-heading mb-3 text-center text-3xl font-semibold">
           Upcoming Events
         </h2>
+        <GoldHairline className="mb-10" />
         <div className="space-y-4">
           {UPCOMING_EVENTS.map((event) => (
             <div
               key={event.title}
-              className="flex flex-col items-center gap-8 rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10 md:flex-row"
+              className="flex flex-col items-center gap-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-[2px] transition hover:bg-white/10 md:flex-row"
             >
               <div
                 className={cn(
@@ -311,13 +419,14 @@ export function ResourcesSection() {
   };
 
   return (
-    <section className="bg-muted py-16 lg:py-20" id="resources">
-      <div className="mx-auto mb-12 max-w-[1280px] px-4 sm:px-6 lg:px-20">
+    <section className="relative overflow-hidden bg-muted py-16 lg:py-20" id="resources">
+      <SectionOrnaments />
+      <div className="relative z-10 mx-auto mb-12 max-w-[1280px] px-4 sm:px-6 lg:px-20">
         <h2 className="font-heading text-3xl font-semibold">
           Digital Library & Resources
         </h2>
       </div>
-      <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-4 lg:px-20">
+      <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-4 lg:px-20">
         {RESOURCES_PREVIEW.map((item) => (
           <div key={item.title} className="glass-card group rounded-2xl p-6">
             <div

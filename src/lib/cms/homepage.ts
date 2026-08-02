@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   COMMUNITY_WORK,
   CORE_VALUES,
+  DEFAULT_ABOUT_QUOTES,
   DEFAULT_HOMEPAGE,
   STATS,
 } from "@/lib/constants";
@@ -21,6 +22,12 @@ export type HomepageValue = {
 export type HomepageCommunityItem = {
   title: string;
   slug: string;
+};
+
+export type HomepageQuote = {
+  quote: string;
+  attribution?: string;
+  image_url?: string;
 };
 
 export type HomepageContent = {
@@ -44,6 +51,9 @@ export type HomepageContent = {
   about_eyebrow_pa: string | null;
   about_headline_pa: string | null;
   about_body_pa: string | null;
+  about_quotes: HomepageQuote[];
+  events_background_url: string | null;
+  admin_background_url: string | null;
   membership_headline: string;
   membership_body: string;
   membership_headline_pa: string | null;
@@ -52,6 +62,25 @@ export type HomepageContent = {
   core_values: HomepageValue[];
   community_work: HomepageCommunityItem[];
 };
+
+function normalizeQuotes(raw: unknown): HomepageQuote[] {
+  if (!Array.isArray(raw) || !raw.length) {
+    return DEFAULT_ABOUT_QUOTES.map((q) => ({ ...q }));
+  }
+  return raw
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const row = item as Record<string, unknown>;
+      const quote = String(row.quote || "").trim();
+      if (!quote) return null;
+      return {
+        quote,
+        attribution: String(row.attribution || "").trim() || undefined,
+        image_url: String(row.image_url || "").trim() || undefined,
+      };
+    })
+    .filter(Boolean) as HomepageQuote[];
+}
 
 function fallbackHomepage(): HomepageContent {
   return {
@@ -66,6 +95,9 @@ function fallbackHomepage(): HomepageContent {
     about_eyebrow_pa: null,
     about_headline_pa: null,
     about_body_pa: null,
+    about_quotes: DEFAULT_ABOUT_QUOTES.map((q) => ({ ...q })),
+    events_background_url: null,
+    admin_background_url: null,
     membership_headline_pa: null,
     membership_body_pa: null,
     stats: STATS.map((s) => ({ ...s })),
@@ -134,6 +166,9 @@ export async function getPublishedHomepage(): Promise<HomepageContent> {
       about_eyebrow_pa: data.about_eyebrow_pa ?? null,
       about_headline_pa: data.about_headline_pa ?? null,
       about_body_pa: data.about_body_pa ?? null,
+      about_quotes: normalizeQuotes(data.about_quotes),
+      events_background_url: data.events_background_url ?? null,
+      admin_background_url: data.admin_background_url ?? null,
       membership_headline:
         data.membership_headline ?? DEFAULT_HOMEPAGE.membership_headline,
       membership_body:
@@ -154,5 +189,22 @@ export async function getPublishedHomepage(): Promise<HomepageContent> {
     };
   } catch {
     return fallbackHomepage();
+  }
+}
+
+/** Lightweight fetch for admin chrome background only. */
+export async function getAdminBackgroundUrl(): Promise<string | null> {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("homepage_content")
+      .select("admin_background_url")
+      .eq("is_published", true)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return data?.admin_background_url ?? null;
+  } catch {
+    return null;
   }
 }

@@ -311,7 +311,11 @@ export function MembershipRegistrationForm({
           </label>
           <div>
             <p className="mb-2 text-sm font-medium text-muted-foreground">
-              Digital signature *
+              Signature *
+            </p>
+            <p className="mb-3 text-xs text-muted-foreground">
+              Draw your signature, or take / upload a photo of a handwritten
+              signature (auto-cropped to signature size).
             </p>
             <SignaturePad onChange={setSignature} />
             <input

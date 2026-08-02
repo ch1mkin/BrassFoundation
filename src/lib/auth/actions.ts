@@ -2,6 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import {
+  AUTH_SUCCESS,
+  professionalAuthError,
+} from "@/lib/auth/messages";
 
 export type AuthActionState = {
   error?: string;
@@ -25,14 +29,17 @@ export async function signInAction(
   const next = String(formData.get("next") || "/member");
 
   if (!email || !password) {
-    return { error: "Email and password are required." };
+    return { error: "Please enter both your email address and password." };
   }
 
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   ) {
-    return { error: "Authentication is not configured." };
+    return {
+      error:
+        "Sign-in is temporarily unavailable. Please try again shortly.",
+    };
   }
 
   try {
@@ -44,7 +51,7 @@ export async function signInAction(
         setTimeout(() => {
           reject(
             new Error(
-              "Sign-in timed out. Check your connection and try again.",
+              "The sign-in request took too long. Please check your connection and try again.",
             ),
           );
         }, 20_000);
@@ -52,18 +59,19 @@ export async function signInAction(
     ]);
 
     if (result.error) {
-      return { error: result.error.message };
+      return { error: professionalAuthError(result.error.message) };
     }
 
     // Do not call redirect() here — it leaves useActionState pending stuck.
     // Cookies are set on this action response; client hard-navigates next.
-    return { success: "Signed in", redirectTo: safeNext(next) };
+    return { success: AUTH_SUCCESS.signedIn, redirectTo: safeNext(next) };
   } catch (err) {
     return {
-      error:
+      error: professionalAuthError(
         err instanceof Error
           ? err.message
-          : "Sign-in failed. Please try again.",
+          : "We couldn't complete sign-in. Please try again.",
+      ),
     };
   }
 }
@@ -81,19 +89,23 @@ export async function signUpAction(
   const next = String(formData.get("next") || "/member");
 
   if (!fullName) {
-    return { error: "Full name is required." };
+    return { error: "Please enter your full name to continue." };
   }
 
   if (!email) {
-    return { error: "Email is required." };
+    return { error: "Please enter a valid email address." };
   }
 
   if (password.length < 8) {
-    return { error: "Password must be at least 8 characters." };
+    return {
+      error: "Your password must be at least 8 characters long.",
+    };
   }
 
   if (password !== confirmPassword) {
-    return { error: "Passwords do not match." };
+    return {
+      error: "The passwords you entered do not match. Please try again.",
+    };
   }
 
   const supabase = await createClient();
@@ -106,7 +118,7 @@ export async function signUpAction(
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: professionalAuthError(error.message) };
   }
 
   if (data.session && data.user) {
@@ -124,9 +136,8 @@ export async function signUpAction(
 
   if (signInError) {
     return {
-      error:
-        signInError.message ||
-        "Account created. Please sign in with your email and password.",
+      success:
+        "Your account has been created. Please sign in with your email and password to continue.",
     };
   }
 
@@ -156,7 +167,7 @@ export async function requestPasswordResetAction(
     .toLowerCase();
 
   if (!email) {
-    return { error: "Email is required." };
+    return { error: "Please enter the email address for your account." };
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -166,12 +177,11 @@ export async function requestPasswordResetAction(
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: professionalAuthError(error.message) };
   }
 
   return {
-    success:
-      "If an account exists for that email, a reset link has been sent.",
+    success: AUTH_SUCCESS.resetSent,
   };
 }
 
@@ -183,15 +193,19 @@ export async function updatePasswordAction(
   const confirmPassword = String(formData.get("confirm_password") || "");
 
   if (password.length < 8) {
-    return { error: "Password must be at least 8 characters." };
+    return {
+      error: "Your password must be at least 8 characters long.",
+    };
   }
   if (password !== confirmPassword) {
-    return { error: "Passwords do not match." };
+    return {
+      error: "The passwords you entered do not match. Please try again.",
+    };
   }
 
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
-  if (error) return { error: error.message };
+  if (error) return { error: professionalAuthError(error.message) };
 
-  return { success: "Password updated. You can continue to your dashboard." };
+  return { success: AUTH_SUCCESS.passwordUpdated };
 }

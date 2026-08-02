@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { PortalSidebar } from "@/components/portal/portal-sidebar";
 import { PortalNavProvider } from "@/components/portal/portal-nav-provider";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
+import { getAdminBackgroundUrl } from "@/lib/cms/homepage";
 
 const NAV = [
   { label: "Overview", href: "/admin", icon: "dashboard" },
@@ -41,9 +42,22 @@ export default async function AdminLayout({
     redirect("/member");
   }
 
+  const adminBackgroundUrl = await getAdminBackgroundUrl();
+
   return (
     <PortalNavProvider>
-      <div className="notranslate flex min-h-[100svh] bg-surface-low">
+      <div className="notranslate relative flex min-h-[100svh] bg-surface-low">
+        {adminBackgroundUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={adminBackgroundUrl}
+              alt=""
+              className="pointer-events-none absolute inset-0 size-full object-cover opacity-25"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-surface-low/80" />
+          </>
+        ) : null}
         <PortalSidebar
           title="Admin Portal"
           subtitle={`${context.email || ""} · ${context.roles.map((r) => r.name).join(", ") || "No roles"}`}
@@ -51,7 +65,7 @@ export default async function AdminLayout({
           nav={NAV}
           storageKey="bf-admin-sidebar-collapsed"
         />
-        <main className="min-w-0 flex-1 p-6 pt-16 sm:p-8 md:pt-8">
+        <main className="relative z-10 min-w-0 flex-1 p-6 pt-16 sm:p-8 md:pt-8">
           {children}
         </main>
       </div>

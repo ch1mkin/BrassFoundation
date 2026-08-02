@@ -2,6 +2,10 @@
 
 import { motion } from "framer-motion";
 import type { ExecutiveMember } from "@/lib/content/committee";
+import {
+  GoldHairline,
+  SectionOrnaments,
+} from "@/components/website/premium-accents";
 import { cn } from "@/lib/utils";
 
 function initialsFor(name: string) {
@@ -94,6 +98,15 @@ function isChair(role: string) {
 function isVice(role: string) {
   return /vice\s*chairman/i.test(role.trim());
 }
+function isGeneralSecretary(role: string) {
+  return /general\s*secretary/i.test(role.trim());
+}
+function isTreasurer(role: string) {
+  return /^treasurer$/i.test(role.trim());
+}
+function isOfficerRow(role: string) {
+  return isVice(role) || isGeneralSecretary(role) || isTreasurer(role);
+}
 
 /**
  * Build widening pyramid row sizes that sum to n.
@@ -105,13 +118,11 @@ function pyramidRowSizes(n: number): number[] {
   if (n === 1) return [1];
   if (n <= 4) return [n];
 
-  // Prefer 2 rows: smaller top, wider flat base (never a lone person)
   for (let top = Math.floor((n - 1) / 2); top >= 2; top--) {
     const base = n - top;
     if (base >= top && base >= 2) return [top, base];
   }
 
-  // 3 rows: a <= b < c (flat base widest)
   for (let base = Math.ceil(n / 2); base <= n - 4; base++) {
     const rem = n - base;
     for (let mid = Math.min(base - 1, rem - 2); mid >= 2; mid--) {
@@ -120,7 +131,6 @@ function pyramidRowSizes(n: number): number[] {
     }
   }
 
-  // Even fallback — chunks of at least 2
   const rows: number[] = [];
   let left = n;
   while (left > 0) {
@@ -156,11 +166,12 @@ const ROW_COLS: Record<number, string> = {
   4: "grid-cols-4",
   5: "grid-cols-5",
   6: "grid-cols-6",
+  7: "grid-cols-7",
+  8: "grid-cols-4 sm:grid-cols-8",
 };
 
 /**
- * Pyramid: Chair + Vice on top (large), then widening rows with a flat base.
- * No orphan single-person rows on desktop or mobile.
+ * Pyramid: Chairman alone → Vice / General Secretary / Treasurer → flat base of the rest.
  */
 export function LeadershipSection({
   members,
@@ -169,36 +180,54 @@ export function LeadershipSection({
 }) {
   const chair = members.find((m) => isChair(m.role_title));
   const vice = members.find((m) => isVice(m.role_title));
-  const rest = members.filter(
-    (m) => !isChair(m.role_title) && !isVice(m.role_title),
+  const generalSecretary = members.find((m) =>
+    isGeneralSecretary(m.role_title),
   );
-  const leaders = [chair, vice].filter(Boolean) as ExecutiveMember[];
+  const treasurer = members.find((m) => isTreasurer(m.role_title));
+  const officers = [vice, generalSecretary, treasurer].filter(
+    Boolean,
+  ) as ExecutiveMember[];
+  const rest = members.filter(
+    (m) => !isChair(m.role_title) && !isOfficerRow(m.role_title),
+  );
 
   const sizes = pyramidRowSizes(rest.length);
   const rows = splitIntoRows(rest, sizes);
 
   return (
-    <section className="bg-surface-high py-10 sm:py-14 lg:py-16">
-      <div className="mx-auto mb-8 max-w-[1280px] px-4 text-center sm:mb-10 sm:px-6 lg:px-20">
+    <section className="relative overflow-hidden bg-surface-high py-10 sm:py-14 lg:py-16">
+      <SectionOrnaments density="rich" />
+      <div className="relative z-10 mx-auto mb-8 max-w-[1280px] px-4 text-center sm:mb-10 sm:px-6 lg:px-20">
         <h2 className="font-heading mb-2 text-2xl font-semibold sm:text-3xl">
           Executive Committee
         </h2>
+        <GoldHairline className="mb-3 mt-3" />
         <p className="mx-auto max-w-2xl text-sm text-muted-foreground sm:text-base">
           The committee guiding Brass Foundation&apos;s mission of education,
           equality, and community development.
         </p>
       </div>
 
-      <div className="mx-auto flex max-w-[1280px] flex-col items-stretch gap-6 px-2 sm:gap-8 sm:px-6 lg:gap-10 lg:px-20">
-        {leaders.length > 0 ? (
+      <div className="relative z-10 mx-auto flex max-w-[1280px] flex-col items-stretch gap-6 px-2 sm:gap-8 sm:px-6 lg:gap-10 lg:px-20">
+        {chair ? (
+          <div className="mx-auto grid w-full max-w-xs grid-cols-1 justify-items-center">
+            <MemberTile member={chair} size="lg" />
+          </div>
+        ) : null}
+
+        {officers.length > 0 ? (
           <div
             className={cn(
-              "mx-auto grid w-full max-w-2xl justify-items-center gap-3 sm:gap-10",
-              leaders.length === 1 ? "grid-cols-1" : "grid-cols-2",
+              "mx-auto grid w-full max-w-3xl justify-items-center gap-3 sm:gap-8",
+              officers.length === 1
+                ? "grid-cols-1"
+                : officers.length === 2
+                  ? "grid-cols-2"
+                  : "grid-cols-3",
             )}
           >
-            {leaders.map((m) => (
-              <MemberTile key={m.id} member={m} size="lg" />
+            {officers.map((m) => (
+              <MemberTile key={m.id} member={m} size="md" />
             ))}
           </div>
         ) : null}

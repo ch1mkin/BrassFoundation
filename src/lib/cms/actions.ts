@@ -22,6 +22,9 @@ const OPTIONAL_COLUMNS = [
   "about_body_pa",
   "membership_headline_pa",
   "membership_body_pa",
+  "about_quotes",
+  "events_background_url",
+  "admin_background_url",
 ] as const;
 
 function isMissingColumnError(message: string) {
@@ -49,6 +52,16 @@ export async function updateHomepageAction(
         stats = JSON.parse(statsRaw);
       } catch {
         return { error: "Invalid stats JSON." };
+      }
+    }
+
+    const quotesRaw = String(formData.get("about_quotes_json") || "").trim();
+    let about_quotes: unknown = undefined;
+    if (quotesRaw) {
+      try {
+        about_quotes = JSON.parse(quotesRaw);
+      } catch {
+        return { error: "Invalid quotes JSON." };
       }
     }
 
@@ -92,6 +105,10 @@ export async function updateHomepageAction(
       about_headline_pa:
         String(formData.get("about_headline_pa") || "").trim() || null,
       about_body_pa: String(formData.get("about_body_pa") || "").trim() || null,
+      events_background_url:
+        String(formData.get("events_background_url") || "").trim() || null,
+      admin_background_url:
+        String(formData.get("admin_background_url") || "").trim() || null,
       membership_headline: String(
         formData.get("membership_headline") || "",
       ).trim(),
@@ -101,6 +118,7 @@ export async function updateHomepageAction(
       membership_body_pa:
         String(formData.get("membership_body_pa") || "").trim() || null,
       ...(stats ? { stats } : {}),
+      ...(about_quotes ? { about_quotes } : {}),
       updated_by: context.userId,
       is_published: true,
     };
@@ -138,9 +156,10 @@ export async function updateHomepageAction(
 
       if (!error) {
         revalidatePath("/");
+        revalidatePath("/admin");
         return {
           success:
-            "Homepage saved. Run migrations 20260801070000 and 20260801080000 in Supabase so hero image + Punjabi fields persist.",
+            "Homepage saved. Run migration 20260802000000_quotes_events_admin_bg.sql in Supabase so quotes and section backgrounds persist.",
         };
       }
     }
@@ -149,15 +168,14 @@ export async function updateHomepageAction(
       if (isMissingColumnError(error.message)) {
         return {
           error:
-            "Database is missing homepage columns. Run supabase/migrations/20260801070000_hero_background.sql, 80000, and 20260801100000_hero_mobile_background.sql in the Supabase SQL Editor.",
+            "Database is missing homepage columns. Run supabase/migrations/20260802000000_quotes_events_admin_bg.sql (and earlier hero migrations) in the Supabase SQL Editor.",
         };
       }
       return { error: error.message };
     }
 
-    // Revalidate public site only — revalidating the current admin page
-    // can leave useActionState pending stuck in a refresh loop.
     revalidatePath("/");
+    revalidatePath("/admin");
     return { success: "Homepage content saved." };
   } catch (err) {
     return {

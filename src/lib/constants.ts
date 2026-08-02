@@ -206,6 +206,15 @@ export const FEATURED_BOOKS = [
   { title: "Waiting for a Visa", price: "₹199", rating: 5, reviews: 210 },
 ] as const;
 
+export const DEFAULT_ABOUT_QUOTES = [
+  {
+    quote:
+      "Education is the most powerful weapon which you can use to change the world.",
+    attribution: "Dr. B. R. Ambedkar",
+    image_url: "",
+  },
+] as const;
+
 export const DEFAULT_HOMEPAGE = {
   hero_eyebrow: "Brass Foundation",
   hero_headline: "Empowering Communities\nThrough Education.",

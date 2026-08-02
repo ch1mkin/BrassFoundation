@@ -44,13 +44,14 @@ export default async function HomePage() {
         headline={content.about_headline}
         body={content.about_body}
         values={content.core_values}
+        quotes={content.about_quotes}
       />
       <SectionDivider />
       <LeadershipSection members={committee} />
       <SectionDivider />
       <CommunitySection items={content.community_work} />
       <SectionDivider />
-      <EventsSection />
+      <EventsSection backgroundUrl={content.events_background_url} />
       <SectionDivider />
       <ResourcesSection />
       <SectionDivider />

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
+import { QuotesEditor } from "@/components/admin/quotes-editor";
 import { StatsEditor } from "@/components/admin/stats-editor";
 import { FormLock } from "@/components/ui/form-lock";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
@@ -194,6 +195,32 @@ export function HomepageCmsForm({ content }: { content: HomepageContent }) {
             name="about_body_pa"
             defaultValue={content.about_body_pa || ""}
             multiline
+          />
+        </section>
+
+        <section className="space-y-4 rounded-2xl bg-card p-6 shadow-soft">
+          <QuotesEditor initial={content.about_quotes} />
+        </section>
+
+        <section className="space-y-4 rounded-2xl bg-card p-6 shadow-soft">
+          <h2 className="font-heading text-xl font-medium">
+            Section backgrounds
+          </h2>
+          <FileOrUrlField
+            name="events_background_url"
+            label="Upcoming Events background image"
+            bucket="gallery"
+            accept="image/*"
+            folder="events-bg"
+            defaultUrl={content.events_background_url || undefined}
+          />
+          <FileOrUrlField
+            name="admin_background_url"
+            label="Admin portal background image"
+            bucket="gallery"
+            accept="image/*"
+            folder="admin-bg"
+            defaultUrl={content.admin_background_url || undefined}
           />
         </section>
 
