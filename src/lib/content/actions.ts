@@ -195,6 +195,11 @@ export async function upsertEventAction(
     return { error: "Title and start date are required." };
   }
 
+  const startsDate = new Date(startsAt);
+  if (Number.isNaN(startsDate.getTime())) {
+    return { error: "Please choose a valid start date and time." };
+  }
+
   const payload = {
     title,
     slug,
@@ -203,7 +208,7 @@ export async function upsertEventAction(
     location: String(formData.get("location") || "").trim() || null,
     location_icon:
       String(formData.get("location_icon") || "").trim() || "location_on",
-    starts_at: new Date(startsAt).toISOString(),
+    starts_at: startsDate.toISOString(),
     registration_open: boolFromForm(formData, "registration_open"),
     is_published: boolFromForm(formData, "is_published"),
     is_featured: boolFromForm(formData, "is_featured"),
@@ -220,21 +225,30 @@ export async function upsertEventAction(
 
   if (error) return { error: error.message };
 
+  revalidatePath("/");
   revalidatePath("/events");
   revalidatePath("/admin/events");
-  revalidatePath("/");
   return { success: id ? "Event updated." : "Event created." };
 }
 
-export async function deleteEventAction(formData: FormData) {
+export async function deleteEventAction(
+  _prev: ContentActionState,
+  formData: FormData,
+): Promise<ContentActionState> {
   const auth = await requireAdmin();
-  if (!auth.ok) return;
-  const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!auth.ok) return { error: auth.error };
+
+  const id = String(formData.get("id") || "").trim();
+  if (!id) return { error: "Missing event id." };
+
   const supabase = await createClient();
-  await supabase.from("events").delete().eq("id", id);
+  const { error } = await supabase.from("events").delete().eq("id", id);
+  if (error) return { error: error.message };
+
+  revalidatePath("/");
   revalidatePath("/events");
   revalidatePath("/admin/events");
+  return { success: "Event deleted." };
 }
 
 export async function upsertNewsAction(

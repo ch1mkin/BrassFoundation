@@ -14,9 +14,9 @@ import {
   COMMUNITY_WORK,
   FEATURED_BOOKS,
   RESOURCES_PREVIEW,
-  UPCOMING_EVENTS,
 } from "@/lib/constants";
 import type { HomepageContent, HomepageQuote } from "@/lib/cms/homepage";
+import type { EventRow } from "@/lib/content/queries";
 import { cn } from "@/lib/utils";
 import { InstantImg, preloadImages } from "@/components/website/instant-img";
 
@@ -406,8 +406,10 @@ export function CommunitySection({
 
 export function EventsSection({
   backgroundUrl,
+  events,
 }: {
   backgroundUrl?: string | null;
+  events: EventRow[];
 }) {
   return (
     <section
@@ -430,47 +432,67 @@ export function EventsSection({
           Upcoming Events
         </h2>
         <GoldHairline className="mb-10" />
-        <div className="space-y-4">
-          {UPCOMING_EVENTS.map((event) => (
-            <div
-              key={event.title}
-              className="flex flex-col items-center gap-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-[2px] transition hover:bg-white/10 md:flex-row"
-            >
-              <div
-                className={cn(
-                  "flex size-24 shrink-0 flex-col items-center justify-center rounded-xl text-white",
-                  event.tone === "primary" ? "bg-primary" : "bg-secondary",
-                )}
-              >
-                <span className="text-xs font-semibold">{event.month}</span>
-                <span className="font-heading text-3xl font-bold">
-                  {event.day}
-                </span>
-              </div>
-              <div className="flex-grow text-center md:text-left">
-                <h4 className="font-heading mb-2 text-xl font-semibold">
-                  {event.title}
-                </h4>
-                <p className="flex items-center justify-center gap-2 text-white/60 md:justify-start">
-                  <MaterialIcon
-                    name={event.locationIcon}
-                    className="text-[18px]"
-                  />
-                  <span data-i18n="content">{event.location}</span>
-                </p>
-              </div>
-              <Link
-                href="/events"
-                className={cn(
-                  "rounded-lg px-8 py-2 text-sm font-bold text-white transition active:scale-95",
-                  event.tone === "primary" ? "bg-primary" : "bg-secondary",
-                )}
-              >
-                Register
-              </Link>
-            </div>
-          ))}
-        </div>
+        {!events.length ? (
+          <p className="text-center text-white/70">
+            New events will appear here once published.{" "}
+            <Link href="/events" className="font-semibold text-brand underline">
+              View all events
+            </Link>
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {events.map((event) => {
+              const starts = new Date(event.starts_at);
+              const month = starts
+                .toLocaleString("en-US", { month: "short" })
+                .toUpperCase();
+              const day = String(starts.getDate()).padStart(2, "0");
+              const tone =
+                event.tone === "secondary" ? "secondary" : "primary";
+              return (
+                <div
+                  key={event.id}
+                  className="flex flex-col items-center gap-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-[2px] transition hover:bg-white/10 md:flex-row"
+                >
+                  <div
+                    className={cn(
+                      "flex size-24 shrink-0 flex-col items-center justify-center rounded-xl text-white",
+                      tone === "primary" ? "bg-primary" : "bg-secondary",
+                    )}
+                  >
+                    <span className="text-xs font-semibold">{month}</span>
+                    <span className="font-heading text-3xl font-bold">
+                      {day}
+                    </span>
+                  </div>
+                  <div className="flex-grow text-center md:text-left">
+                    <h4 className="font-heading mb-2 text-xl font-semibold">
+                      {event.title}
+                    </h4>
+                    {event.location ? (
+                      <p className="flex items-center justify-center gap-2 text-white/60 md:justify-start">
+                        <MaterialIcon
+                          name={event.location_icon || "location_on"}
+                          className="text-[18px]"
+                        />
+                        <span data-i18n="content">{event.location}</span>
+                      </p>
+                    ) : null}
+                  </div>
+                  <Link
+                    href={`/events/${event.slug}`}
+                    className={cn(
+                      "rounded-lg px-8 py-2 text-sm font-bold text-white transition active:scale-95",
+                      tone === "primary" ? "bg-primary" : "bg-secondary",
+                    )}
+                  >
+                    {event.registration_open ? "Register" : "View"}
+                  </Link>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
   );

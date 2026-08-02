@@ -21,6 +21,11 @@ export default async function EventsPage() {
       wide
     >
       <div className="space-y-4">
+        {!events.length ? (
+          <div className="glass-card rounded-2xl p-10 text-center text-muted-foreground">
+            No upcoming events published yet. Check back soon.
+          </div>
+        ) : null}
         {events.map((event) => {
           const { month, day } = formatEventDate(event);
           return (

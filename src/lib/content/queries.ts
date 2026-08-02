@@ -3,7 +3,6 @@ import {
   COMMUNITY_WORK,
   FEATURED_BOOKS,
   RESOURCES_PREVIEW,
-  UPCOMING_EVENTS,
 } from "@/lib/constants";
 
 export type EventRow = {
@@ -101,23 +100,11 @@ export async function getPublishedEvents(limit = 20): Promise<EventRow[]> {
       .order("starts_at", { ascending: true })
       .limit(limit);
 
-    if (error || !data?.length) {
-      return UPCOMING_EVENTS.map((e, i) => ({
-        id: `fallback-event-${i}`,
-        slug: e.title.toLowerCase().replace(/\s+/g, "-"),
-        title: e.title,
-        summary: null,
-        body: null,
-        location: e.location,
-        location_icon: e.locationIcon,
-        starts_at: new Date(2026, 9, Number(e.day), 17).toISOString(),
-        ends_at: null,
-        registration_open: true,
-        tone: e.tone,
-        cover_image_url: null,
-      }));
+    if (error) {
+      console.error("getPublishedEvents", error.message);
+      return [];
     }
-    return data;
+    return data ?? [];
   } catch {
     return [];
   }

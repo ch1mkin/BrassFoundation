@@ -61,7 +61,10 @@ export function EventCalendar({
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, "0");
     const dd = String(date.getDate()).padStart(2, "0");
-    router.push(`${createHrefBase}?date=${yyyy}-${mm}-${dd}T10:00`);
+    const value = `${yyyy}-${mm}-${dd}T10:00`;
+    router.push(
+      `${createHrefBase}?date=${encodeURIComponent(value)}#create-event`,
+    );
   }
 
   return (

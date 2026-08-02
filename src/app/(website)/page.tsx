@@ -12,11 +12,13 @@ import { SectionDivider } from "@/components/website/section-divider";
 import { HeroSection } from "@/components/website/hero-section";
 import { getPublishedHomepage } from "@/lib/cms/homepage";
 import { getExecutiveCommittee } from "@/lib/content/committee";
+import { getPublishedEvents } from "@/lib/content/queries";
 
 export default async function HomePage() {
-  const [content, committee] = await Promise.all([
+  const [content, committee, events] = await Promise.all([
     getPublishedHomepage(),
     getExecutiveCommittee(),
+    getPublishedEvents(6),
   ]);
 
   return (
@@ -51,7 +53,10 @@ export default async function HomePage() {
       <SectionDivider />
       <CommunitySection items={content.community_work} />
       <SectionDivider />
-      <EventsSection backgroundUrl={content.events_background_url} />
+      <EventsSection
+        backgroundUrl={content.events_background_url}
+        events={events}
+      />
       <SectionDivider />
       <ResourcesSection />
       <SectionDivider />

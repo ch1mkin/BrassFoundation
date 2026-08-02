@@ -1,13 +1,28 @@
 import type { Metadata } from "next";
 import { AdminContentForm } from "@/components/admin/content-form";
+import { DeleteEventButton } from "@/components/admin/delete-event-button";
 import { EventCalendar } from "@/components/admin/event-calendar";
-import {
-  deleteEventAction,
-  upsertEventAction,
-} from "@/lib/content/actions";
+import { upsertEventAction } from "@/lib/content/actions";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Admin · Events" };
+
+function normalizeDatetimeLocal(raw: string | undefined) {
+  if (!raw) return "";
+  // Accept "YYYY-MM-DDTHH:mm" or ISO strings from the calendar query param
+  const cleaned = decodeURIComponent(raw).trim();
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(cleaned)) {
+    return cleaned.slice(0, 16);
+  }
+  const parsed = new Date(cleaned);
+  if (Number.isNaN(parsed.getTime())) return "";
+  const yyyy = parsed.getFullYear();
+  const mm = String(parsed.getMonth() + 1).padStart(2, "0");
+  const dd = String(parsed.getDate()).padStart(2, "0");
+  const hh = String(parsed.getHours()).padStart(2, "0");
+  const min = String(parsed.getMinutes()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+}
 
 export default async function AdminEventsPage({
   searchParams,
@@ -34,16 +49,16 @@ export default async function AdminEventsPage({
     counts.set(row.event_id, (counts.get(row.event_id) || 0) + 1);
   }
 
-  const defaultStarts = date
-    ? date.slice(0, 16)
-    : "";
+  const defaultStarts = normalizeDatetimeLocal(date);
+  const dateLabel = defaultStarts ? defaultStarts.slice(0, 10) : null;
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="font-heading text-3xl font-semibold">Events</h1>
         <p className="mt-2 text-muted-foreground">
-          Calendar view, create by clicking a date, and track registrations.
+          Click a calendar date to pre-fill the start time, then save. Published
+          events appear live on the homepage and /events.
         </p>
       </div>
 
@@ -64,7 +79,12 @@ export default async function AdminEventsPage({
 
       <div className="grid gap-8 lg:grid-cols-2">
         <AdminContentForm
-          title={date ? `New event on ${date.slice(0, 10)}` : "Add event"}
+          formKey={defaultStarts || "new-event"}
+          formId="create-event"
+          resetPathOnSuccess="/admin/events"
+          title={
+            dateLabel ? `New event on ${dateLabel}` : "Add event"
+          }
           action={upsertEventAction}
           submitLabel="Create event"
           fields={[
@@ -87,7 +107,7 @@ export default async function AdminEventsPage({
             },
             {
               name: "is_published",
-              label: "Published",
+              label: "Published (show on website)",
               type: "checkbox",
               defaultValue: true,
             },
@@ -102,6 +122,11 @@ export default async function AdminEventsPage({
 
         <div className="space-y-3">
           <h2 className="font-heading text-lg font-semibold">All events</h2>
+          {!(data || []).length ? (
+            <p className="text-sm text-muted-foreground">
+              No events yet. Click a calendar date to create one.
+            </p>
+          ) : null}
           {(data || []).map((row) => (
             <div key={row.id} className="glass-card rounded-2xl p-4">
               <div className="flex items-start justify-between gap-3">
@@ -113,17 +138,10 @@ export default async function AdminEventsPage({
                   </p>
                   <p className="mt-1 text-xs font-semibold text-primary">
                     {counts.get(row.id) || 0} registrations
+                    {row.is_published ? " · Live" : " · Draft"}
                   </p>
                 </div>
-                <form action={deleteEventAction}>
-                  <input type="hidden" name="id" value={row.id} />
-                  <button
-                    type="submit"
-                    className="text-xs font-semibold text-destructive"
-                  >
-                    Delete
-                  </button>
-                </form>
+                <DeleteEventButton id={row.id} />
               </div>
             </div>
           ))}
