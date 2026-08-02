@@ -10,6 +10,30 @@ import type { ContentActionState } from "@/lib/content/utils";
 
 const initial: ContentActionState = {};
 
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block space-y-2">
+      <span className="block text-sm font-medium text-foreground">
+        {label}
+        {hint ? (
+          <span className="ml-1 font-normal text-muted-foreground">
+            ({hint})
+          </span>
+        ) : null}
+      </span>
+      {children}
+    </label>
+  );
+}
+
 export function EventRegisterForm({
   eventId,
   isLoggedIn,
@@ -29,57 +53,78 @@ export function EventRegisterForm({
 
   if (state.success) {
     return (
-      <div className="glass-card rounded-2xl p-6 text-sm text-success">
-        {state.success}
+      <div className="glass-card rounded-2xl p-6 sm:p-8">
+        <p className="text-sm font-medium text-success" role="status">
+          {state.success}
+        </p>
       </div>
     );
   }
 
   return (
-    <form action={action} className="glass-card space-y-4 rounded-2xl p-6">
-      <FormLock pending={pending} className="space-y-4" label="Registering…">
+    <form
+      action={action}
+      className="glass-card rounded-2xl p-6 sm:p-8"
+    >
+      <FormLock pending={pending} className="space-y-6" label="Registering…">
         <input type="hidden" name="event_id" value={eventId} />
-        <h3 className="font-heading text-lg font-semibold">Register</h3>
-        <p className="text-xs text-muted-foreground">
-          {isLoggedIn
-            ? `Registering as ${defaultName || defaultEmail}`
-            : "Enter your details to register for this event."}
-        </p>
-        <Input
-          name="full_name"
-          required
-          placeholder="Full name"
-          defaultValue={defaultName}
-          className="h-11 rounded-xl bg-white"
-        />
-        <Input
-          name="email"
-          type="email"
-          required
-          placeholder="Email"
-          defaultValue={defaultEmail}
-          className="h-11 rounded-xl bg-white"
-        />
-        <Input
-          name="phone"
-          type="tel"
-          placeholder="Phone (optional)"
-          className="h-11 rounded-xl bg-white"
-        />
-        <Input
-          name="notes"
-          placeholder="Notes (optional)"
-          className="h-11 rounded-xl bg-white"
-        />
+        <div className="space-y-2">
+          <h3 className="font-heading text-xl font-semibold">Register</h3>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {isLoggedIn
+              ? `Registering as ${defaultName || defaultEmail}`
+              : "Enter your details to register for this event."}
+          </p>
+        </div>
+
+        <div className="space-y-5">
+          <Field label="Full name">
+            <Input
+              name="full_name"
+              required
+              placeholder="Your full name"
+              defaultValue={defaultName}
+              className="h-12 rounded-xl bg-white"
+            />
+          </Field>
+          <Field label="Email">
+            <Input
+              name="email"
+              type="email"
+              required
+              placeholder="you@example.com"
+              defaultValue={defaultEmail}
+              className="h-12 rounded-xl bg-white"
+            />
+          </Field>
+          <Field label="Phone" hint="optional">
+            <Input
+              name="phone"
+              type="tel"
+              placeholder="+91 …"
+              className="h-12 rounded-xl bg-white"
+            />
+          </Field>
+          <Field label="Notes" hint="optional">
+            <textarea
+              name="notes"
+              rows={3}
+              placeholder="Anything we should know?"
+              className="w-full rounded-xl border border-input bg-white px-3 py-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            />
+          </Field>
+        </div>
+
         {state.error ? (
           <p className="text-sm text-destructive" role="alert">
             {state.error}
           </p>
         ) : null}
+
         <Button
           type="submit"
           disabled={pending}
-          className="h-11 w-full rounded-xl bg-primary"
+          className="h-12 w-full rounded-xl bg-primary text-base"
         >
           {pending ? (
             <>

@@ -296,14 +296,53 @@ export async function getPublishedCommunity(
   }
 }
 
-/** Homepage community cards — featured first, else top published. */
+/** Homepage community cards — always the three initiative slugs, with DB thumbnails. */
 export async function getHomepageCommunity(
   limit = 3,
 ): Promise<CommunityRow[]> {
-  const all = await getPublishedCommunity(24);
-  if (!all.length) return [];
-  const featured = all.filter((p) => p.is_featured);
-  return (featured.length ? featured : all).slice(0, limit);
+  const home = COMMUNITY_WORK.slice(0, limit);
+  const slugs = home.map((c) => c.slug);
+
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("community_projects")
+      .select(
+        "id, slug, title, summary, body, badge, badge_tone, status, cover_image_url, is_featured",
+      )
+      .in("slug", slugs);
+
+    const bySlug = new Map((data || []).map((row) => [row.slug, row]));
+
+    return home.map((c, i) => {
+      const row = bySlug.get(c.slug);
+      return {
+        id: row?.id ?? `fallback-community-${i}`,
+        slug: c.slug,
+        title: row?.title || c.title,
+        summary: row?.summary || c.description,
+        body: row?.body ?? null,
+        badge: row?.badge || c.badge,
+        badge_tone: row?.badge_tone || c.badgeTone,
+        status: row?.status || "ongoing",
+        cover_image_url: row?.cover_image_url ?? null,
+        is_featured: true,
+      };
+    });
+  } catch {
+    return home.map((c, i) => ({
+      id: `fallback-community-${i}`,
+      slug: c.slug,
+      title: c.title,
+      summary: c.description,
+      body: null,
+      badge: c.badge,
+      badge_tone: c.badgeTone,
+      status: "ongoing",
+      cover_image_url: null,
+      is_featured: true,
+    }));
+  }
 }
 
 export async function getCommunityBySlug(
