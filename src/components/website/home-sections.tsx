@@ -345,7 +345,7 @@ export function CommunitySection({
 
   return (
     <section className="relative py-16 lg:py-20" id="community">
-      <div className="relative z-10 mx-auto mb-12 flex max-w-[1280px] flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-end lg:px-20">
+      <div className="relative z-20 mx-auto mb-12 flex max-w-[1280px] flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-end lg:px-20">
         <div className="max-w-xl">
           <h2 className="font-heading mb-3 text-3xl font-semibold">
             Our Community Initiatives
@@ -359,7 +359,7 @@ export function CommunitySection({
           View All Work
         </ViewAllLink>
       </div>
-      <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
+      <div className="relative z-20 mx-auto grid max-w-[1280px] grid-cols-1 gap-6 px-4 sm:px-6 md:grid-cols-3 lg:px-20">
         {items.map((project, i) => {
           const tone = project.badge_tone || "primary";
           return (
@@ -442,10 +442,10 @@ export function EventsSection({
             alt=""
             className="pointer-events-none absolute inset-0 z-0 size-full object-cover object-center"
           />
-          <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/45 via-black/50 to-black/65" />
+          <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/45 via-black/50 to-black/65" />
         </>
       ) : null}
-      <div className="relative z-10 mx-auto mb-10 flex max-w-[1280px] flex-col items-center justify-between gap-4 px-4 sm:mb-12 sm:flex-row sm:items-end sm:px-6 lg:px-20">
+      <div className="relative z-20 mx-auto mb-10 flex max-w-[1280px] flex-col items-center justify-between gap-4 px-4 sm:mb-12 sm:flex-row sm:items-end sm:px-6 lg:px-20">
         <div className="text-center sm:text-left">
           <h2 className="font-heading mb-3 text-3xl font-semibold">
             Upcoming Events
@@ -456,7 +456,7 @@ export function EventsSection({
           View all
         </ViewAllLink>
       </div>
-      <div className="relative z-10 mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-20">
+      <div className="relative z-20 mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-20">
         {!events.length ? (
           <p className="text-center text-white/70">
             New events will appear here once published.
@@ -548,13 +548,13 @@ export function ResourcesSection({
 
   return (
     <section className="relative bg-muted py-12 sm:py-16 lg:py-20" id="resources">
-      <div className="relative z-10 mx-auto mb-6 flex max-w-[1280px] items-center justify-between gap-3 px-4 sm:mb-12 sm:px-6 lg:px-20">
+      <div className="relative z-20 mx-auto mb-6 flex max-w-[1280px] items-center justify-between gap-3 px-4 sm:mb-12 sm:px-6 lg:px-20">
         <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
           Digital Library & Resources
         </h2>
         <ViewAllLink href="/resources">View all</ViewAllLink>
       </div>
-      <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-6 sm:px-6 md:grid-cols-4 lg:px-20">
+      <div className="relative z-20 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-6 sm:px-6 md:grid-cols-4 lg:px-20">
         {categories.map((item) => {
           const tone =
             item.tone in toneClass
@@ -600,7 +600,7 @@ export function MarketplaceSection({
 }) {
   return (
     <section className="overflow-hidden py-12 sm:py-16 lg:py-20">
-      <div className="relative z-10 mx-auto mb-6 flex max-w-[1280px] items-center justify-between gap-3 px-4 sm:mb-12 sm:px-6 lg:px-20">
+      <div className="relative z-20 mx-auto mb-6 flex max-w-[1280px] items-center justify-between gap-3 px-4 sm:mb-12 sm:px-6 lg:px-20">
         <h2 className="font-heading text-2xl font-semibold sm:text-3xl">
           Featured Books
         </h2>
@@ -676,7 +676,7 @@ export function MustReadSection({
 }) {
   return (
     <section className="bg-surface-low/60 py-12 sm:py-16 lg:py-20" id="must-read">
-      <div className="relative z-10 mx-auto mb-6 flex max-w-[1280px] flex-col items-start justify-between gap-4 px-4 sm:mb-12 sm:flex-row sm:items-end sm:px-6 lg:px-20">
+      <div className="relative z-20 mx-auto mb-6 flex max-w-[1280px] flex-col items-start justify-between gap-4 px-4 sm:mb-12 sm:flex-row sm:items-end sm:px-6 lg:px-20">
         <div className="max-w-xl">
           <p className="mb-2 text-sm font-semibold tracking-wide text-primary uppercase">
             Essential reading

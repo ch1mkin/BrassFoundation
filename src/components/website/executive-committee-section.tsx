@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import type { ExecutiveMember } from "@/lib/content/committee";
 import { buttonVariants } from "@/components/ui/button";
@@ -217,7 +216,7 @@ export function LeadershipSection({
       className="relative overflow-hidden bg-surface-high py-10 sm:py-14 lg:py-16"
     >
       <SectionOrnaments />
-      <div className="relative z-10 mx-auto mb-8 flex max-w-[1280px] flex-col items-center justify-between gap-4 px-4 text-center sm:mb-10 sm:flex-row sm:items-end sm:px-6 sm:text-left lg:px-20">
+      <div className="relative z-20 mx-auto mb-8 flex max-w-[1280px] flex-col items-center justify-between gap-4 px-4 text-center sm:mb-10 sm:flex-row sm:items-end sm:px-6 sm:text-left lg:px-20">
         <div>
           <h2 className="font-heading mb-2 text-2xl font-semibold sm:text-3xl">
             Executive Committee
@@ -229,15 +228,16 @@ export function LeadershipSection({
           </p>
         </div>
         {showViewAll ? (
-          <Link
+          // eslint-disable-next-line @next/next/no-html-link-for-pages -- hard nav for mobile taps
+          <a
             href={viewAllHref}
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "pointer-events-auto relative z-30 shrink-0 rounded-full px-3 text-xs sm:px-4 sm:text-sm",
+              "pointer-events-auto relative z-40 inline-flex min-h-11 shrink-0 touch-manipulation items-center justify-center rounded-full px-4 text-sm sm:min-h-10 sm:px-4",
             )}
           >
             View all
-          </Link>
+          </a>
         ) : null}
       </div>
 
