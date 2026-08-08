@@ -27,10 +27,12 @@ export function SelfieField({
   name = "avatar_data_url",
   required = true,
   className,
+  onReadyChange,
 }: {
   name?: string;
   required?: boolean;
   className?: string;
+  onReadyChange?: (ready: boolean) => void;
 }) {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,8 +53,10 @@ export function SelfieField({
       }
       const dataUrl = await fileToJpegDataUrl(file);
       setPreview(dataUrl);
+      onReadyChange?.(true);
     } catch (err) {
       setPreview(null);
+      onReadyChange?.(false);
       setError(err instanceof Error ? err.message : "Could not use that photo.");
     } finally {
       setBusy(false);

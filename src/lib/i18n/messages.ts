@@ -20,6 +20,8 @@ export type MessageKey =
   | "nav.signOut"
   | "nav.mustRead"
   | "nav.fraternity"
+  | "nav.achievers"
+  | "nav.brochure"
   | "footer.blurb"
   | "footer.quickLinks"
   | "footer.community"
@@ -56,6 +58,8 @@ const en: Record<MessageKey, string> = {
   "nav.signOut": "Sign out",
   "nav.mustRead": "Must Read",
   "nav.fraternity": "Fraternity",
+  "nav.achievers": "Achievers",
+  "nav.brochure": "Brochure",
   "footer.blurb":
     "Empowering the marginalized through the light of knowledge and unity.",
   "footer.quickLinks": "Quick Links",
@@ -75,11 +79,11 @@ const en: Record<MessageKey, string> = {
 };
 
 const pa: Record<MessageKey, string> = {
-  "nav.home": "ਘਰ",
-  "nav.about": "ਬਾਰੇ",
+  "nav.home": "ਮੁੱਖ ਪੰਨਾ",
+  "nav.about": "ਸਾਡੇ ਬਾਰੇ",
   "nav.explore": "ਖੋਜੋ",
   "nav.learn": "ਸਿੱਖੋ",
-  "nav.community": "ਕਮਿਊਨਿਟੀ",
+  "nav.community": "ਸਮਾਜ",
   "nav.resources": "ਸਰੋਤ",
   "nav.events": "ਸਮਾਗਮ",
   "nav.gallery": "ਗੈਲਰੀ",
@@ -90,14 +94,16 @@ const pa: Record<MessageKey, string> = {
   "nav.login": "ਲਾਗਇਨ",
   "nav.becomeMember": "ਮੈਂਬਰ ਬਣੋ",
   "nav.memberPortal": "ਮੈਂਬਰ ਪੋਰਟਲ",
-  "nav.adminPortal": "ਐਡਮਿਨ ਪੋਰਟਲ",
+  "nav.adminPortal": "ਪ੍ਰਬੰਧਕ ਪੋਰਟਲ",
   "nav.signOut": "ਸਾਈਨ ਆਉਟ",
   "nav.mustRead": "ਜ਼ਰੂਰੀ ਪੜ੍ਹੋ",
   "nav.fraternity": "ਭਾਈਚਾਰਾ",
+  "nav.achievers": "ਸਫਲਤਾਵਾਂ",
+  "nav.brochure": "ਬ੍ਰੋਸ਼ਰ",
   "footer.blurb":
     "ਗਿਆਨ ਅਤੇ ਏਕਤਾ ਦੀ ਰੋਸ਼ਨੀ ਨਾਲ ਪਿਛੜੇ ਵਰਗਾਂ ਨੂੰ ਸਸ਼ਕਤ ਬਣਾਉਣਾ।",
   "footer.quickLinks": "ਤੇਜ਼ ਲਿੰਕ",
-  "footer.community": "ਕਮਿਊਨਿਟੀ",
+  "footer.community": "ਸਮਾਜ",
   "footer.contactUs": "ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ",
   "footer.becomeMember": "ਮੈਂਬਰ ਬਣੋ",
   "footer.gallery": "ਗੈਲਰੀ",
@@ -113,8 +119,8 @@ const pa: Record<MessageKey, string> = {
 };
 
 const hi: Record<MessageKey, string> = {
-  "nav.home": "होम",
-  "nav.about": "परिचय",
+  "nav.home": "मुख्य पृष्ठ",
+  "nav.about": "हमारे बारे में",
   "nav.explore": "खोजें",
   "nav.learn": "सीखें",
   "nav.community": "समुदाय",
@@ -123,15 +129,17 @@ const hi: Record<MessageKey, string> = {
   "nav.gallery": "गैलरी",
   "nav.news": "समाचार",
   "nav.blog": "ब्लॉग",
-  "nav.marketplace": "बाजार",
+  "nav.marketplace": "बाज़ार",
   "nav.contact": "संपर्क",
   "nav.login": "लॉगिन",
   "nav.becomeMember": "सदस्य बनें",
   "nav.memberPortal": "सदस्य पोर्टल",
-  "nav.adminPortal": "एडमिन पोर्टल",
+  "nav.adminPortal": "प्रशासन पोर्टल",
   "nav.signOut": "साइन आउट",
   "nav.mustRead": "अवश्य पढ़ें",
   "nav.fraternity": "बिरादरी",
+  "nav.achievers": "सफ़ल व्यक्तित्व",
+  "nav.brochure": "ब्रोशर",
   "footer.blurb":
     "ज्ञान और एकता के प्रकाश से वंचित वर्गों को सशक्त बनाना।",
   "footer.quickLinks": "त्वरित लिंक",
@@ -139,7 +147,7 @@ const hi: Record<MessageKey, string> = {
   "footer.contactUs": "हमसे संपर्क करें",
   "footer.becomeMember": "सदस्य बनें",
   "footer.gallery": "गैलरी",
-  "footer.marketplace": "बाजार",
+  "footer.marketplace": "बाज़ार",
   "footer.contact": "संपर्क",
   "footer.rights": "सर्वाधिकार सुरक्षित।",
   "footer.newsletterPlaceholder": "अपडेट के लिए ईमेल",
@@ -173,4 +181,6 @@ export const NAV_MESSAGE_KEYS: Record<string, MessageKey> = {
   Marketplace: "nav.marketplace",
   Contact: "nav.contact",
   "Must Read": "nav.mustRead",
+  Achievers: "nav.achievers",
+  Brochure: "nav.brochure",
 };

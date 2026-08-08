@@ -61,8 +61,10 @@ function AnimatedCounter({
 
 export function StatsSection({
   stats,
+  liveMemberCount,
 }: {
   stats: HomepageContent["stats"];
+  liveMemberCount?: number | null;
 }) {
   const count = stats.length;
   const cols =
@@ -76,12 +78,20 @@ export function StatsSection({
             ? "md:grid-cols-5"
             : "md:grid-cols-3 lg:grid-cols-6";
 
+  const displayStats = stats.map((stat) => {
+    const isMembers = /member/i.test(stat.label);
+    if (isMembers && typeof liveMemberCount === "number") {
+      return { ...stat, value: liveMemberCount, suffix: "+" };
+    }
+    return stat;
+  });
+
   return (
     <section className="relative bg-surface-low py-12 lg:py-16">
       <div
         className={`relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-4 sm:px-6 lg:gap-3 lg:px-8 xl:px-12 ${cols}`}
       >
-        {stats.map((stat, i) => (
+        {displayStats.map((stat, i) => (
           <div
             key={`${stat.label}-${i}`}
             className="glass-card rounded-xl px-2.5 py-3 text-center transition hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(17,76,136,0.08)] sm:px-3 sm:py-4"
@@ -207,7 +217,7 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
         </div>
       ))}
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -226,11 +236,11 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
           }}
         >
           <div className="absolute right-0 bottom-6 left-6 text-white sm:bottom-8 sm:left-8">
-            <p className="font-quote max-w-xl font-medium leading-snug">
+            <p className="font-quote hero-quote max-w-xl font-medium leading-snug">
               &ldquo;{current.quote}&rdquo;
             </p>
             {current.attribution ? (
-              <p className="font-quote-attr mt-3 font-medium text-white/90">
+              <p className="font-quote-attr hero-quote-attr mt-3 font-medium">
                 — {current.attribution}
               </p>
             ) : null}
@@ -388,6 +398,12 @@ export function CommunitySection({
                   ) : (
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(17,181,201,0.35),transparent_55%)] transition-transform duration-500 group-hover:scale-110" />
                   )}
+                  <div className="absolute top-4 right-4 flex size-11 items-center justify-center rounded-full bg-black/25 shadow-[0_0_18px_rgba(242,178,51,0.65)] ring-1 ring-gold/50 backdrop-blur-sm">
+                    <MaterialIcon
+                      name="star"
+                      className="text-[22px] text-gold drop-shadow-[0_0_8px_rgba(242,178,51,0.95)]"
+                    />
+                  </div>
                   {project.badge ? (
                     <div className="absolute top-4 left-4">
                       <span

@@ -41,6 +41,17 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
+
+  // Capture membership referral codes from ?ref=BF-YYYY-…
+  const ref = request.nextUrl.searchParams.get("ref")?.trim().toUpperCase();
+  if (ref && /^BF-\d{4}-\d+$/i.test(ref)) {
+    supabaseResponse.cookies.set("bf_ref", ref, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: "lax",
+    });
+  }
+
   const isAuthRoute =
     pathname.startsWith("/login") ||
     pathname.startsWith("/forgot-password") ||

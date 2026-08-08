@@ -19,9 +19,14 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as {
       applicationId?: string;
-      purpose?: "registration_fee" | "contribution" | "book_purchase";
+      purpose?:
+        | "registration_fee"
+        | "contribution"
+        | "book_purchase"
+        | "family_registration";
       amountPaise?: number;
       marketplaceItemId?: string;
+      familyMemberIds?: string[];
     };
 
     const purpose = body.purpose || "registration_fee";
@@ -37,6 +42,7 @@ export async function POST(request: Request) {
     let amountPaise = body.amountPaise;
     const applicationId = body.applicationId || null;
     const marketplaceItemId = body.marketplaceItemId || null;
+    const familyMemberIds = body.familyMemberIds || [];
     let bookTitle = "";
 
     if (purpose === "registration_fee") {
@@ -44,6 +50,37 @@ export async function POST(request: Request) {
       if (!applicationId) {
         return NextResponse.json(
           { error: "Missing application id." },
+          { status: 400 },
+        );
+      }
+    } else if (purpose === "family_registration") {
+      if (!familyMemberIds.length) {
+        return NextResponse.json(
+          { error: "Missing family member ids." },
+          { status: 400 },
+        );
+      }
+      const adminPeek = createServiceClient();
+      const { data: familyRows } = await adminPeek
+        .from("family_members")
+        .select("id, fee_paise, payment_status, parent_user_id")
+        .in("id", familyMemberIds);
+
+      if (!familyRows?.length) {
+        return NextResponse.json(
+          { error: "Family members not found." },
+          { status: 404 },
+        );
+      }
+      if (familyRows.some((r) => r.parent_user_id !== user.id)) {
+        return NextResponse.json({ error: "Unauthorized family payment." }, { status: 403 });
+      }
+      amountPaise = familyRows
+        .filter((r) => r.payment_status === "unpaid")
+        .reduce((sum, r) => sum + (r.fee_paise || 0), 0);
+      if (!amountPaise || amountPaise < 1000) {
+        return NextResponse.json(
+          { error: "No payable family members found." },
           { status: 400 },
         );
       }
@@ -142,7 +179,9 @@ export async function POST(request: Request) {
         status: "created",
         meta: marketplaceItemId
           ? { marketplace_item_id: marketplaceItemId, book_title: bookTitle }
-          : {},
+          : familyMemberIds.length
+            ? { family_member_ids: familyMemberIds }
+            : {},
       })
       .select("id")
       .single();
@@ -156,6 +195,13 @@ export async function POST(request: Request) {
         .from("membership_applications")
         .update({ payment_status: "pending" })
         .eq("id", applicationId);
+    }
+
+    if (purpose === "family_registration" && familyMemberIds.length) {
+      await admin
+        .from("family_members")
+        .update({ payment_status: "pending", payment_order_id: row.id })
+        .in("id", familyMemberIds);
     }
 
     if (purpose === "book_purchase" && marketplaceItemId) {

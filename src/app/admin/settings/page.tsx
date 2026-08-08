@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { isSmtpConfigured } from "@/lib/email/smtp";
+import { isRazorpayConfigured } from "@/lib/payments/razorpay";
+import { isRazorpayLiveMode } from "@/lib/payments/constants";
 
 export const metadata: Metadata = { title: "Admin · Settings" };
 
@@ -8,6 +10,8 @@ export default function AdminSettingsPage() {
     process.env.CONTACT_INBOX ||
     process.env.SMTP_FROM_EMAIL ||
     process.env.SMTP_USER;
+  const razorpayOk = isRazorpayConfigured();
+  const razorpayLive = isRazorpayLiveMode();
 
   const checks = [
     {
@@ -31,6 +35,14 @@ export default function AdminSettingsPage() {
       ok: Boolean(contactInbox),
     },
     {
+      label: "Razorpay keys",
+      ok: razorpayOk,
+    },
+    {
+      label: "Razorpay LIVE mode",
+      ok: razorpayLive,
+    },
+    {
       label: "App URL",
       ok: Boolean(process.env.NEXT_PUBLIC_APP_URL),
     },
@@ -51,26 +63,23 @@ export default function AdminSettingsPage() {
             <p
               className={`mt-2 text-sm font-semibold ${item.ok ? "text-success" : "text-destructive"}`}
             >
-              {item.ok ? "Configured" : "Missing"}
+              {item.ok ? "Configured" : "Missing / Test mode"}
             </p>
           </div>
         ))}
       </div>
       <div className="glass-card space-y-3 rounded-2xl p-6 text-sm text-muted-foreground">
         <p>
-          Contact Us mail uses Hostinger SMTP. Set{" "}
-          <code className="text-xs">SMTP_USER</code>,{" "}
-          <code className="text-xs">SMTP_PASS</code>,{" "}
-          <code className="text-xs">SMTP_FROM_EMAIL</code>, and optionally{" "}
-          <code className="text-xs">CONTACT_INBOX</code> (defaults to from
-          address). See <code className="text-xs">docs/SETUP.md</code>.
+          For production payments, set Vercel env{" "}
+          <code className="text-xs">NEXT_PUBLIC_RAZORPAY_KEY_ID</code> to a{" "}
+          <code className="text-xs">rzp_live_…</code> key and matching{" "}
+          <code className="text-xs">RAZORPAY_KEY_SECRET</code> + webhook secret.
+          Redeploy after saving.
         </p>
         <p>
-          Homepage copy and stats are edited in{" "}
-          <a href="/admin/website" className="font-semibold text-primary">
-            Website CMS
-          </a>
-          . Brand logo lives at <code>/public/brand/logo.png</code>.
+          Contact Us mail uses Hostinger SMTP (
+          <code className="text-xs">SMTP_*</code> /{" "}
+          <code className="text-xs">CONTACT_INBOX</code>).
         </p>
       </div>
     </div>

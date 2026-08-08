@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { MEMBERSHIP_CONSENT_VERSION } from "@/lib/membership/consent";
 import { REGISTRATION_FEE_PAISE } from "@/lib/payments/constants";
+import { readReferralCookie } from "@/lib/membership/referral";
 import { z } from "zod";
 
 export type RegisterMembershipState = {
@@ -16,20 +17,25 @@ export type RegisterMembershipState = {
   phone?: string;
 };
 
+const CATEGORIES = ["SC", "ST", "OBC"] as const;
+
 const schema = z.object({
-  full_name: z.string().min(2, "Full name is required."),
+  full_name: z
+    .string()
+    .min(2, "Full name with surname is required.")
+    .max(120),
   email: z.string().email("Valid email is required."),
-  government_id: z.string().min(4, "Government / ID number is required."),
-  phone: z.string().min(10, "Mobile number is required."),
+  phone: z.string().min(10, "Mobile number is required.").max(20),
+  address: z.string().min(8, "Address is required.").max(500),
+  category: z.enum(CATEGORIES, { message: "Select category: SC, ST, or OBC." }),
   password: z.string().min(8, "Password must be at least 8 characters."),
   confirm_password: z.string().min(8),
   consent: z.enum(["on"], { message: "You must accept the consent form." }),
   signature_data_url: z
     .string()
     .min(40, "Digital signature is required."),
-  avatar_data_url: z
-    .string()
-    .min(40, "Please take a selfie or upload a profile photo."),
+  avatar_data_url: z.string().optional(),
+  referred_by_membership_id: z.string().optional(),
 });
 
 async function uploadAvatarFromDataUrl(
@@ -74,8 +80,10 @@ async function ensureApplication(
     full_name: string;
     email: string;
     phone: string;
-    government_id: string;
+    address: string;
+    category: string;
     signature_data_url: string;
+    referred_by_membership_id?: string | null;
   },
 ) {
   const { data: existing } = await admin
@@ -95,21 +103,26 @@ async function ensureApplication(
     } as const;
   }
 
+  const payload = {
+    full_name: data.full_name,
+    email: data.email,
+    phone: data.phone,
+    address: data.address,
+    category: data.category,
+    government_id: null,
+    consent_accepted_at: new Date().toISOString(),
+    consent_version: MEMBERSHIP_CONSENT_VERSION,
+    signature_data_url: data.signature_data_url,
+    registration_fee_paise: REGISTRATION_FEE_PAISE,
+    payment_status: "unpaid",
+    status: "pending",
+    referred_by_membership_id: data.referred_by_membership_id || null,
+  };
+
   if (existing && existing.payment_status !== "paid") {
     await admin
       .from("membership_applications")
-      .update({
-        full_name: data.full_name,
-        email: data.email,
-        phone: data.phone,
-        government_id: data.government_id,
-        consent_accepted_at: new Date().toISOString(),
-        consent_version: MEMBERSHIP_CONSENT_VERSION,
-        signature_data_url: data.signature_data_url,
-        registration_fee_paise: REGISTRATION_FEE_PAISE,
-        payment_status: "unpaid",
-        status: "pending",
-      })
+      .update(payload)
       .eq("id", existing.id);
     return { applicationId: existing.id as string } as const;
   }
@@ -119,22 +132,13 @@ async function ensureApplication(
     .insert({
       user_id: userId,
       membership_type: "general",
-      status: "pending",
-      payment_status: "unpaid",
-      full_name: data.full_name,
-      email: data.email,
-      phone: data.phone,
-      government_id: data.government_id,
       education: "—",
       occupation: "—",
       district: "—",
       state: "—",
       reason_for_joining: "Registered via membership payment flow.",
-      consent_accepted_at: new Date().toISOString(),
-      consent_version: MEMBERSHIP_CONSENT_VERSION,
-      signature_data_url: data.signature_data_url,
-      registration_fee_paise: REGISTRATION_FEE_PAISE,
       member_status: "active",
+      ...payload,
     })
     .select("id")
     .single();
@@ -160,21 +164,31 @@ export async function registerMembershipAction(
     data: { user: sessionUser },
   } = await supabase.auth.getUser();
 
+  const avatarRaw = String(formData.get("avatar_data_url") || "").trim();
+  const referredFromForm = String(
+    formData.get("referred_by_membership_id") || "",
+  )
+    .trim()
+    .toUpperCase();
+  const referredFromCookie = await readReferralCookie();
+
   const raw = {
     full_name: String(formData.get("full_name") || "").trim(),
     email: String(formData.get("email") || "")
       .trim()
       .toLowerCase(),
-    government_id: String(formData.get("government_id") || "").trim(),
     phone: String(formData.get("phone") || "").trim(),
+    address: String(formData.get("address") || "").trim(),
+    category: String(formData.get("category") || "").trim().toUpperCase(),
     password: String(formData.get("password") || ""),
     confirm_password: String(formData.get("confirm_password") || ""),
     consent: formData.get("consent") === "on" ? "on" : "",
     signature_data_url: String(formData.get("signature_data_url") || ""),
-    avatar_data_url: String(formData.get("avatar_data_url") || ""),
+    avatar_data_url: avatarRaw || undefined,
+    referred_by_membership_id:
+      referredFromForm || referredFromCookie || undefined,
   };
 
-  // Logged-in users completing membership don't need a new password.
   if (sessionUser) {
     if (!raw.password) {
       raw.password = "LoggedInUser1";
@@ -235,7 +249,6 @@ export async function registerMembershipAction(
         password: data.password,
       });
       if (signInError) {
-        // Account exists; try to continue after they log in manually.
         const ensured = await ensureApplication(admin, userId, data);
         if ("error" in ensured && ensured.error) {
           return { error: ensured.error, applicationId: undefined };
@@ -254,11 +267,14 @@ export async function registerMembershipAction(
     return { error: "Could not create or sign in to your account." };
   }
 
-  const avatarUrl = await uploadAvatarFromDataUrl(
-    admin,
-    userId,
-    data.avatar_data_url,
-  );
+  let avatarUrl: string | null = null;
+  if (data.avatar_data_url && data.avatar_data_url.length > 40) {
+    avatarUrl = await uploadAvatarFromDataUrl(
+      admin,
+      userId,
+      data.avatar_data_url,
+    );
+  }
 
   await admin
     .from("profiles")
@@ -285,7 +301,8 @@ export async function registerMembershipAction(
   revalidatePath("/member");
   revalidatePath("/membership");
   revalidatePath("/admin/members");
-  revalidatePath("/admin/family");
+  revalidatePath("/admin/referrals");
+  revalidatePath("/");
 
   return {
     success: "Account ready. Complete ₹10 payment to activate membership.",

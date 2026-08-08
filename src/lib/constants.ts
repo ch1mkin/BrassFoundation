@@ -31,6 +31,11 @@ export const NAV_ITEMS: NavItem[] = [
         description: "Initiatives, outreach, and collective growth",
       },
       {
+        href: "/achievers",
+        label: "Achievers",
+        description: "Celebrating outstanding members",
+      },
+      {
         href: "/events",
         label: "Events",
         description: "Programs and gatherings",
@@ -39,6 +44,11 @@ export const NAV_ITEMS: NavItem[] = [
         href: "/gallery",
         label: "Gallery",
         description: "Photos and moments",
+      },
+      {
+        href: "/brochure",
+        label: "Brochure",
+        description: "Official organisation brochure",
       },
     ],
   },

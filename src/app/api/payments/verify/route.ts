@@ -111,12 +111,60 @@ export async function POST(request: Request) {
       });
 
       revalidatePath("/admin/family");
+      revalidatePath("/admin/referrals");
       revalidatePath("/member");
+      revalidatePath("/");
 
       return NextResponse.json({
         ok: true,
         membershipId,
         purpose: "registration_fee",
+      });
+    }
+
+    if (order.purpose === "family_registration") {
+      const meta = (order.meta || {}) as { family_member_ids?: string[] };
+      const ids = meta.family_member_ids || [];
+      if (!ids.length) {
+        return NextResponse.json(
+          { error: "Family payment meta missing." },
+          { status: 400 },
+        );
+      }
+
+      const year = new Date().getFullYear();
+      for (const id of ids) {
+        const membershipId = `BF-F-${year}-${String(Date.now()).slice(-5)}${Math.random().toString(36).slice(2, 4)}`;
+        await admin
+          .from("family_members")
+          .update({
+            payment_status: "paid",
+            membership_id: membershipId,
+            payment_order_id: order.id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", id)
+          .eq("parent_user_id", user.id);
+      }
+
+      await admin.from("transactions").insert({
+        user_id: user.id,
+        order_id: order.id,
+        type: "registration",
+        amount_paise: order.amount_paise,
+        currency: "INR",
+        razorpay_payment_id: paymentId,
+        status: "captured",
+        description: "Family membership fees",
+      });
+
+      revalidatePath("/member/family");
+      revalidatePath("/admin/family-members");
+      revalidatePath("/");
+
+      return NextResponse.json({
+        ok: true,
+        purpose: "family_registration",
       });
     }
 

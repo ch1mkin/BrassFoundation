@@ -4,6 +4,7 @@ import { MaterialIcon } from "@/components/ui/material-icon";
 import { PageShell } from "@/components/website/page-shell";
 import { getResourceCategoryCounts } from "@/lib/content/queries";
 import { getResourceCategories } from "@/lib/content/resource-categories";
+import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Digital Library" };
@@ -16,9 +17,22 @@ const toneClass = {
 } as const;
 
 export default async function ResourcesPage() {
-  const [categories, counts] = await Promise.all([
+  const [categories, counts, links] = await Promise.all([
     getResourceCategories(),
     getResourceCategoryCounts(),
+    (async () => {
+      try {
+        const supabase = await createClient();
+        const { data } = await supabase
+          .from("useful_links")
+          .select("id, title, url, description")
+          .eq("is_published", true)
+          .order("sort_order", { ascending: true });
+        return data || [];
+      } catch {
+        return [];
+      }
+    })(),
   ]);
 
   return (
@@ -60,6 +74,33 @@ export default async function ResourcesPage() {
           );
         })}
       </div>
+
+      {links.length ? (
+        <section className="mt-14 space-y-4">
+          <h2 className="font-heading text-2xl font-semibold">Useful links</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {links.map((link) => (
+              <a
+                key={link.id}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass-card rounded-2xl p-5 transition hover:-translate-y-0.5 hover:ring-1 hover:ring-primary/30"
+              >
+                <p className="font-heading text-lg font-semibold">{link.title}</p>
+                {link.description ? (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {link.description}
+                  </p>
+                ) : null}
+                <p className="mt-3 text-xs font-semibold text-primary">
+                  Open link →
+                </p>
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </PageShell>
   );
 }

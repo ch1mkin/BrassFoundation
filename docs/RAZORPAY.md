@@ -1,6 +1,20 @@
 # Razorpay setup — Brass Foundation
 
-Use this for **₹10 membership registration** (one-time) and **monthly contribution mandates**.
+Use this for **₹10 membership registration** (one-time), **family membership fees**, and **monthly contribution mandates**.
+
+## Production (live keys)
+
+1. Dashboard → switch to **Live Mode**
+2. Generate Live API keys (`rzp_live_…`)
+3. Set on Vercel (Production + Preview as needed), then redeploy:
+
+```bash
+NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_live_xxxxxxxx
+RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxx
+RAZORPAY_WEBHOOK_SECRET=whsec_xxxxxxxx
+```
+
+Admin → Settings shows **Razorpay LIVE mode** when the public key starts with `rzp_live_`. There is no separate test-mode flag in code — the env key decides the mode.
 
 ## 1. Create / open Razorpay account
 

@@ -11,6 +11,7 @@ export function HardNavLink({
   href,
   className,
   children,
+  onClick,
   ...rest
 }: {
   href: string;
@@ -23,6 +24,8 @@ export function HardNavLink({
       prefetch={false}
       className={cn("touch-manipulation", className)}
       onClick={(e) => {
+        onClick?.(e);
+        if (e.defaultPrevented) return;
         e.preventDefault();
         window.location.assign(href);
       }}

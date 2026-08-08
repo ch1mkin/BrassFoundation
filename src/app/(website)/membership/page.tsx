@@ -6,12 +6,21 @@ import { ContributionSection } from "@/components/membership/contribution-sectio
 import { SITE } from "@/lib/constants";
 import { getSessionUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { readReferralCookie } from "@/lib/membership/referral";
 
 export const metadata: Metadata = {
   title: "Membership",
 };
 
-export default async function MembershipPage() {
+export default async function MembershipPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ref?: string }>;
+}) {
+  const { ref } = await searchParams;
+  const cookieRef = await readReferralCookie();
+  const referralCode = ref?.trim().toUpperCase() || cookieRef || null;
+
   const user = await getSessionUser();
   let alreadyMember = false;
   let pendingApplicationId: string | null = null;
@@ -64,11 +73,12 @@ export default async function MembershipPage() {
             Membership
           </p>
           <h1 className="font-heading mt-2 text-3xl font-semibold sm:text-4xl">
-            Become a Member
+            {alreadyMember ? "Contribute & grow" : "Become a Member"}
           </h1>
           <p className="mt-3 max-w-xl text-muted-foreground">
-            Join {SITE.name} — register with your details, sign consent, pay ₹10,
-            and become a member instantly. There are no guest accounts.
+            {alreadyMember
+              ? `Thank you for being part of ${SITE.name}. Add monthly contributions or invite family from your member portal.`
+              : `Join ${SITE.name} — register with your details, sign consent, pay ₹10, and become a member instantly.`}
           </p>
         </div>
       </div>
@@ -76,8 +86,11 @@ export default async function MembershipPage() {
       {alreadyMember ? (
         <div className="space-y-8">
           <div className="glass-card rounded-2xl p-6 text-sm text-success">
-            You are already an active member. Thank you for being part of{" "}
-            {SITE.name}.
+            You are already an active member. Use{" "}
+            <a href="/member" className="font-semibold underline">
+              Member portal
+            </a>{" "}
+            to contribute, share your referral link, or add family members.
           </div>
           <ContributionSection
             defaultName={profile?.full_name || undefined}
@@ -97,6 +110,7 @@ export default async function MembershipPage() {
       ) : (
         <div id="register" className="scroll-mt-28">
           <MembershipRegistrationForm
+            referralCode={referralCode}
             defaults={{
               fullName: profile?.full_name || undefined,
               email: profile?.email || undefined,

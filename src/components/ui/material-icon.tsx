@@ -107,6 +107,16 @@ const ICON_MAP: Record<string, LucideIcon> = {
   help: HelpCircle,
   close: X,
   open_in_new: ExternalLink,
+  balance: Shield,
+  sports_soccer: Activity,
+  celebration: Sparkles,
+  emoji_events: Star,
+  directions_bus: MoveRight,
+  theater_comedy: Mic,
+  flag: BadgeCheck,
+  public: Globe,
+  receipt_long: CircleDollarSign,
+  trophy: Star,
 };
 
 function sizeFromClass(className?: string) {

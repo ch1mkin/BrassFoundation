@@ -22,6 +22,7 @@ import {
   getPublishedMarketplace,
 } from "@/lib/content/queries";
 import { getResourceCategories } from "@/lib/content/resource-categories";
+import { getLiveMemberCount } from "@/lib/membership/member-count";
 
 export default async function HomePage() {
   const [
@@ -33,6 +34,7 @@ export default async function HomePage() {
     context,
     resourceCategories,
     communityProjects,
+    liveMemberCount,
   ] = await Promise.all([
       getPublishedHomepage(),
       getExecutiveCommittee(),
@@ -42,6 +44,7 @@ export default async function HomePage() {
       getUserContext(),
       getResourceCategories(),
       getHomepageCommunity(3),
+      getLiveMemberCount(),
     ]);
 
   const purchaseMap = context
@@ -68,7 +71,7 @@ export default async function HomePage() {
         secondaryLabelPa={content.hero_cta_secondary_label_pa}
       />
       <SectionDivider />
-      <StatsSection stats={content.stats} />
+      <StatsSection stats={content.stats} liveMemberCount={liveMemberCount} />
       <SectionDivider />
       <AboutSection
         eyebrow={content.about_eyebrow}
