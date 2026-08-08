@@ -129,13 +129,20 @@ export function LoginForm() {
         </fieldset>
       </form>
 
-      <div className="mt-10 text-center">
+      <div className="mt-10 space-y-3 text-center">
         <p className="text-muted-foreground">
           New here?{" "}
           <MembershipLink className="font-bold text-primary hover:underline">
             Become a member
           </MembershipLink>
         </p>
+        <a
+          href="/"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-white px-5 text-sm font-semibold text-foreground transition hover:bg-surface-low"
+        >
+          <MaterialIcon name="home" className="text-[18px]" />
+          Home
+        </a>
       </div>
     </div>
   );
