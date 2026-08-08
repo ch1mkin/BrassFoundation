@@ -73,7 +73,7 @@ export function LoginForm() {
                 name="email"
                 type="email"
                 required
-                placeholder="name@foundation.org"
+                placeholder="name@brassfoundation.com"
                 autoComplete="email"
                 className="h-12 rounded-xl border-border bg-white pr-4 pl-12"
               />
