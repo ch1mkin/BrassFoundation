@@ -65,6 +65,11 @@ export const NAV_ITEMS: NavItem[] = [
         label: "Resources",
         description: "Books and study materials",
       },
+      {
+        href: "/useful-links",
+        label: "Useful Links",
+        description: "Curated external links and references",
+      },
       { href: "/news", label: "News", description: "Updates and announcements" },
       { href: "/blog", label: "Blog", description: "Stories and reflections" },
       {
@@ -83,6 +88,7 @@ export const NAV_LINKS = [
   { href: "/events", label: "Events" },
   { href: "/must-read", label: "Must Read" },
   { href: "/resources", label: "Resources" },
+  { href: "/useful-links", label: "Useful Links" },
   { href: "/gallery", label: "Gallery" },
   { href: "/marketplace", label: "Marketplace" },
   { href: "/news", label: "News" },

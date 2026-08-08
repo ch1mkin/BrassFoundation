@@ -130,7 +130,7 @@ export async function upsertUsefulLinkAction(
     : await supabase.from("useful_links").insert(payload);
 
   if (error) return { error: error.message };
-  revalidatePath("/resources");
+  revalidatePath("/useful-links");
   revalidatePath("/admin/useful-links");
   return { success: id ? "Link updated." : "Link added." };
 }
@@ -146,7 +146,7 @@ export async function deleteUsefulLinkAction(
   const supabase = await createClient();
   const { error } = await supabase.from("useful_links").delete().eq("id", id);
   if (error) return { error: error.message };
-  revalidatePath("/resources");
+  revalidatePath("/useful-links");
   revalidatePath("/admin/useful-links");
   return { success: "Link deleted." };
 }

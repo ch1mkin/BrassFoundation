@@ -190,13 +190,6 @@ export async function registerMembershipAction(
       referredFromForm || referredFromCookie || undefined,
   };
 
-  if (sessionUser) {
-    if (!raw.password) {
-      raw.password = "LoggedInUser1";
-      raw.confirm_password = "LoggedInUser1";
-    }
-  }
-
   if (raw.password !== raw.confirm_password) {
     return { error: "Passwords do not match." };
   }
@@ -266,6 +259,20 @@ export async function registerMembershipAction(
 
   if (!userId) {
     return { error: "Could not create or sign in to your account." };
+  }
+
+  if (sessionUser) {
+    const { error: passwordError } = await admin.auth.admin.updateUserById(
+      userId,
+      { password: data.password },
+    );
+    if (passwordError) {
+      return {
+        error:
+          passwordError.message ||
+          "Could not save password. Please try a different password.",
+      };
+    }
   }
 
   let avatarUrl: string | null = null;

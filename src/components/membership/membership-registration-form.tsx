@@ -68,20 +68,19 @@ export function MembershipRegistrationForm({
   }, [state.applicationId, state.success]);
 
   const formComplete = useMemo(() => {
-    const base =
+    const passwordsOk =
+      password.length >= 8 &&
+      confirmPassword.length >= 8 &&
+      password === confirmPassword;
+    return (
       fullName.trim().length >= 2 &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
       phone.trim().length >= 10 &&
       address.trim().length >= 8 &&
       isMembershipCategory(category) &&
       consent &&
-      Boolean(signature);
-    if (loggedIn) return base;
-    return (
-      base &&
-      password.length >= 8 &&
-      confirmPassword.length >= 8 &&
-      password === confirmPassword
+      Boolean(signature) &&
+      passwordsOk
     );
   }, [
     fullName,
@@ -91,10 +90,14 @@ export function MembershipRegistrationForm({
     category,
     consent,
     signature,
-    loggedIn,
     password,
     confirmPassword,
   ]);
+
+  const passwordsMismatch =
+    password.length > 0 &&
+    confirmPassword.length > 0 &&
+    password !== confirmPassword;
 
   async function startPayment() {
     const applicationId = state.applicationId;
@@ -354,27 +357,37 @@ export function MembershipRegistrationForm({
             </label>
             <label className="block space-y-2">
               <span className="text-sm font-medium text-foreground">
-                Password {loggedIn ? "(optional)" : "*"}
+                Password *
               </span>
               <PasswordInput
                 name="password"
-                required={!loggedIn}
-                minLength={loggedIn ? undefined : 8}
+                required
+                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
               />
+              <p className="text-xs text-muted-foreground">
+                At least 8 characters.
+              </p>
             </label>
             <label className="block space-y-2">
               <span className="text-sm font-medium text-foreground">
-                Confirm password {loggedIn ? "(optional)" : "*"}
+                Confirm password *
               </span>
               <PasswordInput
                 name="confirm_password"
-                required={!loggedIn}
-                minLength={loggedIn ? undefined : 8}
+                required
+                minLength={8}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
               />
+              {passwordsMismatch ? (
+                <p className="text-xs text-destructive" role="alert">
+                  Passwords do not match.
+                </p>
+              ) : null}
             </label>
             <div className="sm:col-span-2">
               <SelfieField
