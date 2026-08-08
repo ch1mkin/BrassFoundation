@@ -15,6 +15,11 @@ import {
   MEMBERSHIP_CONSENT_VERSION,
 } from "@/lib/membership/consent";
 import {
+  MEMBERSHIP_CATEGORIES,
+  MEMBERSHIP_CATEGORY_LABELS,
+  isMembershipCategory,
+} from "@/lib/membership/categories";
+import {
   registerMembershipAction,
   type RegisterMembershipState,
 } from "@/lib/membership/register-action";
@@ -68,7 +73,7 @@ export function MembershipRegistrationForm({
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
       phone.trim().length >= 10 &&
       address.trim().length >= 8 &&
-      ["SC", "ST", "OBC"].includes(category) &&
+      isMembershipCategory(category) &&
       consent &&
       Boolean(signature);
     if (loggedIn) return base;
@@ -340,9 +345,11 @@ export function MembershipRegistrationForm({
                 className="h-11 w-full rounded-xl border border-input bg-white px-3 text-sm"
               >
                 <option value="">Select category</option>
-                <option value="SC">SC</option>
-                <option value="ST">ST</option>
-                <option value="OBC">OBC</option>
+                {MEMBERSHIP_CATEGORIES.map((value) => (
+                  <option key={value} value={value}>
+                    {MEMBERSHIP_CATEGORY_LABELS[value]}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="block space-y-2">

@@ -22,6 +22,7 @@ import type { BookPurchaseStatus } from "@/lib/content/book-purchases";
 import type { ResourceCategoryRow } from "@/lib/content/resource-categories";
 import { cn } from "@/lib/utils";
 import { InstantImg, preloadImages } from "@/components/website/instant-img";
+import { MemberMilestoneConfetti } from "@/components/website/member-milestone-confetti";
 import { MustReadBookCard } from "@/components/website/must-read-book-card";
 import { BookBuyButton } from "@/components/marketplace/book-buy-button";
 import { ViewAllLink } from "@/components/website/view-all-link";
@@ -88,6 +89,9 @@ export function StatsSection({
 
   return (
     <section className="relative bg-surface-low py-12 lg:py-16">
+      {typeof liveMemberCount === "number" ? (
+        <MemberMilestoneConfetti count={liveMemberCount} />
+      ) : null}
       <div
         className={`relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-4 sm:px-6 lg:gap-3 lg:px-8 xl:px-12 ${cols}`}
       >

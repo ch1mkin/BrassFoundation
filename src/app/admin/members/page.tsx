@@ -12,15 +12,30 @@ export const metadata: Metadata = {
   title: "Membership Requests",
 };
 
-export default async function AdminMembersPage() {
+export default async function AdminMembersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const { q } = await searchParams;
   const supabase = await createClient();
-  const { data, error } = await supabase
+
+  let query = supabase
     .from("membership_applications")
     .select(
       "id, full_name, email, phone, membership_type, status, member_status, district, state, membership_id, created_at",
     )
-    .order("created_at", { ascending: false })
-    .limit(100);
+    .order("created_at", { ascending: false });
+
+  const term = q?.trim();
+  if (term) {
+    const pattern = `%${term}%`;
+    query = query.or(
+      `full_name.ilike.${pattern},email.ilike.${pattern},phone.ilike.${pattern},membership_id.ilike.${pattern},district.ilike.${pattern},state.ilike.${pattern}`,
+    );
+  }
+
+  const { data, error } = await query.limit(term ? 200 : 100);
 
   return (
     <>
@@ -41,13 +56,39 @@ export default async function AdminMembersPage() {
         </Link>
       </div>
 
+      <form className="glass-card mt-6 flex flex-wrap gap-3 rounded-2xl p-4">
+        <input
+          name="q"
+          defaultValue={term || ""}
+          placeholder="Search name, email, phone, membership ID…"
+          className="h-11 min-w-[220px] flex-1 rounded-xl border border-input bg-white px-3 text-sm"
+        />
+        <button
+          type="submit"
+          className="h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-white"
+        >
+          Search
+        </button>
+        {term ? (
+          <Link
+            href="/admin/members"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "h-11 rounded-xl",
+            )}
+          >
+            Clear
+          </Link>
+        ) : null}
+      </form>
+
       {error ? (
         <p className="mt-8 glass-card rounded-2xl p-6 text-sm text-destructive">
           Could not load applications. ({error.message})
         </p>
       ) : !data?.length ? (
         <p className="mt-8 glass-card rounded-2xl p-6 text-muted-foreground">
-          No applications yet.
+          {term ? "No members matched your search." : "No applications yet."}
         </p>
       ) : (
         <div className="mt-8 overflow-x-auto rounded-2xl bg-white shadow-soft">

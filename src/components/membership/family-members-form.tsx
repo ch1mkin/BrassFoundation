@@ -11,6 +11,10 @@ import {
   createFamilyMembersAction,
   type FamilyActionState,
 } from "@/lib/membership/family-actions";
+import {
+  MEMBERSHIP_CATEGORIES,
+  MEMBERSHIP_CATEGORY_LABELS,
+} from "@/lib/membership/categories";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import {
   FAMILY_MEMBER_FEE_PAISE,
@@ -263,9 +267,11 @@ export function FamilyMembersForm() {
                   className="h-11 w-full rounded-xl border border-input bg-white px-3 text-sm"
                 >
                   <option value="">Select</option>
-                  <option value="SC">SC</option>
-                  <option value="ST">ST</option>
-                  <option value="OBC">OBC</option>
+                  {MEMBERSHIP_CATEGORIES.map((value) => (
+                    <option key={value} value={value}>
+                      {MEMBERSHIP_CATEGORY_LABELS[value]}
+                    </option>
+                  ))}
                 </select>
               </label>
             </div>

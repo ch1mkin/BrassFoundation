@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { MEMBERSHIP_CONSENT_VERSION } from "@/lib/membership/consent";
 import { REGISTRATION_FEE_PAISE } from "@/lib/payments/constants";
+import { MEMBERSHIP_CATEGORIES } from "@/lib/membership/categories";
 import { readReferralCookie } from "@/lib/membership/referral";
 import { z } from "zod";
 
@@ -17,8 +18,6 @@ export type RegisterMembershipState = {
   phone?: string;
 };
 
-const CATEGORIES = ["SC", "ST", "OBC"] as const;
-
 const schema = z.object({
   full_name: z
     .string()
@@ -27,7 +26,9 @@ const schema = z.object({
   email: z.string().email("Valid email is required."),
   phone: z.string().min(10, "Mobile number is required.").max(20),
   address: z.string().min(8, "Address is required.").max(500),
-  category: z.enum(CATEGORIES, { message: "Select category: SC, ST, or OBC." }),
+  category: z.enum(MEMBERSHIP_CATEGORIES, {
+    message: "Select category: SC, ST, OBC, or General.",
+  }),
   password: z.string().min(8, "Password must be at least 8 characters."),
   confirm_password: z.string().min(8),
   consent: z.enum(["on"], { message: "You must accept the consent form." }),

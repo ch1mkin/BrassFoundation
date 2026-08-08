@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
+import { isMembershipCategory } from "@/lib/membership/categories";
 import {
   FAMILY_MEMBER_FEE_PAISE,
   FAMILY_MINOR_AGE,
@@ -62,7 +63,7 @@ export async function createFamilyMembersAction(
       .trim()
       .toUpperCase();
 
-    if (!full_name || !age || !gender || !["SC", "ST", "OBC"].includes(category)) {
+    if (!full_name || !age || !gender || !isMembershipCategory(category)) {
       return { error: `Please complete all required fields for member #${i + 1}.` };
     }
     members.push({ full_name, age, gender, occupation, category });
