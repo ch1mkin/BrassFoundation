@@ -1,33 +1,44 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { ButtonSpinner } from "@/components/ui/inline-loader";
+import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import type { ContentActionState } from "@/lib/content/utils";
 
 type Field = {
   name: string;
   label: string;
-  type?: "text" | "textarea" | "datetime-local" | "number" | "url" | "checkbox";
+  type?:
+    | "text"
+    | "textarea"
+    | "datetime-local"
+    | "number"
+    | "url"
+    | "checkbox"
+    | "file-or-url";
   required?: boolean;
   placeholder?: string;
   defaultValue?: string | number | boolean | null;
+  bucket?: "gallery" | "resources" | "marketplace" | "avatars";
+  folder?: string;
+  accept?: string;
 };
 
-export function AdminContentForm({
+function AdminContentFormInner({
   title,
   action,
   fields,
   submitLabel = "Save",
   hidden,
-  formKey,
   resetPathOnSuccess,
   formId,
   onSuccess,
+  successHoldMs = 2200,
 }: {
   title: string;
   action: (
@@ -37,28 +48,29 @@ export function AdminContentForm({
   fields: Field[];
   submitLabel?: string;
   hidden?: Record<string, string>;
-  /** Remount the form when this changes (e.g. calendar-selected date). */
-  formKey?: string;
-  /** After a successful create/update, navigate here (clears query params). */
   resetPathOnSuccess?: string;
   formId?: string;
   onSuccess?: () => void;
+  successHoldMs?: number;
 }) {
   const router = useRouter();
   const [state, formAction, pending] = useSafeFormAction(action, {});
+  const [banner, setBanner] = useState<string | null>(null);
 
   useEffect(() => {
     if (!state.success) return;
+    setBanner(state.success);
     router.refresh();
-    onSuccess?.();
-    if (resetPathOnSuccess) {
-      router.replace(resetPathOnSuccess);
-    }
-  }, [state.success, router, resetPathOnSuccess, onSuccess]);
+    const t = window.setTimeout(() => {
+      setBanner(null);
+      onSuccess?.();
+      if (resetPathOnSuccess) router.replace(resetPathOnSuccess);
+    }, successHoldMs);
+    return () => window.clearTimeout(t);
+  }, [state.success, router, onSuccess, resetPathOnSuccess, successHoldMs]);
 
   return (
     <form
-      key={formKey || "content-form"}
       id={formId}
       action={formAction}
       className="glass-card relative space-y-4 rounded-2xl p-6"
@@ -85,6 +97,23 @@ export function AdminContentForm({
                 />
                 {field.label}
               </label>
+            );
+          }
+          if (field.type === "file-or-url") {
+            return (
+              <FileOrUrlField
+                key={field.name}
+                name={field.name}
+                label={field.label}
+                bucket={field.bucket || "gallery"}
+                folder={field.folder || "uploads"}
+                accept={field.accept || "image/*"}
+                defaultUrl={
+                  field.defaultValue == null
+                    ? undefined
+                    : String(field.defaultValue)
+                }
+              />
             );
           }
           if (field.type === "textarea") {
@@ -127,9 +156,12 @@ export function AdminContentForm({
             {state.error}
           </p>
         ) : null}
-        {state.success ? (
-          <p className="text-sm text-success" role="status">
-            {state.success}
+        {banner ? (
+          <p
+            className="rounded-xl bg-success/10 px-3 py-2 text-sm font-medium text-success"
+            role="status"
+          >
+            {banner}
           </p>
         ) : null}
         <Button
@@ -148,5 +180,29 @@ export function AdminContentForm({
         </Button>
       </FormLock>
     </form>
+  );
+}
+
+export function AdminContentForm({
+  formKey,
+  ...props
+}: {
+  title: string;
+  action: (
+    prev: ContentActionState,
+    formData: FormData,
+  ) => Promise<ContentActionState>;
+  fields: Field[];
+  submitLabel?: string;
+  hidden?: Record<string, string>;
+  /** Remount the form (and clear fields/state) when this changes. */
+  formKey?: string;
+  resetPathOnSuccess?: string;
+  formId?: string;
+  onSuccess?: () => void;
+  successHoldMs?: number;
+}) {
+  return (
+    <AdminContentFormInner key={formKey || "content-form"} {...props} />
   );
 }

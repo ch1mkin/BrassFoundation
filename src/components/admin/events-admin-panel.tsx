@@ -192,7 +192,11 @@ export function EventsAdminPanel({
               },
               {
                 name: "cover_image_url",
-                label: "Cover image URL (optional)",
+                label: "Cover image",
+                type: "file-or-url",
+                bucket: "gallery",
+                folder: "events",
+                accept: "image/*",
                 defaultValue: editing?.cover_image_url || "",
               },
               {

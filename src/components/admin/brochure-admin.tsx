@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
@@ -24,54 +24,127 @@ type Row = {
   is_published: boolean | null;
 };
 
-export function BrochureAdmin({ rows }: { rows: Row[] }) {
+function BrochureForm({
+  editing,
+  onDone,
+}: {
+  editing: Row | null;
+  onDone: () => void;
+}) {
   const router = useRouter();
   const [state, action, pending] = useSafeFormAction(
     upsertBrochureAction,
     {} as ContentActionState,
   );
+  const [banner, setBanner] = useState<string | null>(null);
 
   useEffect(() => {
-    if (state.success) router.refresh();
-  }, [state.success, router]);
+    if (!state.success) return;
+    setBanner(state.success);
+    router.refresh();
+    const t = window.setTimeout(() => {
+      setBanner(null);
+      onDone();
+    }, 2200);
+    return () => window.clearTimeout(t);
+  }, [state.success, router, onDone]);
+
+  return (
+    <form action={action} className="glass-card space-y-4 rounded-2xl p-6">
+      <FormLock pending={pending} className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-heading text-lg font-semibold">
+            {editing ? "Edit brochure" : "Upload brochure"}
+          </h2>
+          {editing ? (
+            <button
+              type="button"
+              onClick={onDone}
+              className="text-xs font-semibold text-muted-foreground hover:text-primary"
+            >
+              Cancel · New
+            </button>
+          ) : null}
+        </div>
+        {editing ? <input type="hidden" name="id" value={editing.id} /> : null}
+        <Input
+          name="title"
+          defaultValue={editing?.title || "Organisation Brochure"}
+          className="h-11 rounded-xl"
+        />
+        <textarea
+          name="description"
+          rows={3}
+          placeholder="Short description"
+          defaultValue={editing?.description || ""}
+          className="w-full rounded-xl border border-input bg-white px-3 py-2 text-sm"
+        />
+        <FileOrUrlField
+          name="file_url"
+          label="Brochure PDF"
+          bucket="resources"
+          accept="application/pdf"
+          folder="brochure"
+          defaultUrl={editing?.file_url || undefined}
+        />
+        <FileOrUrlField
+          name="cover_image_url"
+          label="Cover image (optional)"
+          bucket="gallery"
+          accept="image/*"
+          folder="brochure"
+          defaultUrl={editing?.cover_image_url || undefined}
+        />
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            name="is_published"
+            defaultChecked={editing ? Boolean(editing.is_published) : true}
+          />
+          Published
+        </label>
+        {state.error ? (
+          <p className="text-sm text-destructive">{state.error}</p>
+        ) : null}
+        {banner ? (
+          <p className="rounded-xl bg-success/10 px-3 py-2 text-sm font-medium text-success">
+            {banner}
+          </p>
+        ) : null}
+        <Button type="submit" disabled={pending} className="rounded-xl bg-primary">
+          {pending ? (
+            <>
+              <ButtonSpinner />
+              Saving…
+            </>
+          ) : editing ? (
+            "Save changes"
+          ) : (
+            "Save brochure"
+          )}
+        </Button>
+      </FormLock>
+    </form>
+  );
+}
+
+export function BrochureAdmin({ rows }: { rows: Row[] }) {
+  const [editId, setEditId] = useState<string | null>(null);
+  const [formKey, setFormKey] = useState(0);
+  const editing = rows.find((r) => r.id === editId) || null;
+
+  function resetForm() {
+    setEditId(null);
+    setFormKey((k) => k + 1);
+  }
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
-      <form action={action} className="glass-card space-y-4 rounded-2xl p-6">
-        <FormLock pending={pending} className="space-y-4">
-          <h2 className="font-heading text-lg font-semibold">Upload brochure</h2>
-          <Input name="title" defaultValue="Organisation Brochure" className="h-11 rounded-xl" />
-          <textarea
-            name="description"
-            rows={3}
-            placeholder="Short description"
-            className="w-full rounded-xl border border-input bg-white px-3 py-2 text-sm"
-          />
-          <FileOrUrlField
-            name="file_url"
-            label="Brochure PDF"
-            bucket="resources"
-            accept="application/pdf"
-            folder="brochure"
-          />
-          <FileOrUrlField
-            name="cover_image_url"
-            label="Cover image (optional)"
-            bucket="gallery"
-            accept="image/*"
-            folder="brochure"
-          />
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="is_published" defaultChecked />
-            Published
-          </label>
-          {state.error ? <p className="text-sm text-destructive">{state.error}</p> : null}
-          {state.success ? <p className="text-sm text-success">{state.success}</p> : null}
-          <Button type="submit" disabled={pending} className="rounded-xl bg-primary">
-            {pending ? <><ButtonSpinner /> Saving…</> : "Save brochure"}
-          </Button>
-        </FormLock>
-      </form>
+      <BrochureForm
+        key={`${editId || "new"}-${formKey}`}
+        editing={editing}
+        onDone={resetForm}
+      />
       <div className="space-y-3">
         {rows.map((row) => (
           <div key={row.id} className="glass-card rounded-2xl p-4">
@@ -86,6 +159,16 @@ export function BrochureAdmin({ rows }: { rows: Row[] }) {
                 >
                   Open file
                 </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditId(row.id);
+                    setFormKey((k) => k + 1);
+                  }}
+                  className="mt-2 block text-xs font-semibold text-primary hover:underline"
+                >
+                  Edit
+                </button>
               </div>
               <AdminDeleteButton id={row.id} action={deleteBrochureAction} />
             </div>

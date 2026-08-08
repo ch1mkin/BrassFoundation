@@ -252,13 +252,13 @@ export function MembershipRegistrationForm({
   }
 
   return (
-    <form action={action} className="relative space-y-6">
+    <form action={action} className="relative space-y-6 pb-6 sm:pb-10">
       {pending ? (
         <div className="absolute inset-0 z-20 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-[1px]">
           <InlineLoader label="Creating your account…" />
         </div>
       ) : null}
-      <FormLock pending={pending} className="space-y-6">
+      <FormLock pending={pending} className="space-y-6" label="Creating account…">
         {referralCode ? (
           <input
             type="hidden"
@@ -420,23 +420,25 @@ export function MembershipRegistrationForm({
           </p>
         ) : null}
 
-        <Button
-          type="submit"
-          size="lg"
-          disabled={pending || !formComplete}
-          className="h-12 rounded-xl bg-primary px-8"
-        >
-          {pending ? (
-            <>
-              <ButtonSpinner />
-              Creating account…
-            </>
-          ) : formComplete ? (
-            "Continue to ₹10 payment"
-          ) : (
-            "Fill all fields & sign to unlock payment"
-          )}
-        </Button>
+        <div className="pt-4 pb-2 sm:pt-6 sm:pb-4">
+          <Button
+            type="submit"
+            size="lg"
+            disabled={pending || !formComplete}
+            className="h-12 w-full rounded-xl bg-primary px-8 sm:w-auto sm:min-w-[240px]"
+          >
+            {pending ? (
+              <>
+                <ButtonSpinner />
+                Creating account…
+              </>
+            ) : formComplete ? (
+              "Continue to ₹10 payment"
+            ) : (
+              "Fill all fields & sign to unlock payment"
+            )}
+          </Button>
+        </div>
       </FormLock>
     </form>
   );
