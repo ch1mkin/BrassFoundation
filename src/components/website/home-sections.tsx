@@ -153,7 +153,8 @@ export function StatsSection({
   const displayStats = stats.map((stat) => {
     const isMembers = /member/i.test(stat.label);
     if (isMembers && typeof memberCount === "number") {
-      return { ...stat, value: memberCount, suffix: "+" };
+      // Exact headcount — no decorative "+" (avoids looking like 1+ when total is 0/1).
+      return { ...stat, value: memberCount, suffix: "" };
     }
     return stat;
   });

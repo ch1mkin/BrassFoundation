@@ -8,7 +8,14 @@ const ADMIN_ROLE_SLUGS = [
   "treasurer",
 ] as const;
 
-async function getAdminUserIds(): Promise<string[]> {
+/** Issued IDs look like BF-2026-123456 */
+function hasRealMembershipId(value: string | null | undefined): boolean {
+  const id = String(value || "").trim();
+  if (!id) return false;
+  return /^BF-\d{4}-\d+$/i.test(id);
+}
+
+async function getAdminUserIds(): Promise<Set<string>> {
   const admin = createServiceClient();
   const { data: roles } = await admin
     .from("roles")
@@ -16,55 +23,47 @@ async function getAdminUserIds(): Promise<string[]> {
     .in("slug", [...ADMIN_ROLE_SLUGS]);
 
   const roleIds = (roles ?? []).map((r) => r.id);
-  if (!roleIds.length) return [];
+  if (!roleIds.length) return new Set();
 
   const { data: userRoles } = await admin
     .from("user_roles")
     .select("user_id")
     .in("role_id", roleIds);
 
-  return [
-    ...new Set(
-      (userRoles ?? [])
-        .map((r) => r.user_id)
-        .filter((id): id is string => Boolean(id)),
-    ),
-  ];
+  return new Set(
+    (userRoles ?? [])
+      .map((r) => r.user_id)
+      .filter((id): id is string => Boolean(id)),
+  );
 }
 
 /**
- * Public website member count — service role so login/logout never changes it.
- * Only paid + approved applications with a membership ID.
- * Admin / staff accounts are excluded even if they have membership rows.
+ * Exact public member total for the homepage.
+ * Counts only primary applications that have a real membership ID
+ * (paid + approved). Admins/staff never count. Family members are excluded.
  */
 export async function getLiveMemberCount(): Promise<number> {
   try {
     const admin = createServiceClient();
     const adminIds = await getAdminUserIds();
 
-    const [{ data: primaryRows }, { data: familyRows }] = await Promise.all([
-      admin
-        .from("membership_applications")
-        .select("id, user_id")
-        .eq("payment_status", "paid")
-        .eq("status", "approved")
-        .not("membership_id", "is", null),
-      admin
-        .from("family_members")
-        .select("id, parent_user_id")
-        .in("payment_status", ["paid", "waived"])
-        .not("membership_id", "is", null),
-    ]);
+    const { data, error } = await admin
+      .from("membership_applications")
+      .select("id, user_id, membership_id, payment_status, status")
+      .eq("payment_status", "paid")
+      .eq("status", "approved")
+      .not("membership_id", "is", null);
 
-    const adminSet = new Set(adminIds);
-    const primary = (primaryRows ?? []).filter(
-      (row) => !row.user_id || !adminSet.has(row.user_id),
-    ).length;
-    const family = (familyRows ?? []).filter(
-      (row) => !row.parent_user_id || !adminSet.has(row.parent_user_id),
-    ).length;
+    if (error) {
+      console.error("[member-count] Query failed:", error.message);
+      return 0;
+    }
 
-    return primary + family;
+    return (data ?? []).filter((row) => {
+      if (!hasRealMembershipId(row.membership_id)) return false;
+      if (row.user_id && adminIds.has(row.user_id)) return false;
+      return true;
+    }).length;
   } catch (err) {
     console.error("[member-count] Failed to load live count:", err);
     return 0;
