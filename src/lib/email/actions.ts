@@ -2,10 +2,7 @@
 
 import { getUserContext, canAccessAdmin } from "@/lib/auth/session";
 import { isSmtpConfigured, sendEmail } from "@/lib/email/smtp";
-import {
-  membershipWelcomeEmailHtml,
-  smtpTestEmailHtml,
-} from "@/lib/email/templates";
+import { smtpTestEmailHtml } from "@/lib/email/templates";
 
 export type MailActionState = {
   error?: string;
@@ -57,27 +54,4 @@ export async function sendSmtpTestEmailAction(
   }
 
   return { success: `Test email sent to ${to}.` };
-}
-
-export async function sendMembershipWelcomeEmail(input: {
-  to: string;
-  name: string;
-  membershipId?: string | null;
-}) {
-  if (!input.to) return;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  try {
-    await sendEmail({
-      to: input.to,
-      subject: "Welcome to Brass Foundation — thank you for joining",
-      html: membershipWelcomeEmailHtml({
-        name: input.name,
-        membershipId: input.membershipId,
-        appUrl,
-      }),
-      text: `Dear ${input.name},\n\nThank you for joining Brass Foundation. Your membership payment was successful.\n\nContribute: ${appUrl}/member/payments\nMember panel: ${appUrl}/member\n${input.membershipId ? `Membership ID: ${input.membershipId}\n` : ""}\nWith gratitude,\nTeam Brass Foundation`,
-    });
-  } catch (err) {
-    console.error("[email] Welcome email failed:", err);
-  }
 }

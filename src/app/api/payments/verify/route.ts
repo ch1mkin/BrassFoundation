@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { attachMemberToOrgTree } from "@/lib/content/attach-org-member";
-import { sendMembershipWelcomeEmail } from "@/lib/email/actions";
+import { sendMembershipWelcomeEmail } from "@/lib/email/send-membership";
 import { verifyPaymentSignature } from "@/lib/payments/razorpay";
 
 async function issueMembershipId() {
@@ -111,15 +111,29 @@ export async function POST(request: Request) {
         roleTitle: "Member",
       });
 
-      await sendMembershipWelcomeEmail({
-        to: application?.email || profile?.email || user.email || "",
-        name:
-          application?.full_name ||
-          profile?.full_name ||
-          user.email ||
-          "Friend",
+      const recipient =
+        application?.email ||
+        profile?.email ||
+        user.email ||
+        "";
+      const welcomeName =
+        application?.full_name ||
+        profile?.full_name ||
+        user.email ||
+        "Friend";
+
+      const welcome = await sendMembershipWelcomeEmail({
+        to: recipient,
+        name: welcomeName,
         membershipId,
       });
+      if (!welcome.sent) {
+        console.error(
+          "[payments/verify] Welcome email not sent after membership payment:",
+          welcome.reason,
+          { applicationId, to: recipient },
+        );
+      }
 
       revalidatePath("/admin/family");
       revalidatePath("/admin/referrals");
@@ -130,6 +144,7 @@ export async function POST(request: Request) {
         ok: true,
         membershipId,
         purpose: "registration_fee",
+        welcomeEmailSent: welcome.sent,
       });
     }
 

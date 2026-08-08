@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
@@ -61,11 +61,13 @@ export function MembershipRegistrationForm({
     initial,
   );
   const [signature, setSignature] = useState<string | null>(null);
+  /** "pay" is only a fallback if Razorpay is dismissed / fails to open. */
   const [step, setStep] = useState<"form" | "pay" | "done">("form");
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
   const [membershipId, setMembershipId] = useState<string | null>(null);
   const paySectionRef = useRef<HTMLDivElement>(null);
+  const autoPayStarted = useRef(false);
 
   const [fullName, setFullName] = useState(defaults?.fullName || "");
   const [email, setEmail] = useState(defaults?.email || "");
@@ -77,11 +79,97 @@ export function MembershipRegistrationForm({
   const [consent, setConsent] = useState(false);
   const [avatarReady, setAvatarReady] = useState(false);
 
+  const startPayment = useCallback(
+    async (applicationId: string, opts?: { showPayStepOnFail?: boolean }) => {
+      const showPayStepOnFail = opts?.showPayStepOnFail !== false;
+      setPaying(true);
+      setPayError(null);
+      try {
+        const res = await fetch("/api/payments/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            purpose: "registration_fee",
+            applicationId,
+          }),
+        });
+        const json = (await res.json()) as {
+          error?: string;
+          orderId?: string;
+          amount?: number;
+          currency?: string;
+          keyId?: string;
+        };
+        if (!res.ok || !json.orderId || !json.keyId) {
+          throw new Error(json.error || "Could not start payment.");
+        }
+
+        await openRazorpayCheckout({
+          key: json.keyId,
+          amount: Number(json.amount || REGISTRATION_FEE_PAISE),
+          currency: json.currency || "INR",
+          name: SITE.name,
+          description: "Membership registration fee (₹10)",
+          order_id: json.orderId,
+          prefill: {
+            name: fullName || state.fullName,
+            email: email || state.email,
+            contact: phone || state.phone,
+          },
+          handler: async (response) => {
+            const verify = await fetch("/api/payments/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...response,
+                applicationId,
+              }),
+            });
+            const verified = (await verify.json()) as {
+              ok?: boolean;
+              membershipId?: string;
+              error?: string;
+              welcomeEmailSent?: boolean;
+            };
+            if (!verify.ok || !verified.ok) {
+              setPayError(verified.error || "Payment verification failed.");
+              setPaying(false);
+              if (showPayStepOnFail) setStep("pay");
+              return;
+            }
+            setMembershipId(verified.membershipId || null);
+            setStep("done");
+            bumpLiveMemberCount();
+            confetti({ particleCount: 140, spread: 70, origin: { y: 0.65 } });
+            setPaying(false);
+            scrollMembershipIntoView();
+          },
+          onDismiss: () => {
+            setPaying(false);
+            if (showPayStepOnFail) {
+              setStep("pay");
+              setPayError(
+                "Payment window closed. Tap below when you are ready to pay ₹10.",
+              );
+            }
+          },
+        });
+      } catch (err) {
+        setPayError(err instanceof Error ? err.message : "Payment failed.");
+        setPaying(false);
+        if (showPayStepOnFail) setStep("pay");
+      }
+    },
+    [email, fullName, phone, state.email, state.fullName, state.phone],
+  );
+
   useEffect(() => {
-    if (state.applicationId && state.success) {
-      setStep("pay");
-    }
-  }, [state.applicationId, state.success]);
+    if (!state.applicationId || !state.success) return;
+    if (autoPayStarted.current) return;
+    autoPayStarted.current = true;
+    scrollMembershipIntoView();
+    void startPayment(state.applicationId);
+  }, [state.applicationId, state.success, startPayment]);
 
   useEffect(() => {
     if (step !== "pay" && step !== "done") return;
@@ -124,78 +212,7 @@ export function MembershipRegistrationForm({
     confirmPassword.length > 0 &&
     password !== confirmPassword;
 
-  async function startPayment() {
-    const applicationId = state.applicationId;
-    if (!applicationId) {
-      setPayError("Missing application. Please submit the form again.");
-      return;
-    }
-    setPaying(true);
-    setPayError(null);
-    try {
-      const res = await fetch("/api/payments/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          purpose: "registration_fee",
-          applicationId,
-        }),
-      });
-      const json = (await res.json()) as {
-        error?: string;
-        orderId?: string;
-        amount?: number;
-        currency?: string;
-        keyId?: string;
-      };
-      if (!res.ok || !json.orderId || !json.keyId) {
-        throw new Error(json.error || "Could not start payment.");
-      }
-
-      await openRazorpayCheckout({
-        key: json.keyId,
-        amount: Number(json.amount || REGISTRATION_FEE_PAISE),
-        currency: json.currency || "INR",
-        name: SITE.name,
-        description: "Membership registration fee (₹10)",
-        order_id: json.orderId,
-        prefill: {
-          name: state.fullName,
-          email: state.email,
-          contact: state.phone,
-        },
-        handler: async (response) => {
-          const verify = await fetch("/api/payments/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              ...response,
-              applicationId,
-            }),
-          });
-          const verified = (await verify.json()) as {
-            ok?: boolean;
-            membershipId?: string;
-            error?: string;
-          };
-          if (!verify.ok || !verified.ok) {
-            setPayError(verified.error || "Payment verification failed.");
-            setPaying(false);
-            return;
-          }
-          setMembershipId(verified.membershipId || null);
-          setStep("done");
-          bumpLiveMemberCount();
-          confetti({ particleCount: 140, spread: 70, origin: { y: 0.65 } });
-          setPaying(false);
-        },
-        onDismiss: () => setPaying(false),
-      });
-    } catch (err) {
-      setPayError(err instanceof Error ? err.message : "Payment failed.");
-      setPaying(false);
-    }
-  }
+  const showBootstrapLoader = pending || (Boolean(state.success) && paying && step === "form");
 
   if (step === "done") {
     const shareUrl =
@@ -214,7 +231,8 @@ export function MembershipRegistrationForm({
           Welcome, member!
         </p>
         <p className="mt-3 text-muted-foreground">
-          Your registration payment is complete and membership is active.
+          Your registration payment is complete and membership is active. A
+          welcome email is on its way.
         </p>
         {membershipId ? (
           <p className="mt-4 text-sm font-semibold text-foreground">
@@ -249,7 +267,7 @@ export function MembershipRegistrationForm({
     );
   }
 
-  if (step === "pay") {
+  if (step === "pay" && state.applicationId) {
     return (
       <div
         ref={paySectionRef}
@@ -257,16 +275,18 @@ export function MembershipRegistrationForm({
         className="glass-card relative scroll-mt-28 space-y-5 rounded-2xl p-6 outline-none sm:p-8"
       >
         {paying ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-[1px]">
-            <InlineLoader label="Opening secure payment…" />
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-[2px]">
+            <div className="glass-card rounded-2xl px-8 py-6 shadow-lg">
+              <InlineLoader label="Opening secure payment…" />
+            </div>
           </div>
         ) : null}
         <h2 className="font-heading text-xl font-semibold">
-          Pay registration fee (₹10)
+          Complete ₹10 payment
         </h2>
         <p className="text-sm text-muted-foreground">
-          Complete the secure Razorpay payment to activate your membership
-          instantly.
+          Your registration is saved. Finish the secure Razorpay payment to
+          activate membership.
         </p>
         {payError ? (
           <p className="text-sm text-destructive" role="alert">
@@ -277,7 +297,7 @@ export function MembershipRegistrationForm({
           type="button"
           size="lg"
           disabled={paying}
-          onClick={() => void startPayment()}
+          onClick={() => void startPayment(state.applicationId!)}
           className="h-12 rounded-xl bg-primary"
         >
           {paying ? (
@@ -295,21 +315,23 @@ export function MembershipRegistrationForm({
 
   return (
     <form action={action} className="relative space-y-6 pb-6 sm:pb-10">
-      {pending ? (
+      {showBootstrapLoader ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-[2px]">
           <div className="glass-card rounded-2xl px-8 py-6 shadow-lg">
             <InlineLoader
               label={
-                loggedIn
-                  ? "Preparing your ₹10 payment…"
-                  : "Creating your account…"
+                pending
+                  ? loggedIn
+                    ? "Saving your details…"
+                    : "Creating your account…"
+                  : "Opening secure ₹10 payment…"
               }
             />
           </div>
         </div>
       ) : null}
       <FormLock
-        pending={pending}
+        pending={pending || paying}
         className="space-y-6"
         label={loggedIn ? "Preparing payment…" : "Creating account…"}
       >
@@ -327,7 +349,7 @@ export function MembershipRegistrationForm({
           {loggedIn ? (
             <p className="rounded-xl bg-primary/10 px-3 py-2 text-sm text-primary">
               You&apos;re signed in. Confirm your details below — no password
-              needed — then continue to the ₹10 payment.
+              needed — then we&apos;ll open the ₹10 payment right away.
             </p>
           ) : null}
           {referralCode ? (
@@ -497,16 +519,20 @@ export function MembershipRegistrationForm({
           <Button
             type="submit"
             size="lg"
-            disabled={pending || !formComplete}
+            disabled={pending || paying || !formComplete}
             className="h-12 w-full rounded-xl bg-primary px-8 sm:w-auto sm:min-w-[240px]"
           >
-            {pending ? (
+            {pending || paying ? (
               <>
                 <ButtonSpinner />
-                {loggedIn ? "Preparing payment…" : "Creating account…"}
+                {pending
+                  ? loggedIn
+                    ? "Saving…"
+                    : "Creating account…"
+                  : "Opening payment…"}
               </>
             ) : formComplete ? (
-              "Continue to ₹10 payment"
+              "Submit & pay ₹10"
             ) : (
               "Fill all fields & sign to unlock payment"
             )}
