@@ -8,23 +8,31 @@ import { cn } from "@/lib/utils";
 
 /**
  * Become a Member CTA that navigates reliably.
- * If the viewer is already a paid member → Become a Contributor → /member.
+ * Paid members → Become a Contributor → /member/payments.
  */
 export function MembershipLink({
   className,
   children,
   onClick,
   style,
+  href = "/membership",
+  memberHref = "/member/payments",
   memberLabel = "Become a Contributor",
 }: {
   className?: string;
   children: React.ReactNode;
   onClick?: () => void;
   style?: CSSProperties;
+  href?: string;
+  memberHref?: string;
   memberLabel?: string;
 }) {
-  const [href, setHref] = useState("/membership");
+  const [targetHref, setTargetHref] = useState(href);
   const [labelOverride, setLabelOverride] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTargetHref(href);
+  }, [href]);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,7 +57,7 @@ export function MembershipLink({
           app &&
           (app.payment_status === "paid" || app.membership_id)
         ) {
-          setHref("/member");
+          setTargetHref(memberHref);
           setLabelOverride(memberLabel);
         }
       } catch {
@@ -59,11 +67,11 @@ export function MembershipLink({
     return () => {
       cancelled = true;
     };
-  }, [memberLabel]);
+  }, [memberHref, memberLabel]);
 
   return (
     <HardNavLink
-      href={href}
+      href={targetHref}
       className={cn(className)}
       style={style}
       onClick={onClick}

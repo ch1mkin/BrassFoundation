@@ -6,6 +6,7 @@
 
 import Image from "next/image";
 import { useLocale } from "@/components/i18n/locale-provider";
+import { MembershipLink } from "@/components/membership/membership-link";
 import { NewsletterForm } from "@/components/website/newsletter-form";
 import { SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -91,9 +92,9 @@ export function SiteFooter() {
           </h4>
           <ul className="notranslate space-y-2">
             <li>
-              <FooterLink href="/membership">
+              <MembershipLink className={linkClass}>
                 {t("footer.becomeMember")}
-              </FooterLink>
+              </MembershipLink>
             </li>
             <li>
               <FooterLink href="/gallery">{t("footer.gallery")}</FooterLink>
@@ -121,9 +122,9 @@ export function SiteFooter() {
               <FooterLink href="/contact">{t("footer.contact")}</FooterLink>
             </li>
             <li>
-              <FooterLink href="/membership">
+              <MembershipLink className={linkClass}>
                 {t("footer.becomeMember")}
-              </FooterLink>
+              </MembershipLink>
             </li>
           </ul>
         </div>

@@ -270,8 +270,10 @@ export function HeroSection({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.6 }}
         >
-          {joinHref === "/membership" ? (
+          {joinHref === "/membership" ||
+          /membership|member|join|register/i.test(primaryHref) ? (
             <MembershipLink
+              href="/membership"
               className={cn(GOLD_SHINY_BTN, "w-full shadow-lg sm:w-auto")}
             >
               <span>{displayPrimary}</span>

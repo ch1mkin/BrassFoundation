@@ -192,6 +192,14 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
 
         <div className="ml-3 hidden items-center gap-3 lg:flex">
           <LanguageSwitcher />
+          <MembershipLink
+            className={cn(
+              GOLD_SHINY_BTN,
+              "h-9 px-4 text-sm shadow-md sm:h-10 sm:px-5 sm:text-sm",
+            )}
+          >
+            <span>{t("nav.becomeMember")}</span>
+          </MembershipLink>
           {user ? (
             <div className="relative">
               <details className="group">
@@ -228,6 +236,12 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                   >
                     {t("nav.memberPortal")}
                   </NavLink>
+                  <NavLink
+                    href="/member/payments"
+                    className="block rounded-lg px-3 py-2 text-sm hover:bg-muted"
+                  >
+                    Contribute
+                  </NavLink>
                   {user.isAdmin ? (
                     <NavLink
                       href="/admin"
@@ -244,22 +258,12 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
               </details>
             </div>
           ) : (
-            <>
-              <NavLink
-                href="/login"
-                className="hidden text-sm font-medium text-white/80 transition hover:text-white xl:inline"
-              >
-                {t("nav.login")}
-              </NavLink>
-              <MembershipLink
-                className={cn(
-                  GOLD_SHINY_BTN,
-                  "h-9 px-4 text-sm shadow-md sm:h-10 sm:px-5 sm:text-sm",
-                )}
-              >
-                <span>{t("nav.becomeMember")}</span>
-              </MembershipLink>
-            </>
+            <NavLink
+              href="/login"
+              className="hidden text-sm font-medium text-white/80 transition hover:text-white xl:inline"
+            >
+              {t("nav.login")}
+            </NavLink>
           )}
         </div>
 
@@ -347,6 +351,15 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                       </p>
                     </div>
                   </div>
+                  <MembershipLink
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      GOLD_SHINY_BTN,
+                      "mb-2 h-11 w-full px-5 text-sm shadow-md",
+                    )}
+                  >
+                    <span>{t("nav.becomeMember")}</span>
+                  </MembershipLink>
                   <NavLink
                     href="/member"
                     onClick={() => setMobileOpen(false)}

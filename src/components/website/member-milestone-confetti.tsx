@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 
 const STORAGE_PREFIX = "bf-confetti-milestone:";
@@ -44,31 +44,49 @@ function fireCelebration() {
   requestAnimationFrame(frame);
 }
 
+function markCelebrated(count: number): boolean {
+  const key = `${STORAGE_PREFIX}${count}`;
+  try {
+    if (window.localStorage.getItem(key)) return false;
+    window.localStorage.setItem(key, "1");
+    return true;
+  } catch {
+    const sessionKey = `session:${key}`;
+    try {
+      if (window.sessionStorage.getItem(sessionKey)) return false;
+      window.sessionStorage.setItem(sessionKey, "1");
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
 /**
- * Fires homepage confetti once per browser when the live member count
- * hits a milestone (1, 100, 200, …).
+ * Celebrates member milestones (1, 100, 200…).
+ * Fires live when the count rises into a milestone (e.g. 0 → 1 without refresh),
+ * and once per browser when landing on a milestone cold.
  */
 export function MemberMilestoneConfetti({ count }: { count: number }) {
+  const prevRef = useRef<number | null>(null);
+
   useEffect(() => {
-    if (!isMemberMilestone(count)) return;
     if (typeof window === "undefined") return;
 
-    const key = `${STORAGE_PREFIX}${count}`;
-    try {
-      if (window.localStorage.getItem(key)) return;
-      window.localStorage.setItem(key, "1");
-    } catch {
-      // Private mode / blocked storage — still celebrate this visit once via session
-      const sessionKey = `session:${key}`;
-      try {
-        if (window.sessionStorage.getItem(sessionKey)) return;
-        window.sessionStorage.setItem(sessionKey, "1");
-      } catch {
-        return;
-      }
-    }
+    const previous = prevRef.current;
+    prevRef.current = count;
 
-    const t = window.setTimeout(() => fireCelebration(), 600);
+    if (!isMemberMilestone(count)) return;
+
+    const roseIntoMilestone =
+      previous !== null && previous < count && isMemberMilestone(count);
+    const coldOnMilestone = previous === null;
+
+    if (!roseIntoMilestone && !coldOnMilestone) return;
+    if (!markCelebrated(count)) return;
+
+    const delay = roseIntoMilestone ? 200 : 600;
+    const t = window.setTimeout(() => fireCelebration(), delay);
     return () => window.clearTimeout(t);
   }, [count]);
 

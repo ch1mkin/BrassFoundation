@@ -27,6 +27,10 @@ import { MustReadBookCard } from "@/components/website/must-read-book-card";
 import { BookBuyButton } from "@/components/marketplace/book-buy-button";
 import { ViewAllLink } from "@/components/website/view-all-link";
 import { HardNavLink } from "@/components/website/hard-nav-link";
+import {
+  MEMBER_COUNT_BUMP_KEY,
+  MEMBER_COUNT_CHANNEL,
+} from "@/lib/membership/member-count-client";
 
 function AnimatedCounter({
   value,
@@ -38,18 +42,31 @@ function AnimatedCounter({
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const [count, setCount] = useState(0);
+  const fromRef = useRef(0);
 
   useEffect(() => {
     if (!inView) return;
-    const duration = 1400;
+    const from = fromRef.current;
+    const to = value;
+    if (from === to) {
+      setCount(to);
+      return;
+    }
+    const duration = Math.min(1400, 400 + Math.abs(to - from) * 80);
     const start = performance.now();
+    let raf = 0;
     const tick = (now: number) => {
       const progress = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(value * eased));
-      if (progress < 1) requestAnimationFrame(tick);
+      setCount(Math.round(from + (to - from) * eased));
+      if (progress < 1) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        fromRef.current = to;
+      }
     };
-    requestAnimationFrame(tick);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [inView, value]);
 
   return (
@@ -67,6 +84,60 @@ export function StatsSection({
   stats: HomepageContent["stats"];
   liveMemberCount?: number | null;
 }) {
+  const [memberCount, setMemberCount] = useState(
+    typeof liveMemberCount === "number" ? liveMemberCount : null,
+  );
+
+  useEffect(() => {
+    if (typeof liveMemberCount === "number") {
+      setMemberCount(liveMemberCount);
+    }
+  }, [liveMemberCount]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refreshCount() {
+      try {
+        const res = await fetch("/api/members/count", { cache: "no-store" });
+        if (!res.ok) return;
+        const json = (await res.json()) as { count?: number };
+        if (cancelled || typeof json.count !== "number") return;
+        setMemberCount(json.count);
+      } catch {
+        // keep last known count
+      }
+    }
+
+    void refreshCount();
+    const poll = window.setInterval(() => void refreshCount(), 4000);
+
+    function onBump() {
+      void refreshCount();
+    }
+    function onStorage(e: StorageEvent) {
+      if (e.key === MEMBER_COUNT_BUMP_KEY) onBump();
+    }
+
+    let channel: BroadcastChannel | null = null;
+    try {
+      channel = new BroadcastChannel(MEMBER_COUNT_CHANNEL);
+      channel.onmessage = onBump;
+    } catch {
+      channel = null;
+    }
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("focus", onBump);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(poll);
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("focus", onBump);
+      channel?.close();
+    };
+  }, []);
+
   const count = stats.length;
   const cols =
     count <= 2
@@ -81,16 +152,16 @@ export function StatsSection({
 
   const displayStats = stats.map((stat) => {
     const isMembers = /member/i.test(stat.label);
-    if (isMembers && typeof liveMemberCount === "number") {
-      return { ...stat, value: liveMemberCount, suffix: "+" };
+    if (isMembers && typeof memberCount === "number") {
+      return { ...stat, value: memberCount, suffix: "+" };
     }
     return stat;
   });
 
   return (
     <section className="relative bg-surface-low py-12 lg:py-16">
-      {typeof liveMemberCount === "number" ? (
-        <MemberMilestoneConfetti count={liveMemberCount} />
+      {typeof memberCount === "number" ? (
+        <MemberMilestoneConfetti count={memberCount} />
       ) : null}
       <div
         className={`relative z-10 mx-auto grid max-w-[1280px] grid-cols-2 gap-3 px-4 sm:gap-4 sm:px-6 lg:gap-3 lg:px-8 xl:px-12 ${cols}`}

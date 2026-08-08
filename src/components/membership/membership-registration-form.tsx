@@ -25,6 +25,7 @@ import {
 } from "@/lib/membership/register-action";
 import { SITE } from "@/lib/constants";
 import { REGISTRATION_FEE_PAISE } from "@/lib/payments/constants";
+import { bumpLiveMemberCount } from "@/lib/membership/member-count-client";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 
 const initial: RegisterMembershipState = {};
@@ -184,6 +185,7 @@ export function MembershipRegistrationForm({
           }
           setMembershipId(verified.membershipId || null);
           setStep("done");
+          bumpLiveMemberCount();
           confetti({ particleCount: 140, spread: 70, origin: { y: 0.65 } });
           setPaying(false);
         },

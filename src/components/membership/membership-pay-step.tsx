@@ -7,6 +7,7 @@ import { InlineLoader, ButtonSpinner } from "@/components/ui/inline-loader";
 import { openRazorpayCheckout } from "@/components/membership/razorpay-checkout";
 import { SITE } from "@/lib/constants";
 import { REGISTRATION_FEE_PAISE } from "@/lib/payments/constants";
+import { bumpLiveMemberCount } from "@/lib/membership/member-count-client";
 
 export function MembershipPayStep({
   applicationId,
@@ -88,6 +89,7 @@ export function MembershipPayStep({
           }
           setMembershipId(verified.membershipId || null);
           setDone(true);
+          bumpLiveMemberCount();
           confetti({ particleCount: 140, spread: 70, origin: { y: 0.65 } });
           setPaying(false);
           window.scrollTo({ top: 0, behavior: "smooth" });

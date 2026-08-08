@@ -21,6 +21,7 @@ import {
   FAMILY_MINOR_AGE,
 } from "@/lib/payments/constants";
 import { SITE } from "@/lib/constants";
+import { bumpLiveMemberCount } from "@/lib/membership/member-count-client";
 
 type Draft = {
   full_name: string;
@@ -108,6 +109,7 @@ export function FamilyMembersForm() {
             return;
           }
           setDone(true);
+          bumpLiveMemberCount();
           confetti({ particleCount: 120, spread: 70, origin: { y: 0.7 } });
           setPaying(false);
         },
