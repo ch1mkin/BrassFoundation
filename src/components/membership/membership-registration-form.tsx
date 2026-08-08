@@ -285,7 +285,6 @@ export function MembershipRegistrationForm({
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="e.g. Rajesh Kumar"
                 className="h-11 rounded-xl bg-white"
               />
             </label>
