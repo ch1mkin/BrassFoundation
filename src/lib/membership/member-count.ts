@@ -8,15 +8,14 @@ const ADMIN_ROLE_SLUGS = [
   "treasurer",
 ] as const;
 
-async function getAdminUserIds(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  admin: any,
-): Promise<string[]> {
+async function getAdminUserIds(): Promise<string[]> {
+  const admin = createServiceClient();
   const { data: roles } = await admin
     .from("roles")
     .select("id")
     .in("slug", [...ADMIN_ROLE_SLUGS]);
-  const roleIds = (roles || []).map((r: { id: string }) => r.id);
+
+  const roleIds = (roles ?? []).map((r) => r.id);
   if (!roleIds.length) return [];
 
   const { data: userRoles } = await admin
@@ -26,9 +25,9 @@ async function getAdminUserIds(
 
   return [
     ...new Set(
-      (userRoles || [])
-        .map((r: { user_id: string | null }) => r.user_id)
-        .filter(Boolean) as string[],
+      (userRoles ?? [])
+        .map((r) => r.user_id)
+        .filter((id): id is string => Boolean(id)),
     ),
   ];
 }
@@ -41,34 +40,31 @@ async function getAdminUserIds(
 export async function getLiveMemberCount(): Promise<number> {
   try {
     const admin = createServiceClient();
-    const adminIds = await getAdminUserIds(admin);
+    const adminIds = await getAdminUserIds();
 
-    let primaryQuery = admin
-      .from("membership_applications")
-      .select("id", { count: "exact", head: true })
-      .eq("payment_status", "paid")
-      .eq("status", "approved")
-      .not("membership_id", "is", null);
-
-    let familyQuery = admin
-      .from("family_members")
-      .select("id", { count: "exact", head: true })
-      .in("payment_status", ["paid", "waived"])
-      .not("membership_id", "is", null);
-
-    if (adminIds.length) {
-      // PostgREST `not.in` filter — keep the count membership-only, no staff.
-      const list = `(${adminIds.join(",")})`;
-      primaryQuery = primaryQuery.not("user_id", "in", list);
-      familyQuery = familyQuery.not("parent_user_id", "in", list);
-    }
-
-    const [{ count: primary }, { count: family }] = await Promise.all([
-      primaryQuery,
-      familyQuery,
+    const [{ data: primaryRows }, { data: familyRows }] = await Promise.all([
+      admin
+        .from("membership_applications")
+        .select("id, user_id")
+        .eq("payment_status", "paid")
+        .eq("status", "approved")
+        .not("membership_id", "is", null),
+      admin
+        .from("family_members")
+        .select("id, parent_user_id")
+        .in("payment_status", ["paid", "waived"])
+        .not("membership_id", "is", null),
     ]);
 
-    return (primary || 0) + (family || 0);
+    const adminSet = new Set(adminIds);
+    const primary = (primaryRows ?? []).filter(
+      (row) => !row.user_id || !adminSet.has(row.user_id),
+    ).length;
+    const family = (familyRows ?? []).filter(
+      (row) => !row.parent_user_id || !adminSet.has(row.parent_user_id),
+    ).length;
+
+    return primary + family;
   } catch (err) {
     console.error("[member-count] Failed to load live count:", err);
     return 0;
