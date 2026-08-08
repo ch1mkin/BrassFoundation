@@ -592,14 +592,23 @@ export function ResourcesSection({
             >
               <div
                 className={cn(
-                  "mb-2 flex aspect-[3/4] max-h-36 w-full items-center justify-center rounded-lg bg-surface-highest transition-all duration-300 sm:mb-4 sm:max-h-none sm:rounded-xl",
-                  toneClass[tone],
+                  "mb-2 flex aspect-[4/3] max-h-28 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-highest transition-all duration-300 sm:mb-4 sm:aspect-[3/4] sm:max-h-none sm:rounded-xl",
+                  !item.thumbnail_url && toneClass[tone],
                 )}
               >
-                <MaterialIcon
-                  name={item.icon}
-                  className="text-[36px] sm:text-[64px]"
-                />
+                {item.thumbnail_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={item.thumbnail_url}
+                    alt=""
+                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                  />
+                ) : (
+                  <MaterialIcon
+                    name={item.icon}
+                    className="text-[36px] sm:text-[64px]"
+                  />
+                )}
               </div>
               <h4 className="font-heading mb-0.5 line-clamp-2 text-sm font-semibold sm:mb-1 sm:text-lg">
                 {item.title}

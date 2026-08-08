@@ -10,6 +10,7 @@ import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import { RESOURCE_CATEGORY_ICONS } from "@/lib/constants";
 import { upsertResourceCategoryAction } from "@/lib/content/resource-category-actions";
 import type { ContentActionState } from "@/lib/content/utils";
+import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 
 const TONES = [
   { id: "primary", label: "Primary" },
@@ -96,6 +97,13 @@ export function ResourceCategoryCreateForm() {
           defaultValue={100}
           placeholder="Sort order"
           className="h-10 rounded-xl"
+        />
+        <FileOrUrlField
+          name="thumbnail_url"
+          label="Card thumbnail (optional)"
+          bucket="gallery"
+          accept="image/*"
+          folder="resources/categories"
         />
         <label className="flex items-center gap-2 text-sm">
           <input

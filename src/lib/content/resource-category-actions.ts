@@ -35,6 +35,8 @@ export async function upsertResourceCategoryAction(
     tone,
     sort_order: Number(formData.get("sort_order") || 100),
     is_published: formData.get("is_published") === "on",
+    thumbnail_url:
+      String(formData.get("thumbnail_url") || "").trim() || null,
     updated_at: new Date().toISOString(),
   };
 
@@ -44,6 +46,12 @@ export async function upsertResourceCategoryAction(
   });
 
   if (error) {
+    if (/thumbnail_url/i.test(error.message)) {
+      return {
+        error:
+          "Run supabase/migrations/20260808220000_resource_category_thumbnails.sql then try again.",
+      };
+    }
     if (/relation .* does not exist|Could not find/i.test(error.message)) {
       return {
         error:

@@ -28,7 +28,7 @@ export default async function ResourcesPage() {
       description="Browse library categories — Constitution texts, writings, kits, podcasts, and more."
       wide
     >
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
         {categories.map((item) => {
           const count = counts[item.slug] ?? 0;
           const tone =
@@ -39,19 +39,35 @@ export default async function ResourcesPage() {
             <Link
               key={item.slug}
               href={`/resources/${item.slug}`}
-              className="glass-card group rounded-2xl p-5 transition hover:-translate-y-0.5"
+              className="glass-card group rounded-xl p-3 transition hover:-translate-y-0.5 sm:rounded-2xl sm:p-5"
             >
               <div
                 className={cn(
-                  "mb-4 flex aspect-[3/4] items-center justify-center overflow-hidden rounded-xl bg-surface-highest transition-all duration-300",
-                  toneClass[tone],
+                  "mb-2 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg bg-surface-highest transition-all duration-300 sm:mb-4 sm:aspect-[3/4] sm:rounded-xl",
+                  !item.thumbnail_url && toneClass[tone],
                 )}
               >
-                <MaterialIcon name={item.icon} className="text-5xl" />
+                {item.thumbnail_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={item.thumbnail_url}
+                    alt=""
+                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                  />
+                ) : (
+                  <MaterialIcon
+                    name={item.icon}
+                    className="text-3xl sm:text-5xl"
+                  />
+                )}
               </div>
-              <h2 className="font-heading text-lg font-semibold">{item.title}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{item.subtitle}</p>
-              <p className="mt-4 text-xs font-semibold tracking-wide text-primary uppercase">
+              <h2 className="font-heading line-clamp-2 text-sm font-semibold sm:text-lg">
+                {item.title}
+              </h2>
+              <p className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground sm:mt-1 sm:text-sm">
+                {item.subtitle}
+              </p>
+              <p className="mt-2 text-[10px] font-semibold tracking-wide text-primary uppercase sm:mt-4 sm:text-xs">
                 {count === 0
                   ? "No materials yet"
                   : `${count} material${count === 1 ? "" : "s"}`}
