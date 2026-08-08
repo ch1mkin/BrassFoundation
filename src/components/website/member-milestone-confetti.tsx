@@ -3,8 +3,6 @@
 import { useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 
-const STORAGE_PREFIX = "bf-confetti-milestone:";
-
 /** First member, then every hundredth (1, 100, 200, …). */
 export function isMemberMilestone(count: number): boolean {
   if (!Number.isFinite(count) || count < 1) return false;
@@ -12,81 +10,76 @@ export function isMemberMilestone(count: number): boolean {
   return count % 100 === 0;
 }
 
+/** Milestones crossed when the live total rises from `from` → `to`. */
+export function milestonesCrossed(from: number, to: number): number[] {
+  if (!Number.isFinite(from) || !Number.isFinite(to) || to <= from) return [];
+  const hits: number[] = [];
+  if (from < 1 && to >= 1) hits.push(1);
+  const firstHundred = Math.max(1, Math.floor(from / 100) + 1);
+  const lastHundred = Math.floor(to / 100);
+  for (let h = firstHundred; h <= lastHundred; h++) {
+    const milestone = h * 100;
+    if (milestone > from && milestone <= to) hits.push(milestone);
+  }
+  return hits;
+}
+
 function fireCelebration() {
-  const duration = 2800;
+  const duration = 3200;
   const end = Date.now() + duration;
+  const colors = ["#002B5B", "#006875", "#11B5C9", "#F4B942", "#E8ECF0", "#ffffff"];
+
+  confetti({
+    particleCount: 180,
+    spread: 100,
+    startVelocity: 48,
+    origin: { y: 0.55 },
+    colors,
+  });
 
   const frame = () => {
     confetti({
-      particleCount: 3,
+      particleCount: 4,
       angle: 60,
-      spread: 55,
+      spread: 60,
       origin: { x: 0, y: 0.7 },
-      colors: ["#002B5B", "#11B5C9", "#F4B942", "#ffffff"],
+      colors,
     });
     confetti({
-      particleCount: 3,
+      particleCount: 4,
       angle: 120,
-      spread: 55,
+      spread: 60,
       origin: { x: 1, y: 0.7 },
-      colors: ["#002B5B", "#11B5C9", "#F4B942", "#ffffff"],
+      colors,
     });
     if (Date.now() < end) requestAnimationFrame(frame);
   };
-
-  confetti({
-    particleCount: 160,
-    spread: 90,
-    startVelocity: 45,
-    origin: { y: 0.55 },
-    colors: ["#002B5B", "#006875", "#11B5C9", "#F4B942", "#E8ECF0"],
-  });
   requestAnimationFrame(frame);
 }
 
-function markCelebrated(count: number): boolean {
-  const key = `${STORAGE_PREFIX}${count}`;
-  try {
-    if (window.localStorage.getItem(key)) return false;
-    window.localStorage.setItem(key, "1");
-    return true;
-  } catch {
-    const sessionKey = `session:${key}`;
-    try {
-      if (window.sessionStorage.getItem(sessionKey)) return false;
-      window.sessionStorage.setItem(sessionKey, "1");
-      return true;
-    } catch {
-      return false;
-    }
-  }
-}
-
 /**
- * Celebrates member milestones (1, 100, 200…).
- * Fires live when the count rises into a milestone (e.g. 0 → 1 without refresh),
- * and once per browser when landing on a milestone cold.
+ * Live homepage confetti when the member count rises into 1, 100, 200…
+ * Fires for every open tab that observes that rise (no refresh required).
  */
 export function MemberMilestoneConfetti({ count }: { count: number }) {
   const prevRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (!Number.isFinite(count)) return;
 
     const previous = prevRef.current;
     prevRef.current = count;
 
-    if (!isMemberMilestone(count)) return;
+    // Wait until we have a prior live reading so cold page-load at an
+    // existing milestone does not re-fire — only actual live rises do.
+    if (previous === null) return;
+    if (count <= previous) return;
 
-    const roseIntoMilestone =
-      previous !== null && previous < count && isMemberMilestone(count);
-    const coldOnMilestone = previous === null;
+    const hits = milestonesCrossed(previous, count);
+    if (!hits.length) return;
 
-    if (!roseIntoMilestone && !coldOnMilestone) return;
-    if (!markCelebrated(count)) return;
-
-    const delay = roseIntoMilestone ? 200 : 600;
-    const t = window.setTimeout(() => fireCelebration(), delay);
+    const t = window.setTimeout(() => fireCelebration(), 180);
     return () => window.clearTimeout(t);
   }, [count]);
 

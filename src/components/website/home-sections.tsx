@@ -110,7 +110,8 @@ export function StatsSection({
     }
 
     void refreshCount();
-    const poll = window.setInterval(() => void refreshCount(), 4000);
+    // Poll often enough to catch the first member / hundredth live.
+    const poll = window.setInterval(() => void refreshCount(), 2500);
 
     function onBump() {
       void refreshCount();
