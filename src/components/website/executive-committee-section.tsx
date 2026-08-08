@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import type { ExecutiveMember } from "@/lib/content/committee";
-import { buttonVariants } from "@/components/ui/button";
 import {
   GoldHairline,
   SectionOrnaments,
@@ -180,12 +179,8 @@ const ROW_COLS: Record<number, string> = {
  */
 export function LeadershipSection({
   members,
-  viewAllHref = "/about#executive-committee",
-  showViewAll = true,
 }: {
   members: ExecutiveMember[];
-  viewAllHref?: string;
-  showViewAll?: boolean;
 }) {
   const chair = members.find((m) => isChair(m.role_title));
   const vice = members.find((m) => isVice(m.role_title));
@@ -216,29 +211,15 @@ export function LeadershipSection({
       className="relative overflow-hidden bg-surface-high py-10 sm:py-14 lg:py-16"
     >
       <SectionOrnaments />
-      <div className="relative z-20 mx-auto mb-8 flex max-w-[1280px] flex-col items-center justify-between gap-4 px-4 text-center sm:mb-10 sm:flex-row sm:items-end sm:px-6 sm:text-left lg:px-20">
-        <div>
-          <h2 className="font-heading mb-2 text-2xl font-semibold sm:text-3xl">
-            Executive Committee
-          </h2>
-          <GoldHairline className="mx-auto mb-3 mt-3 sm:mx-0" />
-          <p className="mx-auto max-w-2xl text-sm text-muted-foreground sm:mx-0 sm:text-base">
-            The committee guiding Brass Foundation&apos;s mission of education,
-            equality, and community development.
-          </p>
-        </div>
-        {showViewAll ? (
-          // eslint-disable-next-line @next/next/no-html-link-for-pages -- hard nav for mobile taps
-          <a
-            href={viewAllHref}
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "pointer-events-auto relative z-40 inline-flex min-h-11 shrink-0 touch-manipulation items-center justify-center rounded-full px-4 text-sm sm:min-h-10 sm:px-4",
-            )}
-          >
-            View all
-          </a>
-        ) : null}
+      <div className="relative z-20 mx-auto mb-8 max-w-[1280px] px-4 text-center sm:mb-10 sm:px-6 sm:text-left lg:px-20">
+        <h2 className="font-heading mb-2 text-2xl font-semibold sm:text-3xl">
+          Executive Committee
+        </h2>
+        <GoldHairline className="mx-auto mb-3 mt-3 sm:mx-0" />
+        <p className="mx-auto max-w-2xl text-sm text-muted-foreground sm:mx-0 sm:text-base">
+          The committee guiding Brass Foundation&apos;s mission of education,
+          equality, and community development.
+        </p>
       </div>
 
       <div className="relative z-10 mx-auto flex max-w-[1280px] flex-col items-stretch gap-6 px-2 sm:gap-8 sm:px-6 lg:gap-10 lg:px-20">

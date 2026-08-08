@@ -61,11 +61,7 @@ export default async function AboutPage() {
         </section>
 
         <div className="-mx-4 sm:-mx-6 lg:-mx-20">
-          <LeadershipSection
-            members={committee}
-            viewAllHref="#executive-committee"
-            showViewAll
-          />
+          <LeadershipSection members={committee} />
         </div>
       </div>
     </PageShell>

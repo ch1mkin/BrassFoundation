@@ -18,7 +18,6 @@ import {
   googleTranslateTarget,
   localeHtmlLang,
   type Locale,
-  parseLocale,
 } from "@/lib/i18n/config";
 import { t as translateBuiltin, type MessageKey } from "@/lib/i18n/messages";
 import {
@@ -84,12 +83,24 @@ export function LocaleProvider({
   initialLocale?: Locale;
   initialTranslations?: Record<string, TranslationRow>;
 }) {
-  const [locale, setLocaleState] = useState<Locale>(initialLocale);
+  // Language switcher is locked — always run in English for now.
+  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
   const [translations, setTranslations] = useState(initialTranslations);
   const [translating, setTranslating] = useState(false);
   const pathname = usePathname();
   const skipInitialRouteTranslate = useRef(true);
   const translateGen = useRef(0);
+
+  useEffect(() => {
+    writeCookie(LOCALE_COOKIE, DEFAULT_LOCALE);
+    setLocaleState(DEFAULT_LOCALE);
+    clearGoogleTranslateArtifacts();
+    applyDocumentLocale(DEFAULT_LOCALE);
+    restoreWritingContent();
+  }, []);
+
+  // Silence unused prop while language is locked to English.
+  void initialLocale;
 
   useEffect(() => {
     setTranslations(initialTranslations);
@@ -157,15 +168,11 @@ export function LocaleProvider({
     };
   }, [locale, pathname, runTranslate]);
 
-  const setLocale = useCallback(
-    (next: Locale) => {
-      const resolved = parseLocale(next);
-      if (resolved === locale || translating) return;
-      writeCookie(LOCALE_COOKIE, resolved);
-      setLocaleState(resolved);
-    },
-    [locale, translating],
-  );
+  const setLocale = useCallback((_next: Locale) => {
+    // Language switching temporarily disabled — keep English only.
+    writeCookie(LOCALE_COOKIE, DEFAULT_LOCALE);
+    setLocaleState(DEFAULT_LOCALE);
+  }, []);
 
   const t = useCallback(
     (key: MessageKey | string) => {
