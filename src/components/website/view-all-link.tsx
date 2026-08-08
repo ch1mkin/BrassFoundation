@@ -1,7 +1,3 @@
-/* eslint-disable @next/next/no-html-link-for-pages --
- * Native <a> so View all works on mobile; Next soft-nav was unreliable with
- * section overlays / touch stacking.
- */
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
@@ -21,6 +17,7 @@ export function ViewAllLink({
   withArrow?: boolean;
 }) {
   return (
+    // Native <a> so View all remains reliable on mobile with section overlays.
     <a
       href={href}
       className={cn(

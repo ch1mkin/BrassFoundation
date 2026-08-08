@@ -168,7 +168,8 @@ export function LocaleProvider({
     };
   }, [locale, pathname, runTranslate]);
 
-  const setLocale = useCallback((_next: Locale) => {
+  const setLocale = useCallback((..._args: Locale[]) => {
+    void _args;
     // Language switching temporarily disabled — keep English only.
     writeCookie(LOCALE_COOKIE, DEFAULT_LOCALE);
     setLocaleState(DEFAULT_LOCALE);

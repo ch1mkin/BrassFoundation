@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { PasswordInput } from "@/components/auth/password-input";
@@ -136,13 +137,13 @@ export function LoginForm() {
             Become a member
           </MembershipLink>
         </p>
-        <a
+        <Link
           href="/"
           className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-white px-5 text-sm font-semibold text-foreground transition hover:bg-surface-low"
         >
           <MaterialIcon name="home" className="text-[18px]" />
           Home
-        </a>
+        </Link>
       </div>
     </div>
   );
