@@ -75,6 +75,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   arrow_right_alt: ArrowRight,
   trending_flat: MoveRight,
   location_on: Home,
+  home: Home,
   videocam: Activity,
   star: Star,
   mail: Mail,

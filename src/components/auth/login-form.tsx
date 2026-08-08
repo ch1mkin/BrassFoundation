@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { PasswordInput } from "@/components/auth/password-input";
@@ -8,6 +7,7 @@ import { MembershipLink } from "@/components/membership/membership-link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { HardNavLink } from "@/components/website/hard-nav-link";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import {
   signInAction,
@@ -137,13 +137,13 @@ export function LoginForm() {
             Become a member
           </MembershipLink>
         </p>
-        <Link
+        <HardNavLink
           href="/"
           className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-white px-5 text-sm font-semibold text-foreground transition hover:bg-surface-low"
         >
           <MaterialIcon name="home" className="text-[18px]" />
           Home
-        </Link>
+        </HardNavLink>
       </div>
     </div>
   );
