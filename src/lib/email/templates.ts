@@ -1,3 +1,141 @@
+import { escapeHtml } from "@/lib/security/html";
+
+function appBaseUrl() {
+  return (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(
+    /\/$/,
+    "",
+  );
+}
+
+function logoUrl() {
+  return `${appBaseUrl()}/brand/logo.png`;
+}
+
+/** Shared branded shell for all transactional emails. */
+export function brandedEmailLayout({
+  title,
+  preheader,
+  bodyHtml,
+}: {
+  title: string;
+  preheader?: string;
+  bodyHtml: string;
+}) {
+  const safeTitle = escapeHtml(title);
+  const safePreheader = escapeHtml(preheader || title);
+  const logo = logoUrl();
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${safeTitle}</title>
+</head>
+<body style="margin:0;padding:0;background:#F4F6F8;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+    ${safePreheader}
+  </div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F4F6F8;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 10px 40px rgba(0,43,91,0.08);">
+          <tr>
+            <td style="background:linear-gradient(135deg,#002B5B 0%,#006875 55%,#11B5C9 100%);padding:28px 32px;text-align:center;">
+              <img src="${logo}" alt="Brass Foundation" width="72" height="72" style="display:inline-block;border-radius:999px;background:#ffffff;padding:8px;box-sizing:content-box;" />
+              <p style="margin:14px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:0.02em;">
+                Brass Foundation
+              </p>
+              <p style="margin:6px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:rgba(255,255,255,0.88);letter-spacing:0.12em;text-transform:uppercase;">
+                Education · Empowerment · Equality
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 28px 8px;font-family:Arial,Helvetica,sans-serif;color:#14181F;line-height:1.65;font-size:15px;">
+              ${bodyHtml}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 28px 28px;font-family:Arial,Helvetica,sans-serif;">
+              <hr style="border:none;border-top:1px solid #E8ECF0;margin:8px 0 20px;" />
+              <p style="margin:0;font-size:12px;line-height:1.5;color:#5C6670;text-align:center;">
+                Brass Foundation · Education to Prosperity<br />
+                This is an automated message. Please do not reply directly unless a reply address is provided.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+function ctaButton(href: string, label: string) {
+  return `<p style="margin:28px 0 8px;text-align:center;">
+    <a href="${href}"
+       style="background:#002B5B;color:#ffffff;text-decoration:none;padding:14px 24px;border-radius:12px;display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;">
+      ${escapeHtml(label)}
+    </a>
+  </p>`;
+}
+
+/** Sent after ₹10 membership payment succeeds. */
+export function membershipWelcomeEmailHtml({
+  name,
+  membershipId,
+  appUrl,
+}: {
+  name: string;
+  membershipId?: string | null;
+  appUrl?: string;
+}) {
+  const base = (appUrl || appBaseUrl()).replace(/\/$/, "");
+  const safeName = escapeHtml(name || "Friend");
+  const portalUrl = `${base}/member`;
+  const contributeUrl = `${base}/member/payments`;
+  const idLine = membershipId
+    ? `<p style="margin:16px 0;padding:12px 14px;background:#F4F6F8;border-radius:12px;font-size:14px;color:#002B5B;">
+        <strong>Membership ID:</strong> ${escapeHtml(membershipId)}
+      </p>`
+    : "";
+
+  const body = `
+    <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.25;color:#002B5B;">
+      Welcome to Brass Foundation
+    </h1>
+    <p style="margin:0 0 14px;">Dear ${safeName},</p>
+    <p style="margin:0 0 14px;">
+      Thank you for joining <strong>Brass Foundation</strong>. Your membership payment was successful,
+      and we are delighted to welcome you into our community dedicated to education, empowerment, and equality.
+    </p>
+    <p style="margin:0 0 14px;">
+      Your support strengthens our shared mission. We invite you to contribute further to the Foundation
+      whenever you can — even a small monthly contribution helps expand study centres, mentoring, and outreach.
+    </p>
+    ${idLine}
+    ${ctaButton(contributeUrl, "Contribute to the Foundation")}
+    <p style="margin:18px 0 0;text-align:center;font-size:13px;color:#5C6670;">
+      Or open your
+      <a href="${portalUrl}" style="color:#006875;font-weight:700;text-decoration:none;">Member Panel</a>
+      to manage your membership, referral link, and family members.
+    </p>
+    <p style="margin:24px 0 0;">
+      With gratitude,<br />
+      <strong>Team Brass Foundation</strong>
+    </p>
+  `;
+
+  return brandedEmailLayout({
+    title: "Welcome to Brass Foundation",
+    preheader: `Thank you for joining, ${name || "friend"}. Contribute from your member panel.`,
+    bodyHtml: body,
+  });
+}
+
+/** @deprecated Prefer membershipWelcomeEmailHtml for paid joins. */
 export function welcomeEmailHtml({
   name,
   appUrl,
@@ -5,27 +143,7 @@ export function welcomeEmailHtml({
   name: string;
   appUrl: string;
 }) {
-  return `
-    <div style="font-family: Inter, Arial, sans-serif; color: #1B1B1B; line-height: 1.6; max-width: 560px; margin: 0 auto;">
-      <h1 style="font-family: Poppins, Arial, sans-serif; color: #114C88; font-size: 24px;">
-        Welcome to Brass Foundation
-      </h1>
-      <p>Hi ${name || "there"},</p>
-      <p>
-        Thank you for joining Brass Foundation. Your account is ready —
-        explore resources, events, and community programs from your member portal.
-      </p>
-      <p style="margin: 28px 0;">
-        <a href="${appUrl}/member"
-           style="background: #11B5C9; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 16px; display: inline-block;">
-          Open Member Portal
-        </a>
-      </p>
-      <p style="color: #6B7280; font-size: 14px;">
-        Education · Empowerment · Equality
-      </p>
-    </div>
-  `;
+  return membershipWelcomeEmailHtml({ name, appUrl });
 }
 
 export function passwordResetEmailHtml({
@@ -35,24 +153,20 @@ export function passwordResetEmailHtml({
   name: string;
   resetUrl: string;
 }) {
-  return `
-    <div style="font-family: Inter, Arial, sans-serif; color: #1B1B1B; line-height: 1.6; max-width: 560px; margin: 0 auto;">
-      <h1 style="font-family: Poppins, Arial, sans-serif; color: #114C88; font-size: 24px;">
-        Reset your password
-      </h1>
-      <p>Hi ${name || "there"},</p>
-      <p>We received a request to reset your Brass Foundation account password.</p>
-      <p style="margin: 28px 0;">
-        <a href="${resetUrl}"
-           style="background: #11B5C9; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 16px; display: inline-block;">
-          Reset Password
-        </a>
-      </p>
-      <p style="color: #6B7280; font-size: 14px;">
-        If you did not request this, you can safely ignore this email.
-      </p>
-    </div>
+  const safeName = escapeHtml(name || "there");
+  const body = `
+    <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:24px;color:#002B5B;">
+      Reset your password
+    </h1>
+    <p>Hi ${safeName},</p>
+    <p>We received a request to reset your Brass Foundation account password.</p>
+    ${ctaButton(resetUrl, "Reset Password")}
+    <p style="font-size:13px;color:#5C6670;">If you did not request this, you can safely ignore this email.</p>
   `;
+  return brandedEmailLayout({
+    title: "Reset your password",
+    bodyHtml: body,
+  });
 }
 
 export function membershipReceivedEmailHtml({
@@ -64,25 +178,23 @@ export function membershipReceivedEmailHtml({
   appUrl: string;
   applicationId: string;
 }) {
-  return `
-    <div style="font-family: Inter, Arial, sans-serif; color: #1B1B1B; line-height: 1.6; max-width: 560px; margin: 0 auto;">
-      <h1 style="font-family: Poppins, Arial, sans-serif; color: #006875; font-size: 24px;">
-        Application received
-      </h1>
-      <p>Hi ${name || "there"},</p>
-      <p>
-        Thank you for applying to Brass Foundation. Our team will review your
-        application and follow up by email.
-      </p>
-      <p style="color: #6B7280; font-size: 14px;">Reference: ${applicationId}</p>
-      <p style="margin: 28px 0;">
-        <a href="${appUrl}/member"
-           style="background: #006875; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 12px; display: inline-block;">
-          Open Member Portal
-        </a>
-      </p>
-    </div>
+  const safeName = escapeHtml(name || "there");
+  const body = `
+    <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:24px;color:#006875;">
+      Application received
+    </h1>
+    <p>Hi ${safeName},</p>
+    <p>
+      Thank you for applying to Brass Foundation. Please complete payment if you have not already,
+      so we can activate your membership.
+    </p>
+    <p style="font-size:13px;color:#5C6670;">Reference: ${escapeHtml(applicationId)}</p>
+    ${ctaButton(`${appUrl.replace(/\/$/, "")}/member`, "Open Member Portal")}
   `;
+  return brandedEmailLayout({
+    title: "Application received",
+    bodyHtml: body,
+  });
 }
 
 export function eventRegistrationEmailHtml({
@@ -102,26 +214,23 @@ export function eventRegistrationEmailHtml({
     dateStyle: "medium",
     timeStyle: "short",
   });
-  return `
-    <div style="font-family: Inter, Arial, sans-serif; color: #1B1B1B; line-height: 1.6; max-width: 560px; margin: 0 auto;">
-      <h1 style="font-family: Poppins, Arial, sans-serif; color: #006875; font-size: 24px;">
-        You are registered
-      </h1>
-      <p>Hi ${name || "there"},</p>
-      <p>You registered for <strong>${eventTitle}</strong>.</p>
-      <p><strong>When:</strong> ${when}</p>
-      ${location ? `<p><strong>Where:</strong> ${location}</p>` : ""}
-      <p style="margin: 28px 0;">
-        <a href="${eventUrl}"
-           style="background: #006875; color: #fff; text-decoration: none; padding: 12px 20px; border-radius: 12px; display: inline-block;">
-          View event
-        </a>
-      </p>
-    </div>
+  const safeName = escapeHtml(name || "there");
+  const body = `
+    <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:24px;color:#006875;">
+      You are registered
+    </h1>
+    <p>Hi ${safeName},</p>
+    <p>You registered for <strong>${escapeHtml(eventTitle)}</strong>.</p>
+    <p><strong>When:</strong> ${escapeHtml(when)}</p>
+    ${location ? `<p><strong>Where:</strong> ${escapeHtml(location)}</p>` : ""}
+    ${ctaButton(eventUrl, "View event")}
   `;
+  return brandedEmailLayout({
+    title: "Event registration",
+    bodyHtml: body,
+  });
 }
 
-/** Inbox notification for Contact Us submissions (name/email/message must already be escaped). */
 export function contactInboxEmailHtml({
   name,
   email,
@@ -131,34 +240,64 @@ export function contactInboxEmailHtml({
   email: string;
   messageHtml: string;
 }) {
-  return `
-    <div style="font-family: Inter, Arial, sans-serif; color: #1B1B1B; line-height: 1.6; max-width: 560px; margin: 0 auto;">
-      <h1 style="font-family: Poppins, Arial, sans-serif; color: #114C88; font-size: 22px;">
-        New contact message
-      </h1>
-      <p><strong>From:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 20px 0;" />
-      <p style="white-space: pre-wrap;">${messageHtml}</p>
-    </div>
+  const body = `
+    <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#114C88;">
+      New contact message
+    </h1>
+    <p><strong>From:</strong> ${name}</p>
+    <p><strong>Email:</strong> ${email}</p>
+    <hr style="border:none;border-top:1px solid #E5E7EB;margin:20px 0;" />
+    <p style="white-space:pre-wrap;">${messageHtml}</p>
   `;
+  return brandedEmailLayout({
+    title: "New contact message",
+    bodyHtml: body,
+  });
 }
 
-/** Auto-reply to the person who submitted Contact Us (name must already be escaped). */
 export function contactAutoReplyEmailHtml({ name }: { name: string }) {
-  return `
-    <div style="font-family: Inter, Arial, sans-serif; color: #1B1B1B; line-height: 1.6; max-width: 560px; margin: 0 auto;">
-      <h1 style="font-family: Poppins, Arial, sans-serif; color: #114C88; font-size: 22px;">
-        We received your message
-      </h1>
-      <p>Hi ${name || "there"},</p>
-      <p>
-        Thank you for contacting Brass Foundation. Our team has received your
-        message and will get back to you as soon as we can.
-      </p>
-      <p style="color: #6B7280; font-size: 14px;">
-        Education · Empowerment · Equality
-      </p>
-    </div>
+  const safeName = escapeHtml(name || "there");
+  const body = `
+    <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#114C88;">
+      We received your message
+    </h1>
+    <p>Hi ${safeName},</p>
+    <p>
+      Thank you for contacting Brass Foundation. Our team has received your
+      message and will get back to you as soon as we can.
+    </p>
   `;
+  return brandedEmailLayout({
+    title: "We received your message",
+    bodyHtml: body,
+  });
+}
+
+/** Admin SMTP test email. */
+export function smtpTestEmailHtml({
+  adminName,
+  appUrl,
+}: {
+  adminName?: string | null;
+  appUrl?: string;
+}) {
+  const base = (appUrl || appBaseUrl()).replace(/\/$/, "");
+  const safeName = escapeHtml(adminName || "Admin");
+  const body = `
+    <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:24px;color:#002B5B;">
+      SMTP test successful
+    </h1>
+    <p>Hi ${safeName},</p>
+    <p>
+      This is a test email from the Brass Foundation admin panel.
+      If you received it, Hostinger SMTP is configured correctly.
+    </p>
+    ${ctaButton(`${base}/admin/settings`, "Back to Settings")}
+    <p style="font-size:12px;color:#5C6670;">Sent at ${escapeHtml(new Date().toLocaleString("en-IN"))}</p>
+  `;
+  return brandedEmailLayout({
+    title: "SMTP test successful",
+    preheader: "Brass Foundation email delivery is working.",
+    bodyHtml: body,
+  });
 }

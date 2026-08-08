@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { attachMemberToOrgTree } from "@/lib/content/attach-org-member";
+import { sendMembershipWelcomeEmail } from "@/lib/email/actions";
 import { verifyPaymentSignature } from "@/lib/payments/razorpay";
 
 async function issueMembershipId() {
@@ -78,7 +79,7 @@ export async function POST(request: Request) {
           ).toISOString(),
         })
         .eq("id", applicationId)
-        .select("full_name, user_id")
+        .select("full_name, user_id, email")
         .single();
 
       await admin.from("transactions").insert({
@@ -95,7 +96,7 @@ export async function POST(request: Request) {
 
       const { data: profile } = await admin
         .from("profiles")
-        .select("full_name, avatar_url")
+        .select("full_name, avatar_url, email")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -108,6 +109,16 @@ export async function POST(request: Request) {
           "Member",
         avatarUrl: profile?.avatar_url || null,
         roleTitle: "Member",
+      });
+
+      await sendMembershipWelcomeEmail({
+        to: application?.email || profile?.email || user.email || "",
+        name:
+          application?.full_name ||
+          profile?.full_name ||
+          user.email ||
+          "Friend",
+        membershipId,
       });
 
       revalidatePath("/admin/family");
