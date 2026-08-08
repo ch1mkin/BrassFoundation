@@ -11,6 +11,20 @@ function logoUrl() {
   return `${appBaseUrl()}/brand/logo.png`;
 }
 
+/** Format dates/times for emails in Indian Standard Time. */
+function formatIndianDateTime(
+  value: Date | string | number = new Date(),
+  options?: Intl.DateTimeFormatOptions,
+) {
+  const date = value instanceof Date ? value : new Date(value);
+  return date.toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    dateStyle: "medium",
+    timeStyle: "short",
+    ...options,
+  });
+}
+
 /** Shared branded shell for all transactional emails. */
 export function brandedEmailLayout({
   title,
@@ -46,8 +60,8 @@ export function brandedEmailLayout({
               <p style="margin:14px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:0.02em;">
                 Brass Foundation
               </p>
-              <p style="margin:6px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:rgba(255,255,255,0.88);letter-spacing:0.12em;text-transform:uppercase;">
-                Education · Empowerment · Equality
+              <p style="margin:6px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:rgba(255,255,255,0.88);letter-spacing:0.08em;text-transform:uppercase;">
+                Knowledge to Prosperity
               </p>
             </td>
           </tr>
@@ -60,7 +74,7 @@ export function brandedEmailLayout({
             <td style="padding:8px 28px 28px;font-family:Arial,Helvetica,sans-serif;">
               <hr style="border:none;border-top:1px solid #E8ECF0;margin:8px 0 20px;" />
               <p style="margin:0;font-size:12px;line-height:1.5;color:#5C6670;text-align:center;">
-                Brass Foundation · Education to Prosperity<br />
+                Brass Foundation · Knowledge to Prosperity<br />
                 This is an automated message. Please do not reply directly unless a reply address is provided.
               </p>
             </td>
@@ -210,10 +224,7 @@ export function eventRegistrationEmailHtml({
   startsAt: string;
   location: string | null;
 }) {
-  const when = new Date(startsAt).toLocaleString("en-IN", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
+  const when = `${formatIndianDateTime(startsAt)} IST`;
   const safeName = escapeHtml(name || "there");
   const body = `
     <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:24px;color:#006875;">
@@ -293,7 +304,7 @@ export function smtpTestEmailHtml({
       If you received it, Hostinger SMTP is configured correctly.
     </p>
     ${ctaButton(`${base}/admin/settings`, "Back to Settings")}
-    <p style="font-size:12px;color:#5C6670;">Sent at ${escapeHtml(new Date().toLocaleString("en-IN"))}</p>
+    <p style="font-size:12px;color:#5C6670;">Sent at ${escapeHtml(`${formatIndianDateTime(new Date())} IST`)}</p>
   `;
   return brandedEmailLayout({
     title: "SMTP test successful",
