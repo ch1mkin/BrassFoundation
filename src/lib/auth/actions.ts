@@ -2,11 +2,14 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/admin";
 import {
   AUTH_SUCCESS,
   professionalAuthError,
 } from "@/lib/auth/messages";
 import { safeNextPath } from "@/lib/security/safe-next";
+import { isSmtpConfigured, sendEmail } from "@/lib/email/smtp";
+import { passwordResetEmailHtml } from "@/lib/email/templates";
 
 export type AuthActionState = {
   error?: string;
@@ -162,23 +165,76 @@ export async function requestPasswordResetAction(
     .trim()
     .toLowerCase();
 
-  if (!email) {
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { error: "Please enter the email address for your account." };
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const supabase = await createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${appUrl}/auth/callback?next=/login?mode=reset`,
-  });
-
-  if (error) {
-    return { error: professionalAuthError(error.message) };
+  if (!isSmtpConfigured()) {
+    return {
+      error:
+        "Password reset email is not available yet. Please contact Brass Foundation support.",
+    };
   }
 
-  return {
-    success: AUTH_SUCCESS.resetSent,
-  };
+  const appUrl = (
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  ).replace(/\/$/, "");
+
+  try {
+    const admin = createServiceClient();
+    const { data, error } = await admin.auth.admin.generateLink({
+      type: "recovery",
+      email,
+    });
+
+    // Always return the same success copy — do not reveal whether the email exists.
+    if (error || !data?.properties?.hashed_token) {
+      console.info("[auth] Password reset generateLink skipped:", error?.message);
+      return { success: AUTH_SUCCESS.resetSent };
+    }
+
+    const hashedToken = data.properties.hashed_token;
+    const resetUrl = `${appUrl}/login?mode=reset&token_hash=${encodeURIComponent(hashedToken)}&type=recovery`;
+
+    const userId = data.user?.id;
+    let name = "Friend";
+    if (userId) {
+      const { data: profile } = await admin
+        .from("profiles")
+        .select("full_name")
+        .eq("id", userId)
+        .maybeSingle();
+      name =
+        profile?.full_name ||
+        data.user?.user_metadata?.full_name ||
+        email.split("@")[0] ||
+        "Friend";
+    }
+
+    const mailed = await sendEmail({
+      to: email,
+      subject: "Reset your Brass Foundation password",
+      html: passwordResetEmailHtml({ name, resetUrl }),
+      text: `Hi ${name},\n\nReset your Brass Foundation password using this link (expires in about one hour):\n${resetUrl}\n\nIf you did not request this, ignore this email.\n\nTeam Brass Foundation`,
+    });
+
+    if (!mailed.sent) {
+      return {
+        error:
+          "skipped" in mailed
+            ? mailed.reason
+            : "Could not send the reset email. Please try again shortly.",
+      };
+    }
+
+    return { success: AUTH_SUCCESS.resetSent };
+  } catch (err) {
+    console.error("[auth] Password reset failed:", err);
+    return {
+      error:
+        "We couldn't send a reset email right now. Please try again shortly.",
+    };
+  }
 }
 
 export async function updatePasswordAction(
@@ -200,6 +256,17 @@ export async function updatePasswordAction(
   }
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      error:
+        "This reset link is invalid or has expired. Please request a new password reset email.",
+    };
+  }
+
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: professionalAuthError(error.message) };
 

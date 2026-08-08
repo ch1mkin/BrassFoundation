@@ -173,12 +173,24 @@ export function passwordResetEmailHtml({
       Reset your password
     </h1>
     <p>Hi ${safeName},</p>
-    <p>We received a request to reset your Brass Foundation account password.</p>
+    <p>
+      We received a request to reset your Brass Foundation account password.
+      Click the button below to choose a new password. This link expires in about
+      one hour and can be used once.
+    </p>
     ${ctaButton(resetUrl, "Reset Password")}
-    <p style="font-size:13px;color:#5C6670;">If you did not request this, you can safely ignore this email.</p>
+    <p style="font-size:13px;color:#5C6670;word-break:break-all;">
+      If the button does not work, copy and paste this link into your browser:<br />
+      <a href="${escapeHtml(resetUrl)}" style="color:#006875;">${escapeHtml(resetUrl)}</a>
+    </p>
+    <p style="font-size:13px;color:#5C6670;">
+      If you did not request a password reset, you can safely ignore this email.
+      Your password will stay the same.
+    </p>
   `;
   return brandedEmailLayout({
     title: "Reset your password",
+    preheader: "Reset your Brass Foundation password securely.",
     bodyHtml: body,
   });
 }

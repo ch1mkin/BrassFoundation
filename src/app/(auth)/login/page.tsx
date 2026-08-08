@@ -12,16 +12,30 @@ export const metadata: Metadata = {
   title: "Login",
 };
 
-function AuthPanel({ mode }: { mode: string }) {
+function AuthPanel({
+  mode,
+  tokenHash,
+  type,
+}: {
+  mode: string;
+  tokenHash?: string | null;
+  type?: string | null;
+}) {
   if (mode === "forgot") return <ForgotPasswordForm />;
-  if (mode === "reset") return <UpdatePasswordForm />;
+  if (mode === "reset") {
+    return <UpdatePasswordForm tokenHash={tokenHash} type={type} />;
+  }
   return <LoginForm />;
 }
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ mode?: string }>;
+  searchParams: Promise<{
+    mode?: string;
+    token_hash?: string;
+    type?: string;
+  }>;
 }) {
   const params = await searchParams;
   const mode = params.mode || "signin";
@@ -80,7 +94,11 @@ export default async function LoginPage({
 
         <div className="glass-card w-full max-w-[440px] rounded-xl p-6 sm:p-10">
           <Suspense fallback={<PageLoader label="Loading…" />}>
-            <AuthPanel mode={mode} />
+            <AuthPanel
+              mode={mode}
+              tokenHash={params.token_hash}
+              type={params.type}
+            />
           </Suspense>
         </div>
 
