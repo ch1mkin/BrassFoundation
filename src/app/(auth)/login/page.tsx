@@ -38,14 +38,16 @@ export default async function LoginPage({
         />
         <div className="relative z-10 max-w-lg text-center">
           <div className="mb-12 flex justify-center">
-            <Image
-              src="/brand/logo.png"
-              alt={SITE.name}
-              width={128}
-              height={128}
-              className="h-32 w-32 object-contain drop-shadow-2xl"
-              priority
-            />
+            <Link href="/" aria-label={`${SITE.name} home`} className="inline-block">
+              <Image
+                src="/brand/logo.png"
+                alt={SITE.name}
+                width={128}
+                height={128}
+                className="h-32 w-32 object-contain drop-shadow-2xl transition hover:opacity-90"
+                priority
+              />
+            </Link>
           </div>
           <h1 className="font-heading mb-6 text-4xl font-bold leading-tight tracking-tight text-white lg:text-5xl">
             Shaping the Leaders of Tomorrow.
@@ -65,13 +67,15 @@ export default async function LoginPage({
 
       <section className="relative flex flex-1 items-center justify-center bg-surface px-4 py-16 sm:px-8">
         <div className="absolute top-8 left-8 md:hidden">
-          <Image
-            src="/brand/logo.png"
-            alt=""
-            width={40}
-            height={40}
-            className="h-10 w-10 rounded-full bg-white p-0.5"
-          />
+          <Link href="/" aria-label={`${SITE.name} home`}>
+            <Image
+              src="/brand/logo.png"
+              alt={SITE.name}
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-full bg-white p-0.5 transition hover:opacity-90"
+            />
+          </Link>
         </div>
 
         <div className="glass-card w-full max-w-[440px] rounded-xl p-6 sm:p-10">

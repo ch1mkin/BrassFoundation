@@ -28,13 +28,17 @@ export default async function MembershipPage({
     full_name: string | null;
     email: string | null;
     phone?: string | null;
+    address?: string | null;
+    category?: string | null;
   } | null = null;
 
   if (user) {
     const supabase = await createClient();
     const { data: app } = await supabase
       .from("membership_applications")
-      .select("id, status, payment_status, membership_id, full_name, email, phone")
+      .select(
+        "id, status, payment_status, membership_id, full_name, email, phone, address, category",
+      )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -56,11 +60,15 @@ export default async function MembershipPage({
           full_name: p.full_name || app?.full_name || null,
           email: p.email || app?.email || user.email || null,
           phone: p.phone || app?.phone || null,
+          address: app?.address || null,
+          category: app?.category || null,
         }
       : {
           full_name: app?.full_name || null,
           email: app?.email || user.email || null,
           phone: app?.phone || null,
+          address: app?.address || null,
+          category: app?.category || null,
         };
   }
 
@@ -110,11 +118,14 @@ export default async function MembershipPage({
       ) : (
         <div id="register" className="scroll-mt-28">
           <MembershipRegistrationForm
+            loggedIn={Boolean(user)}
             referralCode={referralCode}
             defaults={{
               fullName: profile?.full_name || undefined,
               email: profile?.email || undefined,
               phone: profile?.phone || undefined,
+              address: profile?.address || undefined,
+              category: profile?.category || undefined,
             }}
           />
         </div>

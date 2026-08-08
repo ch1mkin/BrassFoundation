@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { InlineLoader, ButtonSpinner } from "@/components/ui/inline-loader";
@@ -23,6 +23,14 @@ export function MembershipPayStep({
   const [payError, setPayError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
   const [membershipId, setMembershipId] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.getElementById("register")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, []);
 
   async function startPayment() {
     setPaying(true);
@@ -82,6 +90,7 @@ export function MembershipPayStep({
           setDone(true);
           confetti({ particleCount: 140, spread: 70, origin: { y: 0.65 } });
           setPaying(false);
+          window.scrollTo({ top: 0, behavior: "smooth" });
         },
         onDismiss: () => setPaying(false),
       });
@@ -93,7 +102,7 @@ export function MembershipPayStep({
 
   if (done) {
     return (
-      <div className="glass-card rounded-2xl p-8 text-center">
+      <div className="glass-card scroll-mt-28 rounded-2xl p-8 text-center">
         <p className="font-heading text-3xl font-semibold text-primary">
           Welcome, member!
         </p>
@@ -127,10 +136,12 @@ export function MembershipPayStep({
   }
 
   return (
-    <div className="glass-card relative space-y-5 rounded-2xl p-6 sm:p-8">
+    <div className="glass-card relative scroll-mt-28 space-y-5 rounded-2xl p-6 sm:p-8">
       {paying ? (
-        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-[1px]">
-          <InlineLoader label="Opening secure payment…" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-[2px]">
+          <div className="glass-card rounded-2xl px-8 py-6 shadow-lg">
+            <InlineLoader label="Opening secure payment…" />
+          </div>
         </div>
       ) : null}
       <h2 className="font-heading text-xl font-semibold">

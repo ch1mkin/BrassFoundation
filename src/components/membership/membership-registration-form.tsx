@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 import { FormLock } from "@/components/ui/form-lock";
@@ -29,18 +29,32 @@ import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 
 const initial: RegisterMembershipState = {};
 
+function scrollMembershipIntoView() {
+  if (typeof window === "undefined") return;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  requestAnimationFrame(() => {
+    document.getElementById("register")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
+}
+
 export function MembershipRegistrationForm({
   defaults,
   referralCode,
+  loggedIn = false,
 }: {
   defaults?: {
     fullName?: string;
     email?: string;
     phone?: string;
+    address?: string;
+    category?: string;
   };
   referralCode?: string | null;
+  loggedIn?: boolean;
 }) {
-  const loggedIn = Boolean(defaults?.email);
   const [state, action, pending] = useSafeFormAction(
     registerMembershipAction,
     initial,
@@ -50,12 +64,13 @@ export function MembershipRegistrationForm({
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
   const [membershipId, setMembershipId] = useState<string | null>(null);
+  const paySectionRef = useRef<HTMLDivElement>(null);
 
   const [fullName, setFullName] = useState(defaults?.fullName || "");
   const [email, setEmail] = useState(defaults?.email || "");
   const [phone, setPhone] = useState(defaults?.phone || "");
-  const [address, setAddress] = useState("");
-  const [category, setCategory] = useState("");
+  const [address, setAddress] = useState(defaults?.address || "");
+  const [category, setCategory] = useState(defaults?.category || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [consent, setConsent] = useState(false);
@@ -67,11 +82,18 @@ export function MembershipRegistrationForm({
     }
   }, [state.applicationId, state.success]);
 
+  useEffect(() => {
+    if (step !== "pay" && step !== "done") return;
+    scrollMembershipIntoView();
+    paySectionRef.current?.focus({ preventScroll: true });
+  }, [step]);
+
   const formComplete = useMemo(() => {
-    const passwordsOk =
-      password.length >= 8 &&
-      confirmPassword.length >= 8 &&
-      password === confirmPassword;
+    const passwordsOk = loggedIn
+      ? true
+      : password.length >= 8 &&
+        confirmPassword.length >= 8 &&
+        password === confirmPassword;
     return (
       fullName.trim().length >= 2 &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
@@ -90,11 +112,13 @@ export function MembershipRegistrationForm({
     category,
     consent,
     signature,
+    loggedIn,
     password,
     confirmPassword,
   ]);
 
   const passwordsMismatch =
+    !loggedIn &&
     password.length > 0 &&
     confirmPassword.length > 0 &&
     password !== confirmPassword;
@@ -179,7 +203,11 @@ export function MembershipRegistrationForm({
           ? `/membership?ref=${encodeURIComponent(membershipId)}`
           : null;
     return (
-      <div className="glass-card rounded-2xl p-8 text-center">
+      <div
+        ref={paySectionRef}
+        tabIndex={-1}
+        className="glass-card scroll-mt-28 rounded-2xl p-8 text-center outline-none"
+      >
         <p className="font-heading text-3xl font-semibold text-primary">
           Welcome, member!
         </p>
@@ -221,7 +249,11 @@ export function MembershipRegistrationForm({
 
   if (step === "pay") {
     return (
-      <div className="glass-card relative space-y-5 rounded-2xl p-6 sm:p-8">
+      <div
+        ref={paySectionRef}
+        tabIndex={-1}
+        className="glass-card relative scroll-mt-28 space-y-5 rounded-2xl p-6 outline-none sm:p-8"
+      >
         {paying ? (
           <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-[1px]">
             <InlineLoader label="Opening secure payment…" />
@@ -262,11 +294,23 @@ export function MembershipRegistrationForm({
   return (
     <form action={action} className="relative space-y-6 pb-6 sm:pb-10">
       {pending ? (
-        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-[1px]">
-          <InlineLoader label="Creating your account…" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-[2px]">
+          <div className="glass-card rounded-2xl px-8 py-6 shadow-lg">
+            <InlineLoader
+              label={
+                loggedIn
+                  ? "Preparing your ₹10 payment…"
+                  : "Creating your account…"
+              }
+            />
+          </div>
         </div>
       ) : null}
-      <FormLock pending={pending} className="space-y-6" label="Creating account…">
+      <FormLock
+        pending={pending}
+        className="space-y-6"
+        label={loggedIn ? "Preparing payment…" : "Creating account…"}
+      >
         {referralCode ? (
           <input
             type="hidden"
@@ -276,8 +320,14 @@ export function MembershipRegistrationForm({
         ) : null}
         <section className="glass-card space-y-4 rounded-2xl p-6 sm:p-8">
           <h2 className="font-heading text-xl font-semibold">
-            Create your membership
+            {loggedIn ? "Complete your membership" : "Create your membership"}
           </h2>
+          {loggedIn ? (
+            <p className="rounded-xl bg-primary/10 px-3 py-2 text-sm text-primary">
+              You&apos;re signed in. Confirm your details below — no password
+              needed — then continue to the ₹10 payment.
+            </p>
+          ) : null}
           {referralCode ? (
             <p className="rounded-xl bg-primary/10 px-3 py-2 text-sm text-primary">
               Referred by membership ID: <strong>{referralCode}</strong>
@@ -306,7 +356,8 @@ export function MembershipRegistrationForm({
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-11 rounded-xl bg-white"
+                readOnly={loggedIn}
+                className="h-11 rounded-xl bg-white read-only:bg-surface-low"
               />
             </label>
             <label className="block space-y-2">
@@ -355,45 +406,46 @@ export function MembershipRegistrationForm({
                 ))}
               </select>
             </label>
-            <label className="block space-y-2">
-              <span className="text-sm font-medium text-foreground">
-                Password *
-              </span>
-              <PasswordInput
-                name="password"
-                required
-                minLength={8}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-              />
-              <p className="text-xs text-muted-foreground">
-                At least 8 characters.
-              </p>
-            </label>
-            <label className="block space-y-2">
-              <span className="text-sm font-medium text-foreground">
-                Confirm password *
-              </span>
-              <PasswordInput
-                name="confirm_password"
-                required
-                minLength={8}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                autoComplete="new-password"
-              />
-              {passwordsMismatch ? (
-                <p className="text-xs text-destructive" role="alert">
-                  Passwords do not match.
-                </p>
-              ) : null}
-            </label>
+            {!loggedIn ? (
+              <>
+                <label className="block space-y-2">
+                  <span className="text-sm font-medium text-foreground">
+                    Password *
+                  </span>
+                  <PasswordInput
+                    name="password"
+                    required
+                    minLength={8}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    At least 8 characters.
+                  </p>
+                </label>
+                <label className="block space-y-2">
+                  <span className="text-sm font-medium text-foreground">
+                    Confirm password *
+                  </span>
+                  <PasswordInput
+                    name="confirm_password"
+                    required
+                    minLength={8}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                  />
+                  {passwordsMismatch ? (
+                    <p className="text-xs text-destructive" role="alert">
+                      Passwords do not match.
+                    </p>
+                  ) : null}
+                </label>
+              </>
+            ) : null}
             <div className="sm:col-span-2">
-              <SelfieField
-                required={false}
-                onReadyChange={setAvatarReady}
-              />
+              <SelfieField required={false} onReadyChange={setAvatarReady} />
               <p className="mt-1 text-xs text-muted-foreground">
                 Photo is optional.
                 {avatarReady ? " Photo attached." : ""}
@@ -449,7 +501,7 @@ export function MembershipRegistrationForm({
             {pending ? (
               <>
                 <ButtonSpinner />
-                Creating account…
+                {loggedIn ? "Preparing payment…" : "Creating account…"}
               </>
             ) : formComplete ? (
               "Continue to ₹10 payment"

@@ -283,11 +283,11 @@ export function FamilyMembersForm() {
           </div>
         ))}
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-border/60 pt-6">
           <Button
             type="button"
             variant="outline"
-            className="rounded-xl"
+            className="h-11 rounded-xl px-5"
             onClick={() => setRows((r) => [...r, empty()])}
           >
             Add another member

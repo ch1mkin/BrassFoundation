@@ -18,7 +18,7 @@ export type RegisterMembershipState = {
   phone?: string;
 };
 
-const schema = z.object({
+const guestSchema = z.object({
   full_name: z
     .string()
     .min(2, "Full name with surname is required.")
@@ -37,6 +37,11 @@ const schema = z.object({
     .min(40, "Digital signature is required."),
   avatar_data_url: z.string().optional(),
   referred_by_membership_id: z.string().optional(),
+});
+
+const loggedInSchema = guestSchema.omit({
+  password: true,
+  confirm_password: true,
 });
 
 async function uploadAvatarFromDataUrl(
@@ -190,11 +195,13 @@ export async function registerMembershipAction(
       referredFromForm || referredFromCookie || undefined,
   };
 
-  if (raw.password !== raw.confirm_password) {
+  if (!sessionUser && raw.password !== raw.confirm_password) {
     return { error: "Passwords do not match." };
   }
 
-  const parsed = schema.safeParse(raw);
+  const parsed = sessionUser
+    ? loggedInSchema.safeParse(raw)
+    : guestSchema.safeParse(raw);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message || "Invalid form." };
   }
@@ -205,10 +212,11 @@ export async function registerMembershipAction(
   let userId = sessionUser?.id ?? null;
 
   if (!userId) {
+    const password = String(raw.password || "");
     const { data: created, error: createError } =
       await admin.auth.admin.createUser({
         email: data.email,
-        password: data.password,
+        password,
         email_confirm: true,
         user_metadata: { full_name: data.full_name },
       });
@@ -218,7 +226,7 @@ export async function registerMembershipAction(
       if (msg.includes("already") || msg.includes("registered")) {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email: data.email,
-          password: data.password,
+          password,
         });
         if (signInError) {
           return {
@@ -240,7 +248,7 @@ export async function registerMembershipAction(
       userId = created.user.id;
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: data.email,
-        password: data.password,
+        password,
       });
       if (signInError) {
         const ensured = await ensureApplication(admin, userId, data);
@@ -259,20 +267,6 @@ export async function registerMembershipAction(
 
   if (!userId) {
     return { error: "Could not create or sign in to your account." };
-  }
-
-  if (sessionUser) {
-    const { error: passwordError } = await admin.auth.admin.updateUserById(
-      userId,
-      { password: data.password },
-    );
-    if (passwordError) {
-      return {
-        error:
-          passwordError.message ||
-          "Could not save password. Please try a different password.",
-      };
-    }
   }
 
   let avatarUrl: string | null = null;
