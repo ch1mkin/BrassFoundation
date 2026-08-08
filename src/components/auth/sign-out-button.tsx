@@ -28,7 +28,7 @@ export function SignOutButton({
     } catch {
       // Still leave the page even if the network call fails.
     } finally {
-      window.location.assign("/login");
+      window.location.assign("/");
     }
   }
 

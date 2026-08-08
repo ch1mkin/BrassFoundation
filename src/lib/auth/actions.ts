@@ -153,8 +153,7 @@ export async function signUpAction(
 export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  // Prefer client SignOutButton + hard navigation; keep this for any remaining forms.
-  redirect("/login");
+  redirect("/");
 }
 
 export async function requestPasswordResetAction(
