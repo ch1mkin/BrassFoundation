@@ -7,6 +7,7 @@
 import Image from "next/image";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { MembershipLink } from "@/components/membership/membership-link";
+import { DonateNowLink } from "@/components/membership/donate-now-link";
 import { NewsletterForm } from "@/components/website/newsletter-form";
 import { SITE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -97,6 +98,11 @@ export function SiteFooter() {
               </MembershipLink>
             </li>
             <li>
+              <DonateNowLink className={linkClass}>
+                {t("footer.donateNow")}
+              </DonateNowLink>
+            </li>
+            <li>
               <FooterLink href="/gallery">{t("footer.gallery")}</FooterLink>
             </li>
             <li>
@@ -125,6 +131,11 @@ export function SiteFooter() {
               <MembershipLink className={linkClass}>
                 {t("footer.becomeMember")}
               </MembershipLink>
+            </li>
+            <li>
+              <DonateNowLink className={linkClass}>
+                {t("footer.donateNow")}
+              </DonateNowLink>
             </li>
           </ul>
         </div>

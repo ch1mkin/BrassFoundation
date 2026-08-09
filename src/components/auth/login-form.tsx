@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { PasswordInput } from "@/components/auth/password-input";
 import { MembershipLink } from "@/components/membership/membership-link";
+import { DonateNowLink } from "@/components/membership/donate-now-link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MaterialIcon } from "@/components/ui/material-icon";
@@ -136,6 +137,10 @@ export function LoginForm() {
           <MembershipLink className="font-bold text-primary hover:underline">
             Become a member
           </MembershipLink>
+          {" · "}
+          <DonateNowLink className="font-bold text-primary hover:underline">
+            Donate Now
+          </DonateNowLink>
         </p>
         <HardNavLink
           href="/"

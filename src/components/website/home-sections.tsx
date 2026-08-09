@@ -5,6 +5,8 @@ import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { MembershipLink } from "@/components/membership/membership-link";
+import { DonateNowLink } from "@/components/membership/donate-now-link";
+import { DONATE_NOW_BTN } from "@/components/membership/gold-membership-cta";
 import {
   GoldHairline,
   GOLD_SHINY_BTN,
@@ -858,14 +860,28 @@ export function MembershipCta({
                   </div>
                 ))}
               </div>
-              <MembershipLink
-                className={cn(
-                  GOLD_SHINY_BTN,
-                  "h-auto w-full justify-center rounded-xl px-6 py-3.5 text-base shadow-2xl sm:w-auto sm:px-10 sm:py-4 sm:text-lg sm:hover:scale-105 active:scale-95",
-                )}
-              >
-                <span>Start Your Membership</span>
-              </MembershipLink>
+              <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <MembershipLink
+                  className={cn(
+                    GOLD_SHINY_BTN,
+                    "h-auto w-full justify-center rounded-xl px-6 py-3.5 text-base shadow-2xl sm:w-auto sm:px-10 sm:py-4 sm:text-lg sm:hover:scale-105 active:scale-95",
+                  )}
+                >
+                  <span>Start Your Membership</span>
+                </MembershipLink>
+                <DonateNowLink
+                  className={cn(
+                    DONATE_NOW_BTN,
+                    "h-auto w-full justify-center rounded-xl px-6 py-3.5 text-base shadow-2xl sm:w-auto sm:px-10 sm:py-4 sm:text-lg",
+                  )}
+                >
+                  <span>Donate Now</span>
+                  <MaterialIcon
+                    name="volunteer_activism"
+                    className="text-[20px]"
+                  />
+                </DonateNowLink>
+              </div>
             </div>
             <div className="flex justify-center lg:w-1/3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
