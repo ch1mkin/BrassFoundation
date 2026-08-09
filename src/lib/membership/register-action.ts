@@ -18,6 +18,8 @@ export type RegisterMembershipState = {
   phone?: string;
 };
 
+const GENDERS = ["Female", "Male", "Other"] as const;
+
 const guestSchema = z.object({
   full_name: z
     .string()
@@ -26,6 +28,12 @@ const guestSchema = z.object({
   email: z.string().email("Valid email is required."),
   phone: z.string().min(10, "Mobile number is required.").max(20),
   address: z.string().min(8, "Address is required.").max(500),
+  age: z
+    .number({ message: "Age is required." })
+    .int("Age must be a whole number.")
+    .min(1, "Enter a valid age.")
+    .max(119, "Enter a valid age."),
+  gender: z.enum(GENDERS, { message: "Select gender." }),
   category: z.enum(MEMBERSHIP_CATEGORIES, {
     message: "Select category: SC, ST, OBC, or General.",
   }),
@@ -87,6 +95,8 @@ async function ensureApplication(
     email: string;
     phone: string;
     address: string;
+    age: number;
+    gender: string;
     category: string;
     signature_data_url: string;
     referred_by_membership_id?: string | null;
@@ -114,6 +124,8 @@ async function ensureApplication(
     email: data.email,
     phone: data.phone,
     address: data.address,
+    age: data.age,
+    gender: data.gender,
     category: data.category,
     government_id: null,
     consent_accepted_at: new Date().toISOString(),
@@ -185,6 +197,8 @@ export async function registerMembershipAction(
       .toLowerCase(),
     phone: String(formData.get("phone") || "").trim(),
     address: String(formData.get("address") || "").trim(),
+    age: Number(formData.get("age") || 0),
+    gender: String(formData.get("gender") || "").trim(),
     category: String(formData.get("category") || "").trim().toUpperCase(),
     password: String(formData.get("password") || ""),
     confirm_password: String(formData.get("confirm_password") || ""),

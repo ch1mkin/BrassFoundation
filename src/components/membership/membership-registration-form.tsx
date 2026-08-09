@@ -51,6 +51,8 @@ export function MembershipRegistrationForm({
     email?: string;
     phone?: string;
     address?: string;
+    age?: string;
+    gender?: string;
     category?: string;
   };
   referralCode?: string | null;
@@ -73,6 +75,8 @@ export function MembershipRegistrationForm({
   const [email, setEmail] = useState(defaults?.email || "");
   const [phone, setPhone] = useState(defaults?.phone || "");
   const [address, setAddress] = useState(defaults?.address || "");
+  const [age, setAge] = useState(defaults?.age || "");
+  const [gender, setGender] = useState(defaults?.gender || "");
   const [category, setCategory] = useState(defaults?.category || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -178,6 +182,7 @@ export function MembershipRegistrationForm({
   }, [step]);
 
   const formComplete = useMemo(() => {
+    const ageNum = Number(age);
     const passwordsOk = loggedIn
       ? true
       : password.length >= 8 &&
@@ -188,6 +193,10 @@ export function MembershipRegistrationForm({
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
       phone.trim().length >= 10 &&
       address.trim().length >= 8 &&
+      Number.isInteger(ageNum) &&
+      ageNum >= 1 &&
+      ageNum <= 119 &&
+      ["Female", "Male", "Other"].includes(gender) &&
       isMembershipCategory(category) &&
       consent &&
       Boolean(signature) &&
@@ -198,6 +207,8 @@ export function MembershipRegistrationForm({
     email,
     phone,
     address,
+    age,
+    gender,
     category,
     consent,
     signature,
@@ -396,6 +407,38 @@ export function MembershipRegistrationForm({
                 onChange={(e) => setPhone(e.target.value)}
                 className="h-11 rounded-xl bg-white"
               />
+            </label>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-foreground">
+                Age *
+              </span>
+              <Input
+                name="age"
+                type="number"
+                min={1}
+                max={119}
+                required
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                className="h-11 rounded-xl bg-white"
+              />
+            </label>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-foreground">
+                Gender *
+              </span>
+              <select
+                name="gender"
+                required
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="h-11 w-full rounded-xl border border-input bg-white px-3 text-sm"
+              >
+                <option value="">Select gender</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Other">Other</option>
+              </select>
             </label>
             <label className="block space-y-2 sm:col-span-2">
               <span className="text-sm font-medium text-foreground">
