@@ -665,7 +665,7 @@ export function ResourcesSection({
             >
               <div
                 className={cn(
-                  "mb-2 flex aspect-[4/3] max-h-28 w-full items-center justify-center overflow-hidden rounded-lg bg-surface-highest transition-all duration-300 sm:mb-4 sm:aspect-[3/4] sm:max-h-none sm:rounded-xl",
+                  "mb-2 flex aspect-[5/4] w-full items-center justify-center overflow-hidden rounded-lg bg-surface-highest transition-all duration-300 sm:mb-4 sm:aspect-[4/5] sm:rounded-xl",
                   !item.thumbnail_url && toneClass[tone],
                 )}
               >
@@ -674,7 +674,7 @@ export function ResourcesSection({
                   <img
                     src={item.thumbnail_url}
                     alt=""
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                    className="max-h-full max-w-full object-contain transition duration-300 group-hover:scale-[1.03]"
                   />
                 ) : (
                   <MaterialIcon

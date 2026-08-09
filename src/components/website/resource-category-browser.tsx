@@ -133,7 +133,7 @@ export function ResourceCategoryBrowser({
               <article key={item.id} className="glass-card rounded-2xl p-5">
                 <div
                   className={cn(
-                    "mb-4 flex aspect-[3/4] items-center justify-center overflow-hidden rounded-xl bg-surface-highest",
+                    "mb-4 flex aspect-[4/5] items-center justify-center overflow-hidden rounded-xl bg-surface-highest",
                     !item.thumbnail_url && toneClass[tone],
                   )}
                 >
@@ -142,7 +142,7 @@ export function ResourceCategoryBrowser({
                     <img
                       src={item.thumbnail_url}
                       alt={item.title}
-                      className="h-full w-full object-cover"
+                      className="max-h-full max-w-full object-contain"
                     />
                   ) : (
                     <MaterialIcon

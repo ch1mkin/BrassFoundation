@@ -74,12 +74,16 @@ export function ContributionSection({
     <section className="glass-card space-y-5 rounded-2xl p-6 sm:p-8">
       <div>
         <h2 className="font-heading text-xl font-semibold">
-          Monthly contribution
+          Monthly contribution mandate
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Choose an amount. Razorpay will set up a monthly mandate so your
-          contribution renews automatically. You and admins can see every
-          transaction in history.
+          Choose an amount. Razorpay will set up a monthly e-mandate so your
+          contribution renews automatically. Manage history and one-time gifts
+          from{" "}
+          <a href="/member/payments" className="font-medium text-primary underline">
+            Payments
+          </a>
+          .
         </p>
       </div>
 

@@ -85,7 +85,7 @@ export default async function MembershipPage({
           </h1>
           <p className="mt-3 max-w-xl text-muted-foreground">
             {alreadyMember
-              ? `Thank you for being part of ${SITE.name}. Add monthly contributions or invite family from your member portal.`
+              ? `Thank you for being part of ${SITE.name}. Set up a monthly contribution mandate below, or invite family from your member portal.`
               : `Join ${SITE.name} — register with your details, sign consent, pay ₹10, and become a member instantly.`}
           </p>
         </div>

@@ -250,6 +250,12 @@ export async function POST(request: Request) {
       });
     }
 
+    const contributionMeta = (order.meta || {}) as { note?: string };
+    const contributionNote = String(contributionMeta.note || "").trim();
+    const contributionDescription = contributionNote
+      ? `One-time contribution — ${contributionNote}`
+      : "Contribution payment";
+
     await admin.from("transactions").insert({
       user_id: user.id,
       application_id: applicationId,
@@ -259,8 +265,11 @@ export async function POST(request: Request) {
       currency: "INR",
       razorpay_payment_id: paymentId,
       status: "captured",
-      description: "Contribution payment",
+      description: contributionDescription,
     });
+
+    revalidatePath("/member/payments");
+    revalidatePath("/admin/payments");
 
     return NextResponse.json({ ok: true, purpose: order.purpose });
   } catch (err) {

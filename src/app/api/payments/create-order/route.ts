@@ -27,6 +27,7 @@ export async function POST(request: Request) {
       amountPaise?: number;
       marketplaceItemId?: string;
       familyMemberIds?: string[];
+      note?: string;
     };
 
     const purpose = body.purpose || "registration_fee";
@@ -44,6 +45,9 @@ export async function POST(request: Request) {
     const marketplaceItemId = body.marketplaceItemId || null;
     const familyMemberIds = body.familyMemberIds || [];
     let bookTitle = "";
+    const contributionNote = String(body.note || "")
+      .trim()
+      .slice(0, 280);
 
     if (purpose === "registration_fee") {
       amountPaise = REGISTRATION_FEE_PAISE;
@@ -88,6 +92,12 @@ export async function POST(request: Request) {
       if (!amountPaise || amountPaise < 10000) {
         return NextResponse.json(
           { error: "Minimum contribution is ₹100." },
+          { status: 400 },
+        );
+      }
+      if (contributionNote.length < 3) {
+        return NextResponse.json(
+          { error: "Please add a note describing this contribution." },
           { status: 400 },
         );
       }
@@ -163,10 +173,19 @@ export async function POST(request: Request) {
         application_id: applicationId || "",
         marketplace_item_id: marketplaceItemId || "",
         book_title: bookTitle,
+        contribution_note: contributionNote,
       },
     });
 
     const admin = createServiceClient();
+    const orderMeta = marketplaceItemId
+      ? { marketplace_item_id: marketplaceItemId, book_title: bookTitle }
+      : familyMemberIds.length
+        ? { family_member_ids: familyMemberIds }
+        : purpose === "contribution"
+          ? { note: contributionNote }
+          : {};
+
     const { data: row, error } = await admin
       .from("payment_orders")
       .insert({
@@ -177,11 +196,7 @@ export async function POST(request: Request) {
         currency: "INR",
         razorpay_order_id: order.id,
         status: "created",
-        meta: marketplaceItemId
-          ? { marketplace_item_id: marketplaceItemId, book_title: bookTitle }
-          : familyMemberIds.length
-            ? { family_member_ids: familyMemberIds }
-            : {},
+        meta: orderMeta,
       })
       .select("id")
       .single();

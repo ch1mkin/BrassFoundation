@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ContributionSection } from "@/components/membership/contribution-section";
+import { OneTimeContributionSection } from "@/components/membership/one-time-contribution-section";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
 import { formatInrFromPaise } from "@/lib/payments/constants";
@@ -38,11 +38,12 @@ export default async function MemberPaymentsPage() {
           Contributions & payments
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Your registration fee, monthly mandates, and payment history.
+          Make a one-time gift with a note, and review registration fees,
+          mandates, and payment history.
         </p>
       </div>
 
-      <ContributionSection
+      <OneTimeContributionSection
         defaultName={profile?.full_name || undefined}
         defaultEmail={profile?.email || undefined}
         defaultPhone={profile?.phone || undefined}
