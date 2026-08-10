@@ -6,8 +6,6 @@ import { motion } from "framer-motion";
 import { buttonVariants } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { MembershipLink } from "@/components/membership/membership-link";
-import { DonateNowLink } from "@/components/membership/donate-now-link";
-import { DONATE_NOW_BTN } from "@/components/membership/gold-membership-cta";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { InstantImg } from "@/components/website/instant-img";
@@ -290,12 +288,6 @@ export function HeroSection({
               <MaterialIcon name="person_add" className="text-[20px]" />
             </a>
           )}
-          <DonateNowLink
-            className={cn(DONATE_NOW_BTN, "w-full shadow-lg sm:w-auto")}
-          >
-            <span>Donate Now</span>
-            <MaterialIcon name="volunteer_activism" className="text-[20px]" />
-          </DonateNowLink>
           <a
             href={secondaryHref}
             className={cn(

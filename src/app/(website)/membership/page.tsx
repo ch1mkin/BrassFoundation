@@ -92,7 +92,7 @@ export default async function MembershipPage({
       </div>
 
       {alreadyMember ? (
-        <div id="register" className="scroll-mt-28 space-y-8">
+        <div className="space-y-8">
           <div className="glass-card rounded-2xl p-6 text-sm text-success">
             You are already an active member. Use{" "}
             <a href="/member" className="font-semibold underline">

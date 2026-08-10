@@ -8,14 +8,11 @@ import { BrandLogo } from "@/components/brand/logo";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { MembershipLink } from "@/components/membership/membership-link";
-import { DonateNowLink } from "@/components/membership/donate-now-link";
-import { DONATE_NOW_BTN } from "@/components/membership/gold-membership-cta";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { NAV_ITEMS, SITE, type NavItem } from "@/lib/constants";
 import { NAV_MESSAGE_KEYS } from "@/lib/i18n/messages";
 import { cn } from "@/lib/utils";
-import { MaterialIcon } from "@/components/ui/material-icon";
 
 /** Plain anchors — full navigation always works. */
 function NavLink({
@@ -203,14 +200,6 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
           >
             <span>{t("nav.becomeMember")}</span>
           </MembershipLink>
-          <DonateNowLink
-            className={cn(
-              DONATE_NOW_BTN,
-              "h-9 px-4 text-sm sm:h-10 sm:px-5 sm:text-sm",
-            )}
-          >
-            <span>{t("nav.donateNow")}</span>
-          </DonateNowLink>
           {user ? (
             <div className="relative">
               <details className="group">
@@ -371,19 +360,6 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                   >
                     <span>{t("nav.becomeMember")}</span>
                   </MembershipLink>
-                  <DonateNowLink
-                    onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      DONATE_NOW_BTN,
-                      "mb-2 h-11 w-full px-5 text-sm",
-                    )}
-                  >
-                    <span>{t("nav.donateNow")}</span>
-                    <MaterialIcon
-                      name="volunteer_activism"
-                      className="text-[18px]"
-                    />
-                  </DonateNowLink>
                   <NavLink
                     href="/member"
                     onClick={() => setMobileOpen(false)}
@@ -426,24 +402,11 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                     onClick={() => setMobileOpen(false)}
                     className={cn(
                       GOLD_SHINY_BTN,
-                      "mb-2 h-11 w-full px-5 text-sm shadow-md sm:h-11",
+                      "h-11 w-full px-5 text-sm shadow-md sm:h-11",
                     )}
                   >
                     <span>{t("nav.becomeMember")}</span>
                   </MembershipLink>
-                  <DonateNowLink
-                    onClick={() => setMobileOpen(false)}
-                    className={cn(
-                      DONATE_NOW_BTN,
-                      "h-11 w-full px-5 text-sm",
-                    )}
-                  >
-                    <span>{t("nav.donateNow")}</span>
-                    <MaterialIcon
-                      name="volunteer_activism"
-                      className="text-[18px]"
-                    />
-                  </DonateNowLink>
                 </>
               )}
             </div>

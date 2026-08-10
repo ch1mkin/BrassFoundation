@@ -15,7 +15,6 @@ export type MessageKey =
   | "nav.contact"
   | "nav.login"
   | "nav.becomeMember"
-  | "nav.donateNow"
   | "nav.memberPortal"
   | "nav.adminPortal"
   | "nav.signOut"
@@ -28,7 +27,6 @@ export type MessageKey =
   | "footer.community"
   | "footer.contactUs"
   | "footer.becomeMember"
-  | "footer.donateNow"
   | "footer.gallery"
   | "footer.marketplace"
   | "footer.contact"
@@ -55,7 +53,6 @@ const en: Record<MessageKey, string> = {
   "nav.contact": "Contact",
   "nav.login": "Login",
   "nav.becomeMember": "Become Member",
-  "nav.donateNow": "Donate Now",
   "nav.memberPortal": "Member portal",
   "nav.adminPortal": "Admin portal",
   "nav.signOut": "Sign out",
@@ -69,7 +66,6 @@ const en: Record<MessageKey, string> = {
   "footer.community": "Community",
   "footer.contactUs": "Contact Us",
   "footer.becomeMember": "Become a Member",
-  "footer.donateNow": "Donate Now",
   "footer.gallery": "Gallery",
   "footer.marketplace": "Marketplace",
   "footer.contact": "Contact",
@@ -97,7 +93,6 @@ const pa: Record<MessageKey, string> = {
   "nav.contact": "ਸੰਪਰਕ",
   "nav.login": "ਲਾਗਇਨ",
   "nav.becomeMember": "ਮੈਂਬਰ ਬਣੋ",
-  "nav.donateNow": "ਦਾਨ ਕਰੋ",
   "nav.memberPortal": "ਮੈਂਬਰ ਪੋਰਟਲ",
   "nav.adminPortal": "ਪ੍ਰਬੰਧਕ ਪੋਰਟਲ",
   "nav.signOut": "ਸਾਈਨ ਆਉਟ",
@@ -111,7 +106,6 @@ const pa: Record<MessageKey, string> = {
   "footer.community": "ਸਮਾਜ",
   "footer.contactUs": "ਸਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰੋ",
   "footer.becomeMember": "ਮੈਂਬਰ ਬਣੋ",
-  "footer.donateNow": "ਦਾਨ ਕਰੋ",
   "footer.gallery": "ਗੈਲਰੀ",
   "footer.marketplace": "ਬਾਜ਼ਾਰ",
   "footer.contact": "ਸੰਪਰਕ",
@@ -139,7 +133,6 @@ const hi: Record<MessageKey, string> = {
   "nav.contact": "संपर्क",
   "nav.login": "लॉगिन",
   "nav.becomeMember": "सदस्य बनें",
-  "nav.donateNow": "दान करें",
   "nav.memberPortal": "सदस्य पोर्टल",
   "nav.adminPortal": "प्रशासन पोर्टल",
   "nav.signOut": "साइन आउट",
@@ -153,7 +146,6 @@ const hi: Record<MessageKey, string> = {
   "footer.community": "समुदाय",
   "footer.contactUs": "हमसे संपर्क करें",
   "footer.becomeMember": "सदस्य बनें",
-  "footer.donateNow": "दान करें",
   "footer.gallery": "गैलरी",
   "footer.marketplace": "बाज़ार",
   "footer.contact": "संपर्क",
