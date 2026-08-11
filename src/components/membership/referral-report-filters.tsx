@@ -10,10 +10,16 @@ export function ReferralReportFilters({
     age_min?: string;
     age_max?: string;
     mandates_only?: string;
+    referrer?: string;
+    q?: string;
   };
 }) {
   return (
     <form className="grid gap-3 sm:grid-cols-3" method="get">
+      {filters.referrer ? (
+        <input type="hidden" name="referrer" value={filters.referrer} />
+      ) : null}
+      {filters.q ? <input type="hidden" name="q" value={filters.q} /> : null}
       <label className="space-y-1 text-xs font-medium">
         From
         <input

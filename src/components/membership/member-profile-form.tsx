@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { useFormStatus } from "react-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SelfieField } from "@/components/membership/selfie-field";
@@ -11,19 +10,6 @@ import {
   updateMemberProfileAction,
   type UpdateProfileState,
 } from "@/lib/membership/update-profile-action";
-
-function SubmitButton({ disabled }: { disabled?: boolean }) {
-  const { pending } = useFormStatus();
-  return (
-    <Button
-      type="submit"
-      disabled={pending || disabled}
-      className="h-11 rounded-xl bg-primary px-8 text-white"
-    >
-      {pending ? "Saving…" : "Save profile"}
-    </Button>
-  );
-}
 
 export function MemberProfileForm({
   defaults,
@@ -40,7 +26,7 @@ export function MemberProfileForm({
     avatarUrl?: string | null;
   };
 }) {
-  const [state, action] = useActionState(
+  const [state, action, isPending] = useActionState(
     updateMemberProfileAction,
     {} as UpdateProfileState,
   );
@@ -53,10 +39,10 @@ export function MemberProfileForm({
   const [category, setCategory] = useState(defaults.category);
 
   useEffect(() => {
-    if (state.success) {
+    if (state.success || state.error) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [state.success]);
+  }, [state.success, state.error]);
 
   return (
     <form action={action} className="glass-card space-y-6 rounded-2xl p-6 sm:p-8">
@@ -186,7 +172,13 @@ export function MemberProfileForm({
         </p>
       </div>
 
-      <SubmitButton />
+      <Button
+        type="submit"
+        disabled={isPending}
+        className="h-11 rounded-xl bg-primary px-8 text-white"
+      >
+        {isPending ? "Saving…" : "Save profile"}
+      </Button>
     </form>
   );
 }

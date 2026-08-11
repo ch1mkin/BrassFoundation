@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ReferralSharePanel } from "@/components/membership/referral-share-panel";
-import { ReferralReportFilters } from "@/components/membership/referral-report-filters";
+import { ReferralLeaderboardChart } from "@/components/membership/referral-leaderboard-chart";
 import { getSessionUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
@@ -18,25 +18,12 @@ type ReferralRow = {
   status: string | null;
   gender: string | null;
   age: number | null;
-  date_of_birth: string | null;
   user_id: string | null;
   created_at: string;
   has_mandate: boolean;
 };
 
-export default async function MemberReferralsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    from?: string;
-    to?: string;
-    gender?: string;
-    age_min?: string;
-    age_max?: string;
-    mandates_only?: string;
-  }>;
-}) {
-  const filters = await searchParams;
+export default async function MemberReferralsPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login?next=/member/referrals");
 
@@ -78,7 +65,7 @@ export default async function MemberReferralsPage({
     const { data } = await admin
       .from("membership_applications")
       .select(
-        "id, full_name, email, phone, membership_id, payment_status, status, gender, age, date_of_birth, user_id, created_at",
+        "id, full_name, email, phone, membership_id, payment_status, status, gender, age, user_id, created_at",
       )
       .eq("referred_by_membership_id", membershipId)
       .order("created_at", { ascending: false })
@@ -107,43 +94,10 @@ export default async function MemberReferralsPage({
       }
     }
 
-    let enriched: ReferralRow[] = rows.map((row) => ({
+    referrals = rows.map((row) => ({
       ...row,
       has_mandate: Boolean(row.user_id && mandateUserIds.has(row.user_id)),
     }));
-
-    if (filters.from) {
-      const from = new Date(filters.from);
-      enriched = enriched.filter((r) => new Date(r.created_at) >= from);
-    }
-    if (filters.to) {
-      const to = new Date(filters.to);
-      to.setHours(23, 59, 59, 999);
-      enriched = enriched.filter((r) => new Date(r.created_at) <= to);
-    }
-    if (filters.gender) {
-      enriched = enriched.filter(
-        (r) =>
-          (r.gender || "").toLowerCase() === filters.gender!.toLowerCase(),
-      );
-    }
-    if (filters.age_min) {
-      const min = Number(filters.age_min);
-      enriched = enriched.filter(
-        (r) => typeof r.age === "number" && r.age >= min,
-      );
-    }
-    if (filters.age_max) {
-      const max = Number(filters.age_max);
-      enriched = enriched.filter(
-        (r) => typeof r.age === "number" && r.age <= max,
-      );
-    }
-    if (filters.mandates_only === "1") {
-      enriched = enriched.filter((r) => r.has_mandate);
-    }
-
-    referrals = enriched;
 
     const { data: allReferred } = await admin
       .from("membership_applications")
@@ -168,11 +122,10 @@ export default async function MemberReferralsPage({
     const allMandateUsers = new Set<string>();
     const allUids = [...refMap.values()].flatMap((v) => [...v.userIds]);
     if (allUids.length) {
-      const chunk = allUids.slice(0, 2000);
       const { data: mandates } = await admin
         .from("payment_mandates")
         .select("user_id, status")
-        .in("user_id", chunk);
+        .in("user_id", allUids.slice(0, 2000));
       for (const m of mandates || []) {
         if (
           m.user_id &&
@@ -208,22 +161,15 @@ export default async function MemberReferralsPage({
         (a, b) =>
           b.registrations + b.mandates * 2 - (a.registrations + a.mandates * 2),
       )
-      .slice(0, 20);
+      .slice(0, 12);
   }
 
   const paidCount = referrals.filter(
     (r) => r.payment_status === "paid" || r.membership_id,
   ).length;
   const mandateCount = referrals.filter((r) => r.has_mandate).length;
-
   const inviterName =
     me?.full_name || profile?.full_name || profile?.email || "A member";
-
-  const downloadHref = `/api/member/referrals/export?${new URLSearchParams(
-    Object.entries(filters)
-      .filter(([, v]) => Boolean(v))
-      .map(([k, v]) => [k, String(v)]),
-  ).toString()}`;
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
@@ -232,8 +178,8 @@ export default async function MemberReferralsPage({
           Referrals
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Track people who joined with your referral, view contribution status,
-          and download filtered reports.
+          Share your link, see who joined, and check the leaderboard. Report
+          downloads are available to admins only.
         </p>
       </div>
 
@@ -261,64 +207,20 @@ export default async function MemberReferralsPage({
             inviterName={inviterName}
           />
 
-          <section className="glass-card space-y-4 rounded-2xl p-6">
-            <h2 className="font-heading text-lg font-semibold">
-              Referral leaderboard
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Ranked by registrations and monthly mandates from referral links.
-            </p>
-            <ol className="divide-y divide-border">
-              {leaderboard.map((row, index) => (
-                <li
-                  key={row.membership_id}
-                  className="flex items-center justify-between gap-3 py-3 text-sm"
-                >
-                  <div className="min-w-0">
-                    <p className="font-medium">
-                      #{index + 1}{" "}
-                      {row.membership_id === membershipId
-                        ? `${row.full_name} (You)`
-                        : row.full_name}
-                    </p>
-                    <p className="font-mono text-xs text-muted-foreground">
-                      {row.membership_id}
-                    </p>
-                  </div>
-                  <div className="shrink-0 text-right text-xs">
-                    <p>
-                      <span className="font-semibold">{row.registrations}</span>{" "}
-                      regs
-                    </p>
-                    <p>
-                      <span className="font-semibold">{row.mandates}</span>{" "}
-                      mandates
-                    </p>
-                  </div>
-                </li>
-              ))}
-              {!leaderboard.length ? (
-                <li className="py-6 text-center text-muted-foreground">
-                  No referral data yet.
-                </li>
-              ) : null}
-            </ol>
-          </section>
-
-          <section className="glass-card space-y-4 rounded-2xl p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="font-heading text-lg font-semibold">
-                Filter & download report
-              </h2>
-              <a
-                href={downloadHref}
-                className="inline-flex h-10 items-center rounded-xl bg-primary px-4 text-sm font-semibold text-white"
-              >
-                Download CSV
-              </a>
-            </div>
-            <ReferralReportFilters filters={filters} />
-          </section>
+          <ReferralLeaderboardChart
+            description="Top referrers by registrations and monthly mandates."
+            items={leaderboard.map((row) => ({
+              id: row.membership_id,
+              label:
+                row.membership_id === membershipId
+                  ? `${row.full_name} (You)`
+                  : row.full_name,
+              subtitle: row.membership_id,
+              registrations: row.registrations,
+              mandates: row.mandates,
+              highlight: row.membership_id === membershipId,
+            }))}
+          />
 
           <section className="glass-card space-y-3 rounded-2xl p-6">
             <h2 className="font-heading text-lg font-semibold">
@@ -356,8 +258,8 @@ export default async function MemberReferralsPage({
               ))}
               {!referrals.length ? (
                 <li className="py-8 text-center text-sm text-muted-foreground">
-                  No referrals match these filters. Share your code or invite
-                  message to get started.
+                  No referrals yet. Share your code or invite message to get
+                  started.
                 </li>
               ) : null}
             </ul>

@@ -2,15 +2,27 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
+import { ReferralLeaderboardChart } from "@/components/membership/referral-leaderboard-chart";
+import { ReferralReportFilters } from "@/components/membership/referral-report-filters";
 
 export const metadata: Metadata = { title: "Admin · Referrals" };
 
 export default async function AdminReferralsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; referrer?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    referrer?: string;
+    from?: string;
+    to?: string;
+    gender?: string;
+    age_min?: string;
+    age_max?: string;
+    mandates_only?: string;
+  }>;
 }) {
-  const { q, referrer } = await searchParams;
+  const filters = await searchParams;
+  const { q, referrer } = filters;
   const supabase = await createClient();
   const admin = createServiceClient();
 
@@ -35,8 +47,8 @@ export default async function AdminReferralsPage({
     );
   }
 
-  const { data, error } = await query.limit(500);
-  const rows = data || [];
+  const { data, error } = await query.limit(1000);
+  let rows = data || [];
 
   const userIds = rows
     .map((r) => r.user_id)
@@ -57,6 +69,33 @@ export default async function AdminReferralsPage({
         mandateUsers.add(m.user_id);
       }
     }
+  }
+
+  if (filters.from) {
+    const from = new Date(filters.from);
+    rows = rows.filter((r) => new Date(r.created_at) >= from);
+  }
+  if (filters.to) {
+    const to = new Date(filters.to);
+    to.setHours(23, 59, 59, 999);
+    rows = rows.filter((r) => new Date(r.created_at) <= to);
+  }
+  if (filters.gender) {
+    rows = rows.filter(
+      (r) =>
+        (r.gender || "").toLowerCase() === filters.gender!.toLowerCase(),
+    );
+  }
+  if (filters.age_min) {
+    const min = Number(filters.age_min);
+    rows = rows.filter((r) => typeof r.age === "number" && r.age >= min);
+  }
+  if (filters.age_max) {
+    const max = Number(filters.age_max);
+    rows = rows.filter((r) => typeof r.age === "number" && r.age <= max);
+  }
+  if (filters.mandates_only === "1") {
+    rows = rows.filter((r) => r.user_id && mandateUsers.has(r.user_id));
   }
 
   const byReferrer = new Map<
@@ -82,14 +121,56 @@ export default async function AdminReferralsPage({
         b.registrations + b.mandates * 2 - (a.registrations + a.mandates * 2),
     );
 
+  const genderBuckets = { Female: 0, Male: 0, Other: 0, Unknown: 0 };
+  for (const row of rows) {
+    const g = (row.gender || "").trim();
+    if (g === "Female" || g === "Male" || g === "Other") genderBuckets[g] += 1;
+    else genderBuckets.Unknown += 1;
+  }
+  const genderMax = Math.max(1, ...Object.values(genderBuckets));
+
+  const statusBuckets = { Member: 0, Contributed: 0, Pending: 0 };
+  for (const row of rows) {
+    if (row.user_id && mandateUsers.has(row.user_id)) statusBuckets.Contributed += 1;
+    else if (row.payment_status === "paid" || row.membership_id)
+      statusBuckets.Member += 1;
+    else statusBuckets.Pending += 1;
+  }
+  const statusMax = Math.max(1, ...Object.values(statusBuckets));
+
+  const exportParams = new URLSearchParams();
+  for (const [k, v] of Object.entries(filters)) {
+    if (v) exportParams.set(k, String(v));
+  }
+  const downloadHref = `/api/admin/referrals/export?${exportParams.toString()}`;
+
+  const referrerIds = leaderboard.map((r) => r.id).slice(0, 50);
+  const { data: referrerApps } = referrerIds.length
+    ? await admin
+        .from("membership_applications")
+        .select("membership_id, full_name")
+        .in("membership_id", referrerIds)
+    : { data: [] as { membership_id: string; full_name: string }[] };
+  const nameById = new Map(
+    (referrerApps || []).map((r) => [r.membership_id, r.full_name]),
+  );
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="font-heading text-3xl font-semibold">Referrals</h1>
-        <p className="mt-2 text-muted-foreground">
-          Leaderboard of referrers by registrations and mandates from referral
-          links (`/membership?ref=BF-YYYY-XXXXXX`).
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-heading text-3xl font-semibold">Referrals</h1>
+          <p className="mt-2 text-muted-foreground">
+            Leaderboard, charts, filters, and CSV download for referral
+            registrations and mandates.
+          </p>
+        </div>
+        <a
+          href={downloadHref}
+          className="inline-flex h-11 items-center rounded-xl bg-primary px-5 text-sm font-semibold text-white"
+        >
+          Download CSV report
+        </a>
       </div>
 
       <form className="glass-card grid gap-3 rounded-2xl p-4 sm:grid-cols-3">
@@ -107,9 +188,14 @@ export default async function AdminReferralsPage({
           type="submit"
           className="h-11 rounded-xl bg-primary text-sm font-semibold text-white"
         >
-          Apply filters
+          Apply search
         </button>
       </form>
+
+      <section className="glass-card space-y-4 rounded-2xl p-6">
+        <h2 className="font-heading text-lg font-semibold">Report filters</h2>
+        <ReferralReportFilters filters={filters} />
+      </section>
 
       {error ? (
         <p className="text-sm text-destructive">
@@ -117,17 +203,67 @@ export default async function AdminReferralsPage({
         </p>
       ) : null}
 
+      <ReferralLeaderboardChart
+        title="Referral leaderboard (charts)"
+        description="Top referrers in the current filter set."
+        items={leaderboard.slice(0, 15).map((row) => ({
+          id: row.id,
+          label: nameById.get(row.id) || row.id,
+          subtitle: row.id,
+          registrations: row.registrations,
+          mandates: row.mandates,
+        }))}
+      />
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <MiniChart
+          title="By gender"
+          rows={Object.entries(genderBuckets).map(([label, value]) => ({
+            label,
+            value,
+            max: genderMax,
+            tone: "bg-primary",
+          }))}
+        />
+        <MiniChart
+          title="By status"
+          rows={[
+            {
+              label: "Contributed",
+              value: statusBuckets.Contributed,
+              max: statusMax,
+              tone: "bg-secondary",
+            },
+            {
+              label: "Member",
+              value: statusBuckets.Member,
+              max: statusMax,
+              tone: "bg-primary",
+            },
+            {
+              label: "Pending",
+              value: statusBuckets.Pending,
+              max: statusMax,
+              tone: "bg-muted-foreground/50",
+            },
+          ]}
+        />
+      </div>
+
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {leaderboard.map((row, index) => (
+        {leaderboard.slice(0, 9).map((row, index) => (
           <Link
             key={row.id}
             href={`/admin/referrals?referrer=${encodeURIComponent(row.id)}`}
             className="glass-card rounded-2xl p-4 transition hover:ring-1 hover:ring-primary/40"
           >
-            <p className="text-xs text-muted-foreground">
-              #{index + 1} Referrer
+            <p className="text-xs text-muted-foreground">#{index + 1} Referrer</p>
+            <p className="truncate text-sm font-semibold">
+              {nameById.get(row.id) || row.id}
             </p>
-            <p className="font-mono text-sm font-semibold">{row.id}</p>
+            <p className="mt-1 font-mono text-xs text-muted-foreground">
+              {row.id}
+            </p>
             <p className="mt-2 font-heading text-2xl font-semibold text-primary">
               {row.registrations}
             </p>
@@ -186,7 +322,7 @@ export default async function AdminReferralsPage({
                   colSpan={5}
                   className="px-4 py-8 text-center text-muted-foreground"
                 >
-                  No referral registrations yet.
+                  No referral registrations match these filters.
                 </td>
               </tr>
             ) : null}
@@ -194,6 +330,38 @@ export default async function AdminReferralsPage({
         </table>
       </div>
     </div>
+  );
+}
+
+function MiniChart({
+  title,
+  rows,
+}: {
+  title: string;
+  rows: { label: string; value: number; max: number; tone: string }[];
+}) {
+  return (
+    <section className="glass-card space-y-4 rounded-2xl p-6">
+      <h2 className="font-heading text-lg font-semibold">{title}</h2>
+      <ul className="space-y-3">
+        {rows.map((row) => (
+          <li key={row.label} className="space-y-1">
+            <div className="flex justify-between text-xs">
+              <span className="font-medium">{row.label}</span>
+              <span className="tabular-nums font-semibold">{row.value}</span>
+            </div>
+            <div className="h-2.5 overflow-hidden rounded-full bg-muted/60">
+              <div
+                className={`h-full rounded-full ${row.tone}`}
+                style={{
+                  width: `${Math.max(2, Math.round((row.value / row.max) * 100))}%`,
+                }}
+              />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
