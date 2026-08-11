@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { FamilyMembersForm } from "@/components/membership/family-members-form";
+import { FamilyMemberCard } from "@/components/membership/family-member-card";
 import { FamilyPayButton } from "@/components/membership/family-pay-button";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
@@ -20,7 +21,7 @@ export default async function MemberFamilyPage() {
   const { data: family } = await supabase
     .from("family_members")
     .select(
-      "id, full_name, age, gender, occupation, category, payment_status, membership_id, fee_paise, created_at",
+      "id, full_name, age, date_of_birth, gender, occupation, category, payment_status, membership_id, fee_paise, created_at",
     )
     .eq("parent_user_id", user.id)
     .order("created_at", { ascending: false });
@@ -54,7 +55,7 @@ export default async function MemberFamilyPage() {
         <p className="mt-2 text-muted-foreground">
           Save relatives first — payment is optional until you&apos;re ready.
           Members under 18 are free; each adult is ₹10 and receives a membership
-          ID after payment.
+          ID after payment. You can edit or remove family members anytime.
         </p>
       </div>
 
@@ -91,46 +92,23 @@ export default async function MemberFamilyPage() {
           ) : null}
         </div>
 
-        {(family || []).map((row) => {
-          const payable = isPayableStatus(row.payment_status);
-          const fee = row.fee_paise || 0;
-          return (
-            <div
-              key={row.id}
-              className="glass-card flex flex-col gap-3 rounded-2xl p-4 text-sm sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div>
-                <p className="font-medium">{row.full_name}</p>
-                <p className="text-muted-foreground">
-                  Age {row.age} · {row.gender} · {row.category}
-                  {row.membership_id ? ` · ${row.membership_id}` : ""}
-                </p>
-                <p className="mt-1 text-xs">
-                  <span
-                    className={
-                      row.payment_status === "paid" ||
-                      row.payment_status === "waived"
-                        ? "font-semibold text-success"
-                        : "font-semibold text-amber-700"
-                    }
-                  >
-                    {row.payment_status}
-                  </span>
-                  {payable && fee > 0
-                    ? ` · ${formatInrFromPaise(fee)} due`
-                    : null}
-                </p>
-              </div>
-              {payable && fee > 0 ? (
-                <FamilyPayButton
-                  familyIds={[row.id]}
-                  amountPaise={fee}
-                  label={`Pay ${formatInrFromPaise(fee)}`}
-                />
-              ) : null}
-            </div>
-          );
-        })}
+        {(family || []).map((row) => (
+          <FamilyMemberCard
+            key={row.id}
+            member={{
+              id: row.id,
+              full_name: row.full_name,
+              age: row.age,
+              date_of_birth: row.date_of_birth,
+              gender: row.gender,
+              occupation: row.occupation,
+              category: row.category,
+              payment_status: row.payment_status,
+              membership_id: row.membership_id,
+              fee_paise: row.fee_paise,
+            }}
+          />
+        ))}
         {!family?.length ? (
           <p className="text-sm text-muted-foreground">No family members yet.</p>
         ) : null}

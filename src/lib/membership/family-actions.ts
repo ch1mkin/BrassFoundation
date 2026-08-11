@@ -143,6 +143,161 @@ export async function createFamilyMembersAction(
   return finishFamilySave(inserted);
 }
 
+export type FamilyMemberMutationState = {
+  error?: string;
+  success?: string;
+};
+
+export async function updateFamilyMemberAction(
+  _prev: FamilyMemberMutationState,
+  formData: FormData,
+): Promise<FamilyMemberMutationState> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { error: "Please sign in." };
+
+    const id = String(formData.get("id") || "").trim();
+    if (!id) return { error: "Missing family member." };
+
+    const full_name = String(formData.get("full_name") || "").trim();
+    const date_of_birth = String(formData.get("date_of_birth") || "").trim();
+    const gender = String(formData.get("gender") || "").trim();
+    const occupation = String(formData.get("occupation") || "").trim();
+    const category = String(formData.get("category") || "")
+      .trim()
+      .toUpperCase();
+
+    const dobIssue = dobError(date_of_birth, { minAge: 0, maxAge: 119 });
+    const age = ageFromIsoDate(date_of_birth);
+    if (
+      !full_name ||
+      dobIssue ||
+      age === null ||
+      !gender ||
+      !isMembershipCategory(category)
+    ) {
+      return {
+        error: dobIssue || "Please complete all required fields.",
+      };
+    }
+
+    const admin = createServiceClient();
+    const { data: existing, error: loadError } = await admin
+      .from("family_members")
+      .select(
+        "id, parent_user_id, payment_status, membership_id, fee_paise",
+      )
+      .eq("id", id)
+      .eq("parent_user_id", user.id)
+      .maybeSingle();
+
+    if (loadError || !existing) {
+      return { error: "Family member not found." };
+    }
+
+    const minor = age < FAMILY_MINOR_AGE;
+    const isPaid = existing.payment_status === "paid";
+    const patch: Record<string, string | number | null> = {
+      full_name,
+      date_of_birth,
+      age,
+      gender,
+      occupation: occupation || null,
+      category,
+    };
+
+    // Only recalculate fee/status/ID when not already paid.
+    if (!isPaid) {
+      if (minor) {
+        patch.fee_paise = 0;
+        patch.payment_status = "waived";
+        patch.membership_id =
+          existing.membership_id ||
+          `BF-F-${Date.now().toString().slice(-6)}-${Math.random().toString(36).slice(2, 5)}`;
+      } else {
+        patch.fee_paise = FAMILY_MEMBER_FEE_PAISE;
+        patch.payment_status =
+          existing.payment_status === "pending" ? "pending" : "unpaid";
+        // Clear auto-waived ID when becoming an unpaid adult.
+        if (existing.payment_status === "waived") {
+          patch.membership_id = null;
+        }
+      }
+    }
+
+    const { error: updateError } = await admin
+      .from("family_members")
+      .update(patch)
+      .eq("id", id)
+      .eq("parent_user_id", user.id);
+
+    if (updateError) {
+      return { error: updateError.message || "Could not update member." };
+    }
+
+    revalidatePath("/member/family");
+    revalidatePath("/admin/family-members");
+    revalidatePath("/member");
+    revalidatePath("/");
+    return { success: "Family member updated." };
+  } catch (err) {
+    return {
+      error:
+        err instanceof Error ? err.message : "Could not update family member.",
+    };
+  }
+}
+
+export async function deleteFamilyMemberAction(
+  _prev: FamilyMemberMutationState,
+  formData: FormData,
+): Promise<FamilyMemberMutationState> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { error: "Please sign in." };
+
+    const id = String(formData.get("id") || "").trim();
+    if (!id) return { error: "Missing family member." };
+
+    const admin = createServiceClient();
+    const { data: existing } = await admin
+      .from("family_members")
+      .select("id")
+      .eq("id", id)
+      .eq("parent_user_id", user.id)
+      .maybeSingle();
+
+    if (!existing) return { error: "Family member not found." };
+
+    const { error } = await admin
+      .from("family_members")
+      .delete()
+      .eq("id", id)
+      .eq("parent_user_id", user.id);
+
+    if (error) {
+      return { error: error.message || "Could not remove member." };
+    }
+
+    revalidatePath("/member/family");
+    revalidatePath("/admin/family-members");
+    revalidatePath("/member");
+    revalidatePath("/");
+    return { success: "Family member removed." };
+  } catch (err) {
+    return {
+      error:
+        err instanceof Error ? err.message : "Could not remove family member.",
+    };
+  }
+}
+
 function finishFamilySave(
   inserted: { id: string; fee_paise: number | null; payment_status: string }[],
 ): FamilyActionState {
