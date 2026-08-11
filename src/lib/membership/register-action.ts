@@ -27,7 +27,7 @@ const guestSchema = z.object({
     .max(120),
   email: z.string().email("Valid email is required."),
   phone: z.string().min(10, "Mobile number is required.").max(20),
-  address: z.string().min(8, "Address is required.").max(500),
+  address: z.string().min(1, "Address is required.").max(500),
   age: z
     .number({ message: "Age is required." })
     .int("Age must be a whole number.")

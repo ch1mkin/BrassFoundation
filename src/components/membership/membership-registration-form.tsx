@@ -68,8 +68,10 @@ export function MembershipRegistrationForm({
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
   const [membershipId, setMembershipId] = useState<string | null>(null);
+  const [submitLocked, setSubmitLocked] = useState(false);
   const paySectionRef = useRef<HTMLDivElement>(null);
   const autoPayStarted = useRef(false);
+  const submitGuard = useRef(false);
 
   const [fullName, setFullName] = useState(defaults?.fullName || "");
   const [email, setEmail] = useState(defaults?.email || "");
@@ -192,7 +194,7 @@ export function MembershipRegistrationForm({
       fullName.trim().length >= 2 &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
       phone.trim().length >= 10 &&
-      address.trim().length >= 8 &&
+      address.trim().length >= 1 &&
       Number.isInteger(ageNum) &&
       ageNum >= 1 &&
       ageNum <= 119 &&
@@ -223,7 +225,19 @@ export function MembershipRegistrationForm({
     confirmPassword.length > 0 &&
     password !== confirmPassword;
 
-  const showBootstrapLoader = pending || (Boolean(state.success) && paying && step === "form");
+  useEffect(() => {
+    if (!state.error) return;
+    submitGuard.current = false;
+    setSubmitLocked(false);
+    autoPayStarted.current = false;
+  }, [state.error]);
+
+  const showBootstrapLoader =
+    submitLocked ||
+    pending ||
+    (Boolean(state.success) && paying && step === "form");
+
+  const submitBusy = submitLocked || pending || paying;
 
   if (step === "done") {
     const shareUrl =
@@ -325,7 +339,18 @@ export function MembershipRegistrationForm({
   }
 
   return (
-    <form action={action} className="relative space-y-6 pb-6 sm:pb-10">
+    <form
+      action={action}
+      onSubmit={(e) => {
+        if (submitGuard.current || pending || paying || !formComplete) {
+          e.preventDefault();
+          return;
+        }
+        submitGuard.current = true;
+        setSubmitLocked(true);
+      }}
+      className="relative space-y-6 pb-6 sm:pb-10"
+    >
       {showBootstrapLoader ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-[2px]">
           <div className="glass-card rounded-2xl px-8 py-6 shadow-lg">
@@ -342,7 +367,7 @@ export function MembershipRegistrationForm({
         </div>
       ) : null}
       <FormLock
-        pending={pending || paying}
+        pending={submitBusy}
         className="space-y-6"
         label={loggedIn ? "Preparing payment…" : "Creating account…"}
       >
@@ -450,7 +475,7 @@ export function MembershipRegistrationForm({
                 rows={3}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="House / street, village or city, district, state, PIN"
+                placeholder="City or full address"
                 className="w-full rounded-xl border border-input bg-white px-3 py-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
               />
             </label>
@@ -562,17 +587,19 @@ export function MembershipRegistrationForm({
           <Button
             type="submit"
             size="lg"
-            disabled={pending || paying || !formComplete}
+            disabled={submitBusy || !formComplete}
             className="h-12 w-full rounded-xl bg-primary px-8 sm:w-auto sm:min-w-[240px]"
           >
-            {pending || paying ? (
+            {submitBusy ? (
               <>
                 <ButtonSpinner />
                 {pending
                   ? loggedIn
                     ? "Saving…"
                     : "Creating account…"
-                  : "Opening payment…"}
+                  : paying
+                    ? "Opening payment…"
+                    : "Submitting…"}
               </>
             ) : formComplete ? (
               "Submit & pay ₹10"

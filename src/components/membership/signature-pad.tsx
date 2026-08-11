@@ -53,6 +53,7 @@ export function SignaturePad({
   const streamRef = useRef<MediaStream | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const drawing = useRef(false);
+  const hasInkRef = useRef(false);
   const [mode, setMode] = useState<"draw" | "photo">("draw");
   const [hasInk, setHasInk] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -68,25 +69,51 @@ export function SignaturePad({
     const ratio = window.devicePixelRatio || 1;
     const width = parent.clientWidth;
     const height = 160;
-    canvas.width = width * ratio;
-    canvas.height = height * ratio;
+    const nextW = Math.round(width * ratio);
+    const nextH = Math.round(height * ratio);
+    // Mobile browser chrome show/hide can fire resize; skip no-op width changes.
+    if (canvas.width === nextW && canvas.height === nextH) return;
+
+    const snapshot =
+      canvas.width > 0 && canvas.height > 0
+        ? canvas.toDataURL("image/png")
+        : null;
+
+    canvas.width = nextW;
+    canvas.height = nextH;
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(ratio, ratio);
-      ctx.lineWidth = 2;
-      ctx.lineCap = "round";
-      ctx.strokeStyle = "#0B1C28";
+    if (!ctx) return;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(ratio, ratio);
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#0B1C28";
+
+    if (snapshot) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, width, height);
+      };
+      img.src = snapshot;
     }
   }, []);
 
   useEffect(() => {
     if (mode !== "draw") return;
     resize();
+    const parent = canvasRef.current?.parentElement;
+    const ro =
+      typeof ResizeObserver !== "undefined" && parent
+        ? new ResizeObserver(() => resize())
+        : null;
+    ro?.observe(parent!);
     window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", resize);
+    };
   }, [mode, resize]);
 
   useEffect(() => {
@@ -144,12 +171,13 @@ export function SignaturePad({
     const p = pos(e);
     ctx.lineTo(p.x, p.y);
     ctx.stroke();
+    hasInkRef.current = true;
     setHasInk(true);
   }
 
   function end() {
     drawing.current = false;
-    if (hasInk && canvasRef.current) {
+    if (hasInkRef.current && canvasRef.current) {
       onChange(canvasRef.current.toDataURL("image/png"));
     }
   }
@@ -159,6 +187,7 @@ export function SignaturePad({
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasInkRef.current = false;
     setHasInk(false);
     onChange(null);
     resize();
@@ -166,6 +195,7 @@ export function SignaturePad({
 
   function clearAll() {
     stopCamera();
+    hasInkRef.current = false;
     setHasInk(false);
     setPhotoPreview(null);
     onChange(null);
@@ -181,6 +211,7 @@ export function SignaturePad({
       const dataUrl = await cropToSignatureFrame(video);
       setPhotoPreview(dataUrl);
       onChange(dataUrl);
+      hasInkRef.current = true;
       setHasInk(true);
       stopCamera();
     } catch (err) {
@@ -205,6 +236,7 @@ export function SignaturePad({
       bitmap.close();
       setPhotoPreview(dataUrl);
       onChange(dataUrl);
+      hasInkRef.current = true;
       setHasInk(true);
       stopCamera();
     } catch (err) {
@@ -219,6 +251,7 @@ export function SignaturePad({
   function switchMode(next: "draw" | "photo") {
     if (next === mode) return;
     stopCamera();
+    hasInkRef.current = false;
     setHasInk(false);
     setPhotoPreview(null);
     onChange(null);
