@@ -2,17 +2,20 @@ import type { Metadata } from "next";
 import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 import { AdminLockedForm } from "@/components/admin/admin-locked-form";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
+import { MembershipStatCards } from "@/components/admin/membership-stat-cards";
 import { OrgTree } from "@/components/admin/org-tree";
 import {
   deleteOrgNodeAction,
   upsertOrgNodeFormAction,
 } from "@/lib/content/gallery-org-actions";
+import { getMembershipStats } from "@/lib/membership/member-count";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Admin · Family" };
 
 export default async function AdminFamilyPage() {
   const supabase = await createClient();
+  const stats = await getMembershipStats();
   const { data: rawNodes, error } = await supabase
     .from("org_nodes")
     .select(
@@ -39,31 +42,20 @@ export default async function AdminFamilyPage() {
     };
   });
 
-  const { count } = await supabase
-    .from("membership_applications")
-    .select("id", { count: "exact", head: true })
-    .eq("status", "approved")
-    .eq("member_status", "active");
-
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-heading text-3xl font-semibold">
-            Brass Foundation Family
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Organization tree for screenshots — profile images as nodes, names
-            and roles in compact labels.
-          </p>
-        </div>
-        <div className="glass-card rounded-xl px-5 py-3 text-center">
-          <p className="text-xs text-muted-foreground">Active members</p>
-          <p className="font-heading text-2xl font-semibold text-primary">
-            {count ?? "—"}
-          </p>
-        </div>
+      <div>
+        <h1 className="font-heading text-3xl font-semibold">
+          Brass Foundation Family
+        </h1>
+        <p className="mt-2 text-muted-foreground">
+          Organization tree for screenshots — profile images as nodes, names and
+          roles in compact labels. Membership totals include primary members and
+          paid family members (same as the public live counter).
+        </p>
       </div>
+
+      <MembershipStatCards {...stats} />
 
       {error ? (
         <p className="glass-card rounded-2xl p-6 text-sm text-destructive">
