@@ -1,5 +1,5 @@
-import PDFDocument from "pdfkit";
 import { SITE } from "@/lib/constants";
+import { buildSimpleTablePdf } from "@/lib/reports/pdf-table";
 
 export type ReferralReportRow = {
   full_name: string | null;
@@ -58,61 +58,30 @@ export async function buildReferralReportPdf(input: {
   filtersLabel?: string;
 }): Promise<Buffer> {
   const generatedAt = input.generatedAt || new Date();
-  const doc = new PDFDocument({ margin: 40, size: "A4" });
-  const chunks: Buffer[] = [];
-  doc.on("data", (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
-
-  const done = new Promise<Buffer>((resolve, reject) => {
-    doc.on("end", () => resolve(Buffer.concat(chunks)));
-    doc.on("error", reject);
-  });
-
-  doc
-    .fontSize(18)
-    .fillColor("#000")
-    .text(`${SITE.name} — Referral report`, { align: "left" });
-  doc.moveDown(0.4);
-  doc
-    .fontSize(10)
-    .fillColor("#444")
-    .text(
+  return buildSimpleTablePdf({
+    title: `${SITE.name} — Referral report`,
+    metaLines: [
       `Generated: ${generatedAt.toLocaleString("en-IN", {
         timeZone: "Asia/Kolkata",
       })} IST`,
-    )
-    .text(`Rows: ${input.rows.length}`)
-    .text(input.filtersLabel || "Filters: none");
-  doc.moveDown();
-  doc.fillColor("#000");
-
-  doc
-    .fontSize(9)
-    .text(
+      `Rows: ${input.rows.length}`,
+      input.filtersLabel || "Filters: none",
+    ],
+    header:
       "Name | Age | Gender | Membership ID | Referred by | Status | Joined",
-      { underline: true },
-    );
-  doc.moveDown(0.35);
-
-  for (const row of input.rows) {
-    const line = [
-      row.full_name || "—",
-      row.age ?? "—",
-      row.gender || "—",
-      row.membership_id || "—",
-      row.referred_by_membership_id || "—",
-      row.contribution || row.payment_status || row.status || "—",
-      new Date(row.created_at).toLocaleString("en-IN", {
-        timeZone: "Asia/Kolkata",
-      }),
-    ].join(" | ");
-    doc.fontSize(8).text(line, { width: 520 });
-    doc.moveDown(0.15);
-  }
-
-  if (!input.rows.length) {
-    doc.fontSize(11).text("No referral registrations match these filters.");
-  }
-
-  doc.end();
-  return done;
+    lines: input.rows.map((row) =>
+      [
+        row.full_name || "—",
+        row.age ?? "—",
+        row.gender || "—",
+        row.membership_id || "—",
+        row.referred_by_membership_id || "—",
+        row.contribution || row.payment_status || row.status || "—",
+        new Date(row.created_at).toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata",
+        }),
+      ].join(" | "),
+    ),
+    emptyMessage: "No referral registrations match these filters.",
+  });
 }
