@@ -40,8 +40,8 @@ export function DailyReportEmailForm({
             Daily membership PDF report
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Enter the Gmail (or inbox) that should receive a PDF of registrations
-            every day at 12:00 AM IST (after the previous day ends). Requires{" "}
+            Enter one or more email addresses (comma-separated) that should
+            receive a PDF of registrations every day at 12:00 AM IST. Requires{" "}
             <code className="text-xs">CRON_SECRET</code>, SMTP, and Vercel Cron.
           </p>
         </div>
@@ -59,15 +59,18 @@ export function DailyReportEmailForm({
           </p>
         ) : null}
         <label className="block space-y-2">
-          <span className="text-sm font-medium">Recipient email</span>
+          <span className="text-sm font-medium">Recipient email(s)</span>
           <Input
             name="email"
-            type="email"
+            type="text"
             required
             defaultValue={defaultEmail || ""}
-            placeholder="reports@example.com"
+            placeholder="one@gmail.com, two@gmail.com"
             className="h-11 rounded-xl bg-white"
           />
+          <span className="text-xs text-muted-foreground">
+            Separate multiple addresses with commas.
+          </span>
         </label>
         <Button
           type="submit"

@@ -331,15 +331,12 @@ export function membershipReportEmailHtml({
   rowCount,
   generatedAt,
   variant = "share",
-  appUrl,
 }: {
   periodLabel: string;
   rowCount: number;
   generatedAt?: Date | string;
   variant?: "share" | "daily";
-  appUrl?: string;
 }) {
-  const base = (appUrl || appBaseUrl()).replace(/\/$/, "");
   const when = formatIndianDateTime(generatedAt || new Date());
   const safePeriod = escapeHtml(periodLabel);
   const isDaily = variant === "daily";
@@ -347,8 +344,8 @@ export function membershipReportEmailHtml({
     ? "Daily membership report"
     : "Membership report ready";
   const intro = isDaily
-    ? `Attached is the automatic daily membership registration PDF for <strong>${safePeriod}</strong> (IST day ending at midnight).`
-    : `Attached is the BRASS Foundation membership registration PDF for the selected period <strong>${safePeriod}</strong>.`;
+    ? `Please find attached the automatic daily membership registration PDF for <strong>${safePeriod}</strong> (IST day ending at midnight).`
+    : `Please find attached the BRASS Foundation membership registration PDF for the selected period <strong>${safePeriod}</strong>.`;
 
   const body = `
     <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:24px;line-height:1.25;color:#002B5B;">
@@ -373,10 +370,12 @@ export function membershipReportEmailHtml({
       </tr>
     </table>
     <p style="margin:0 0 14px;">
-      The attached PDF includes a branded cover header, tabular member list (name, age, gender, membership ID, status, and registration time), and a subtle BRASS Foundation logo watermark.
+      Please check out the <strong>attached report</strong> for the full tabular list of members (name, age, gender, membership ID, status, and registration time).
     </p>
-    ${ctaButton(`${base}/admin/settings`, "Open admin settings")}
-    <p style="margin:20px 0 0;">
+    <p style="margin:18px 0 0;padding:14px 16px;background:#F4F6F8;border-radius:12px;font-size:14px;color:#002B5B;text-align:center;font-weight:700;">
+      Check out the attached Report
+    </p>
+    <p style="margin:24px 0 0;">
       With gratitude,<br />
       <strong>Team BRASS Foundation</strong>
     </p>

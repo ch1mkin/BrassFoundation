@@ -1,20 +1,16 @@
 "use server";
 
-import { z } from "zod";
 import { getUserContext, canAccessAdmin } from "@/lib/auth/session";
 import {
   DAILY_REPORT_EMAIL_KEY,
   setSiteSetting,
+  validateEmailListInput,
 } from "@/lib/cms/site-settings";
 
 export type DailyReportEmailState = {
   error?: string;
   success?: string;
 };
-
-const schema = z.object({
-  email: z.string().email("Enter a valid Gmail / email address."),
-});
 
 export async function saveDailyReportEmailAction(
   _prev: DailyReportEmailState,
@@ -26,28 +22,29 @@ export async function saveDailyReportEmailAction(
       return { error: "Unauthorized." };
     }
 
-    const parsed = schema.safeParse({
-      email: String(formData.get("email") || "")
-        .trim()
-        .toLowerCase(),
-    });
-    if (!parsed.success) {
-      return { error: parsed.error.issues[0]?.message || "Invalid email." };
+    const raw = String(formData.get("email") || "").trim();
+    const { emails, error } = validateEmailListInput(raw);
+    if (error || !emails.length) {
+      return { error: error || "Enter at least one valid email." };
     }
 
     await setSiteSetting(
       DAILY_REPORT_EMAIL_KEY,
-      { email: parsed.data.email },
+      { emails, email: emails[0] },
       context.userId,
     );
 
+    const list =
+      emails.length === 1
+        ? emails[0]
+        : `${emails.length} addresses (${emails.join(", ")})`;
+
     return {
-      success: `Daily PDF report will be sent to ${parsed.data.email} at 12:00 AM IST.`,
+      success: `Daily PDF report will be sent to ${list} at 12:00 AM IST.`,
     };
   } catch (err) {
     return {
-      error:
-        err instanceof Error ? err.message : "Could not save setting.",
+      error: err instanceof Error ? err.message : "Could not save setting.",
     };
   }
 }

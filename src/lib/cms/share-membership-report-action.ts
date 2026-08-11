@@ -73,7 +73,7 @@ export async function shareMembershipReportAction(
       generatedAt,
       variant: "share",
     });
-    const text = `Dear colleague,\n\nAttached is the ${SITE.name} membership registration PDF for ${periodLabel}.\nRegistrations listed: ${rows.length}\nGenerated: ${generatedAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST\n\nTeam ${SITE.name}`;
+    const text = `Dear colleague,\n\nPlease find attached the ${SITE.name} membership registration PDF for ${periodLabel}.\nRegistrations listed: ${rows.length}\nGenerated: ${generatedAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST\n\nPlease check out the attached Report.\n\nTeam ${SITE.name}`;
 
     const result = await sendEmail({
       to: parsed.data.email,

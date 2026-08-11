@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDailyReportEmail } from "@/lib/cms/site-settings";
+import { getDailyReportEmails } from "@/lib/cms/site-settings";
 import { isSmtpConfigured, sendEmail } from "@/lib/email/smtp";
 import { membershipReportEmailHtml } from "@/lib/email/templates";
 import {
@@ -22,8 +22,8 @@ function authorize(request: Request) {
 }
 
 async function runDailyReport() {
-  const to = await getDailyReportEmail();
-  if (!to) {
+  const recipients = await getDailyReportEmails();
+  if (!recipients.length) {
     return {
       ok: false,
       skipped: true,
@@ -53,10 +53,10 @@ async function runDailyReport() {
     generatedAt,
     variant: "daily",
   });
-  const text = `Daily membership report for ${window.label}.\nRegistrations: ${rows.length}\nGenerated: ${generatedAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST\n\nTeam ${SITE.name}`;
+  const text = `Daily membership report for ${window.label}.\nRegistrations: ${rows.length}\nGenerated: ${generatedAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST\n\nPlease check out the attached Report.\n\nTeam ${SITE.name}`;
 
   const result = await sendEmail({
-    to,
+    to: recipients,
     subject,
     html,
     text,
@@ -78,7 +78,7 @@ async function runDailyReport() {
 
   return {
     ok: true,
-    to,
+    to: recipients,
     period: window.label,
     count: rows.length,
     messageId: result.messageId,

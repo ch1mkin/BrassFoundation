@@ -59,7 +59,7 @@ export default async function AdminSettingsPage() {
       ok: Boolean(process.env.CRON_SECRET),
     },
     {
-      label: "Daily report email",
+      label: "Daily report email(s)",
       ok: Boolean(dailyReportEmail),
     },
   ];
