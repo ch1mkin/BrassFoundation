@@ -22,6 +22,7 @@ import {
   FAMILY_MEMBER_FEE_PAISE,
   FAMILY_MINOR_AGE,
 } from "@/lib/payments/constants";
+import { bumpLiveMemberCount } from "@/lib/membership/member-count-client";
 
 type Draft = {
   full_name: string;
@@ -62,6 +63,8 @@ export function FamilyMembersForm() {
     if (!state.success) return;
     setSavedNotice(state.success);
     setRows([empty()]);
+    // Refresh homepage total (minors activate immediately; paid adults on pay).
+    bumpLiveMemberCount();
     router.refresh();
   }, [state.success, state.familyIds, state.totalPaise, router]);
 
