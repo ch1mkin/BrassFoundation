@@ -324,3 +324,70 @@ export function smtpTestEmailHtml({
     bodyHtml: body,
   });
 }
+
+/** Branded membership PDF report email (manual share or daily cron). */
+export function membershipReportEmailHtml({
+  periodLabel,
+  rowCount,
+  generatedAt,
+  variant = "share",
+  appUrl,
+}: {
+  periodLabel: string;
+  rowCount: number;
+  generatedAt?: Date | string;
+  variant?: "share" | "daily";
+  appUrl?: string;
+}) {
+  const base = (appUrl || appBaseUrl()).replace(/\/$/, "");
+  const when = formatIndianDateTime(generatedAt || new Date());
+  const safePeriod = escapeHtml(periodLabel);
+  const isDaily = variant === "daily";
+  const headline = isDaily
+    ? "Daily membership report"
+    : "Membership report ready";
+  const intro = isDaily
+    ? `Attached is the automatic daily membership registration PDF for <strong>${safePeriod}</strong> (IST day ending at midnight).`
+    : `Attached is the BRASS Foundation membership registration PDF for the selected period <strong>${safePeriod}</strong>.`;
+
+  const body = `
+    <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:24px;line-height:1.25;color:#002B5B;">
+      ${headline}
+    </h1>
+    <p style="margin:0 0 14px;">Dear colleague,</p>
+    <p style="margin:0 0 14px;">
+      ${intro}
+    </p>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;margin:18px 0;border-collapse:separate;border-spacing:0;background:#F4F6F8;border-radius:14px;overflow:hidden;">
+      <tr>
+        <td style="padding:14px 16px;font-size:13px;color:#5C6670;border-bottom:1px solid #E8ECF0;">Period</td>
+        <td style="padding:14px 16px;font-size:14px;font-weight:700;color:#002B5B;text-align:right;border-bottom:1px solid #E8ECF0;">${safePeriod}</td>
+      </tr>
+      <tr>
+        <td style="padding:14px 16px;font-size:13px;color:#5C6670;border-bottom:1px solid #E8ECF0;">Registrations listed</td>
+        <td style="padding:14px 16px;font-size:14px;font-weight:700;color:#002B5B;text-align:right;border-bottom:1px solid #E8ECF0;">${escapeHtml(String(rowCount))}</td>
+      </tr>
+      <tr>
+        <td style="padding:14px 16px;font-size:13px;color:#5C6670;">Generated</td>
+        <td style="padding:14px 16px;font-size:14px;font-weight:700;color:#002B5B;text-align:right;">${escapeHtml(when)} IST</td>
+      </tr>
+    </table>
+    <p style="margin:0 0 14px;">
+      The attached PDF includes a branded cover header, tabular member list (name, age, gender, membership ID, status, and registration time), and a subtle BRASS Foundation logo watermark.
+    </p>
+    ${ctaButton(`${base}/admin/settings`, "Open admin settings")}
+    <p style="margin:20px 0 0;">
+      With gratitude,<br />
+      <strong>Team BRASS Foundation</strong>
+    </p>
+  `;
+
+  return brandedEmailLayout({
+    title: isDaily
+      ? `Daily membership report — ${periodLabel}`
+      : `Membership report — ${periodLabel}`,
+    preheader: `PDF membership report · ${rowCount} registration${rowCount === 1 ? "" : "s"} · ${periodLabel}`,
+    bodyHtml: body,
+  });
+}
+

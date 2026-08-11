@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { getUserContext, canAccessAdmin } from "@/lib/auth/session";
 import { isSmtpConfigured, sendEmail } from "@/lib/email/smtp";
+import { membershipReportEmailHtml } from "@/lib/email/templates";
 import {
   buildMembershipReportPdf,
   fetchMembershipRows,
@@ -66,11 +67,19 @@ export async function shareMembershipReportAction(
       periodLabel,
     });
 
+    const html = membershipReportEmailHtml({
+      periodLabel,
+      rowCount: rows.length,
+      generatedAt,
+      variant: "share",
+    });
+    const text = `Dear colleague,\n\nAttached is the ${SITE.name} membership registration PDF for ${periodLabel}.\nRegistrations listed: ${rows.length}\nGenerated: ${generatedAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST\n\nTeam ${SITE.name}`;
+
     const result = await sendEmail({
       to: parsed.data.email,
       subject: `${SITE.name} membership report — ${periodLabel}`,
-      html: `<p>Attached membership report (${rows.length} rows).</p><p>Generated ${generatedAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST.</p>`,
-      text: `Membership report attached. Rows: ${rows.length}.`,
+      html,
+      text,
       attachments: [
         {
           filename: `membership-report-${generatedAt.toISOString().slice(0, 10)}.pdf`,

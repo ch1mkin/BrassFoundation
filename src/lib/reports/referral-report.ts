@@ -1,5 +1,5 @@
 import { SITE } from "@/lib/constants";
-import { buildSimpleTablePdf } from "@/lib/reports/pdf-table";
+import { buildBrandedTablePdf } from "@/lib/reports/pdf-table";
 
 export type ReferralReportRow = {
   full_name: string | null;
@@ -58,30 +58,39 @@ export async function buildReferralReportPdf(input: {
   filtersLabel?: string;
 }): Promise<Buffer> {
   const generatedAt = input.generatedAt || new Date();
-  return buildSimpleTablePdf({
+  return buildBrandedTablePdf({
     title: `${SITE.name} — Referral report`,
     metaLines: [
       `Generated: ${generatedAt.toLocaleString("en-IN", {
         timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short",
       })} IST`,
       `Rows: ${input.rows.length}`,
       input.filtersLabel || "Filters: none",
     ],
-    header:
-      "Name | Age | Gender | Membership ID | Referred by | Status | Joined",
-    lines: input.rows.map((row) =>
-      [
-        row.full_name || "—",
-        row.age ?? "—",
-        row.gender || "—",
-        row.membership_id || "—",
-        row.referred_by_membership_id || "—",
-        row.contribution || row.payment_status || row.status || "—",
-        new Date(row.created_at).toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata",
-        }),
-      ].join(" | "),
-    ),
+    columns: [
+      { key: "full_name", header: "Name", weight: 2.1 },
+      { key: "age", header: "Age", weight: 0.6 },
+      { key: "gender", header: "Gender", weight: 0.8 },
+      { key: "membership_id", header: "Membership ID", weight: 1.4 },
+      { key: "referred_by", header: "Referred by", weight: 1.4 },
+      { key: "contribution", header: "Status", weight: 1.1 },
+      { key: "joined", header: "Joined (IST)", weight: 1.5 },
+    ],
+    rows: input.rows.map((row) => ({
+      full_name: row.full_name,
+      age: row.age,
+      gender: row.gender,
+      membership_id: row.membership_id,
+      referred_by: row.referred_by_membership_id,
+      contribution: row.contribution || row.payment_status || row.status,
+      joined: new Date(row.created_at).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short",
+      }),
+    })),
     emptyMessage: "No referral registrations match these filters.",
   });
 }

@@ -1,6 +1,6 @@
 import { createServiceClient } from "@/lib/supabase/admin";
 import { SITE } from "@/lib/constants";
-import { buildSimpleTablePdf } from "@/lib/reports/pdf-table";
+import { buildBrandedTablePdf } from "@/lib/reports/pdf-table";
 
 export type MembershipReportRow = {
   full_name: string;
@@ -21,7 +21,6 @@ export function istDayWindow(reference = new Date()) {
   const y = istNow.getUTCFullYear();
   const m = istNow.getUTCMonth();
   const d = istNow.getUTCDate();
-  // Midnight IST for "today" as UTC
   const startOfTodayIstUtc = Date.UTC(y, m, d) - istOffsetMs;
   const startOfYesterdayIstUtc = startOfTodayIstUtc - 24 * 60 * 60 * 1000;
   return {
@@ -62,28 +61,37 @@ export async function buildMembershipReportPdf(input: {
   generatedAt: Date;
   periodLabel: string;
 }): Promise<Buffer> {
-  return buildSimpleTablePdf({
+  return buildBrandedTablePdf({
     title: `${SITE.name} — Membership report`,
     metaLines: [
       `Period: ${input.periodLabel} (IST)`,
       `Generated: ${input.generatedAt.toLocaleString("en-IN", {
         timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short",
       })} IST`,
-      `Total registrations listed: ${input.rows.length}`,
+      `Total registrations: ${input.rows.length}`,
     ],
-    header: "Name | Age | Gender | Membership ID | Status | Registered",
-    lines: input.rows.map((row) =>
-      [
-        row.full_name || "—",
-        row.age ?? "—",
-        row.gender || "—",
-        row.membership_id || "—",
-        row.payment_status || row.status || "—",
-        new Date(row.created_at).toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata",
-        }),
-      ].join(" | "),
-    ),
+    columns: [
+      { key: "full_name", header: "Name", weight: 2.4 },
+      { key: "age", header: "Age", weight: 0.7 },
+      { key: "gender", header: "Gender", weight: 0.9 },
+      { key: "membership_id", header: "Membership ID", weight: 1.6 },
+      { key: "status", header: "Status", weight: 1.1 },
+      { key: "registered", header: "Registered (IST)", weight: 1.8 },
+    ],
+    rows: input.rows.map((row) => ({
+      full_name: row.full_name,
+      age: row.age,
+      gender: row.gender,
+      membership_id: row.membership_id,
+      status: row.payment_status || row.status,
+      registered: new Date(row.created_at).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short",
+      }),
+    })),
     emptyMessage: "No registrations in this period.",
   });
 }

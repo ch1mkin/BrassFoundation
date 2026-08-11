@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDailyReportEmail } from "@/lib/cms/site-settings";
 import { isSmtpConfigured, sendEmail } from "@/lib/email/smtp";
+import { membershipReportEmailHtml } from "@/lib/email/templates";
 import {
   buildMembershipReportPdf,
   fetchMembershipRows,
@@ -46,19 +47,19 @@ async function runDailyReport() {
   });
 
   const subject = `${SITE.name} daily membership report — ${window.label}`;
-  const html = `
-    <p>Hello,</p>
-    <p>Attached is the ${SITE.name} membership registration report for <strong>${window.label}</strong> (IST day ending at midnight).</p>
-    <p>Total registrations in period: <strong>${rows.length}</strong></p>
-    <p>Generated at ${generatedAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST.</p>
-    <p>— ${SITE.name}</p>
-  `;
+  const html = membershipReportEmailHtml({
+    periodLabel: window.label,
+    rowCount: rows.length,
+    generatedAt,
+    variant: "daily",
+  });
+  const text = `Daily membership report for ${window.label}.\nRegistrations: ${rows.length}\nGenerated: ${generatedAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST\n\nTeam ${SITE.name}`;
 
   const result = await sendEmail({
     to,
     subject,
     html,
-    text: `Daily membership report for ${window.label}. Registrations: ${rows.length}.`,
+    text,
     attachments: [
       {
         filename: `membership-report-${window.label}.pdf`,

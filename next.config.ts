@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "12mb",
     },
   },
+  // Ensure brand logo is available to serverless PDF generators (watermark).
+  outputFileTracingIncludes: {
+    "/*": ["./public/brand/logo.png"],
+  },
   images: {
     remotePatterns: [
       {
