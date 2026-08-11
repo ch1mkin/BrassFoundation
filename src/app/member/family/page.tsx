@@ -45,8 +45,17 @@ export default async function MemberFamilyPage() {
 
       {referralLink ? (
         <div className="glass-card rounded-2xl p-5 text-sm">
-          <p className="font-medium">Your referral link</p>
-          <p className="mt-1 break-all text-muted-foreground">{referralLink}</p>
+          <p className="font-medium">Invite others with your referral</p>
+          <p className="mt-1 text-muted-foreground">
+            Copy your code, customize an invite message, and track who joined on{" "}
+            <a
+              href="/member/referrals"
+              className="font-semibold text-primary underline"
+            >
+              Referrals
+            </a>
+            .
+          </p>
         </div>
       ) : null}
 

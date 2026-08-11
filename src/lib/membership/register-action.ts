@@ -323,6 +323,7 @@ export async function registerMembershipAction(
   }
 
   revalidatePath("/member");
+  revalidatePath("/member/referrals");
   revalidatePath("/membership");
   revalidatePath("/admin/members");
   revalidatePath("/admin/referrals");

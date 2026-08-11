@@ -6,6 +6,7 @@ import { getUserContext } from "@/lib/auth/session";
 const NAV = [
   { label: "Dashboard", href: "/member", icon: "dashboard" },
   { label: "Membership Card", href: "/member#membership-card", icon: "badge" },
+  { label: "Referrals", href: "/member/referrals", icon: "diversity_3" },
   { label: "Family", href: "/member/family", icon: "groups" },
   { label: "Payments", href: "/member/payments", icon: "payments" },
   { label: "My Books", href: "/member/books", icon: "auto_stories" },
