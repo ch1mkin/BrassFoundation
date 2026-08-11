@@ -7,6 +7,7 @@ import { FormLock } from "@/components/ui/form-lock";
 import { Input } from "@/components/ui/input";
 import { ButtonSpinner } from "@/components/ui/inline-loader";
 import { openRazorpayCheckout } from "@/components/membership/razorpay-checkout";
+import { DobField } from "@/components/membership/dob-field";
 import {
   createFamilyMembersAction,
   type FamilyActionState,
@@ -15,6 +16,7 @@ import {
   MEMBERSHIP_CATEGORIES,
   MEMBERSHIP_CATEGORY_LABELS,
 } from "@/lib/membership/categories";
+import { ageFromIsoDate } from "@/lib/membership/dob";
 import { useSafeFormAction } from "@/hooks/use-safe-form-action";
 import {
   FAMILY_MEMBER_FEE_PAISE,
@@ -25,7 +27,7 @@ import { bumpLiveMemberCount } from "@/lib/membership/member-count-client";
 
 type Draft = {
   full_name: string;
-  age: string;
+  date_of_birth: string;
   gender: string;
   occupation: string;
   category: string;
@@ -33,7 +35,7 @@ type Draft = {
 
 const empty = (): Draft => ({
   full_name: "",
-  age: "",
+  date_of_birth: "",
   gender: "",
   occupation: "",
   category: "",
@@ -52,8 +54,8 @@ export function FamilyMembersForm() {
   const estimatePaise = useMemo(
     () =>
       rows.reduce((sum, row) => {
-        const age = Number(row.age || 0);
-        if (!age || age < FAMILY_MINOR_AGE) return sum;
+        const age = ageFromIsoDate(row.date_of_birth);
+        if (age === null || age < FAMILY_MINOR_AGE) return sum;
         return sum + FAMILY_MEMBER_FEE_PAISE;
       }, 0),
     [rows],
@@ -198,33 +200,22 @@ export function FamilyMembersForm() {
                   className="h-11 rounded-xl"
                 />
               </label>
-              <label className="space-y-1 text-sm">
-                <span>Age *</span>
-                <div className="relative">
-                  <Input
-                    name={`age_${i}`}
-                    type="number"
-                    min={1}
-                    max={119}
-                    required
-                    value={row.age}
-                    onChange={(e) =>
-                      setRows((r) =>
-                        r.map((x, idx) =>
-                          idx === i ? { ...x, age: e.target.value } : x,
-                        ),
-                      )
-                    }
-                    className="h-11 rounded-xl pr-16"
-                    aria-describedby={`age-years-suffix-${i}`}
-                  />
-                  <span
-                    id={`age-years-suffix-${i}`}
-                    className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground"
-                  >
-                    years
-                  </span>
-                </div>
+              <label className="space-y-1 text-sm sm:col-span-2">
+                <span>Date of birth *</span>
+                <DobField
+                  name={`date_of_birth_${i}`}
+                  value={row.date_of_birth}
+                  onChange={(iso) =>
+                    setRows((r) =>
+                      r.map((x, idx) =>
+                        idx === i ? { ...x, date_of_birth: iso } : x,
+                      ),
+                    )
+                  }
+                  minAge={0}
+                  maxAge={119}
+                  required
+                />
               </label>
               <label className="space-y-1 text-sm">
                 <span>Gender *</span>
@@ -286,11 +277,18 @@ export function FamilyMembersForm() {
                 </select>
               </label>
             </div>
-            {Number(row.age) > 0 && Number(row.age) < FAMILY_MINOR_AGE ? (
-              <p className="text-xs text-success">Under 18 — no fee.</p>
-            ) : Number(row.age) >= FAMILY_MINOR_AGE ? (
-              <p className="text-xs text-muted-foreground">Fee: ₹10</p>
-            ) : null}
+            {(() => {
+              const age = ageFromIsoDate(row.date_of_birth);
+              if (age !== null && age < FAMILY_MINOR_AGE) {
+                return (
+                  <p className="text-xs text-success">Under 18 — no fee.</p>
+                );
+              }
+              if (age !== null && age >= FAMILY_MINOR_AGE) {
+                return <p className="text-xs text-muted-foreground">Fee: ₹10</p>;
+              }
+              return null;
+            })()}
           </div>
         ))}
 

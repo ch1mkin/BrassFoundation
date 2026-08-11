@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { isMembershipCategory } from "@/lib/membership/categories";
+import { ageFromIsoDate, dobError } from "@/lib/membership/dob";
 import {
   FAMILY_MEMBER_FEE_PAISE,
   FAMILY_MINOR_AGE,
@@ -19,6 +20,7 @@ export type FamilyActionState = {
 
 type FamilyInput = {
   full_name: string;
+  date_of_birth: string;
   age: number;
   gender: string;
   occupation: string;
@@ -56,17 +58,37 @@ export async function createFamilyMembersAction(
   const members: FamilyInput[] = [];
   for (let i = 0; i < count; i++) {
     const full_name = String(formData.get(`full_name_${i}`) || "").trim();
-    const age = Number(formData.get(`age_${i}`) || 0);
+    const date_of_birth = String(formData.get(`date_of_birth_${i}`) || "").trim();
     const gender = String(formData.get(`gender_${i}`) || "").trim();
     const occupation = String(formData.get(`occupation_${i}`) || "").trim();
     const category = String(formData.get(`category_${i}`) || "")
       .trim()
       .toUpperCase();
 
-    if (!full_name || !age || !gender || !isMembershipCategory(category)) {
-      return { error: `Please complete all required fields for member #${i + 1}.` };
+    const dobIssue = dobError(date_of_birth, { minAge: 0, maxAge: 119 });
+    const age = ageFromIsoDate(date_of_birth);
+
+    if (
+      !full_name ||
+      dobIssue ||
+      age === null ||
+      !gender ||
+      !isMembershipCategory(category)
+    ) {
+      return {
+        error:
+          dobIssue ||
+          `Please complete all required fields for member #${i + 1}.`,
+      };
     }
-    members.push({ full_name, age, gender, occupation, category });
+    members.push({
+      full_name,
+      date_of_birth,
+      age,
+      gender,
+      occupation,
+      category,
+    });
   }
 
   const rows = members.map((m) => {
@@ -76,6 +98,7 @@ export async function createFamilyMembersAction(
       parent_application_id: parentApp.id,
       parent_membership_id: parentApp.membership_id,
       full_name: m.full_name,
+      date_of_birth: m.date_of_birth,
       age: m.age,
       gender: m.gender,
       occupation: m.occupation || null,
@@ -94,9 +117,30 @@ export async function createFamilyMembersAction(
     .select("id, fee_paise, payment_status");
 
   if (error || !inserted) {
+    if (error && /date_of_birth/i.test(error.message)) {
+      const withoutDob = rows.map(({ date_of_birth: _dob, ...rest }) => rest);
+      const retry = await admin
+        .from("family_members")
+        .insert(withoutDob)
+        .select("id, fee_paise, payment_status");
+      if (retry.error || !retry.data) {
+        return {
+          error:
+            retry.error?.message ||
+            "Could not save family members. Run migration 20260811100000_family_members_dob.sql, then try again.",
+        };
+      }
+      return finishFamilySave(retry.data);
+    }
     return { error: error?.message || "Could not save family members." };
   }
 
+  return finishFamilySave(inserted);
+}
+
+function finishFamilySave(
+  inserted: { id: string; fee_paise: number | null; payment_status: string }[],
+): FamilyActionState {
   const payable = inserted.filter((r) => r.payment_status === "unpaid");
   const totalPaise = payable.reduce((sum, r) => sum + (r.fee_paise || 0), 0);
 

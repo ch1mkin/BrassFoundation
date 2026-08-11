@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/auth/password-input";
 import { SignaturePad } from "@/components/membership/signature-pad";
 import { SelfieField } from "@/components/membership/selfie-field";
+import { DobField } from "@/components/membership/dob-field";
 import { openRazorpayCheckout } from "@/components/membership/razorpay-checkout";
 import {
   MEMBERSHIP_CONSENT_TEXT,
@@ -19,6 +20,7 @@ import {
   MEMBERSHIP_CATEGORY_LABELS,
   isMembershipCategory,
 } from "@/lib/membership/categories";
+import { dobError } from "@/lib/membership/dob";
 import {
   registerMembershipAction,
   type RegisterMembershipState,
@@ -51,7 +53,7 @@ export function MembershipRegistrationForm({
     email?: string;
     phone?: string;
     address?: string;
-    age?: string;
+    dateOfBirth?: string;
     gender?: string;
     category?: string;
   };
@@ -77,7 +79,7 @@ export function MembershipRegistrationForm({
   const [email, setEmail] = useState(defaults?.email || "");
   const [phone, setPhone] = useState(defaults?.phone || "");
   const [address, setAddress] = useState(defaults?.address || "");
-  const [age, setAge] = useState(defaults?.age || "");
+  const [dateOfBirth, setDateOfBirth] = useState(defaults?.dateOfBirth || "");
   const [gender, setGender] = useState(defaults?.gender || "");
   const [category, setCategory] = useState(defaults?.category || "");
   const [password, setPassword] = useState("");
@@ -184,7 +186,6 @@ export function MembershipRegistrationForm({
   }, [step]);
 
   const formComplete = useMemo(() => {
-    const ageNum = Number(age);
     const passwordsOk = loggedIn
       ? true
       : password.length >= 8 &&
@@ -195,9 +196,7 @@ export function MembershipRegistrationForm({
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
       phone.trim().length >= 10 &&
       address.trim().length >= 1 &&
-      Number.isInteger(ageNum) &&
-      ageNum >= 1 &&
-      ageNum <= 119 &&
+      !dobError(dateOfBirth, { minAge: 1, maxAge: 119 }) &&
       ["Female", "Male", "Other"].includes(gender) &&
       isMembershipCategory(category) &&
       consent &&
@@ -209,7 +208,7 @@ export function MembershipRegistrationForm({
     email,
     phone,
     address,
-    age,
+    dateOfBirth,
     gender,
     category,
     consent,
@@ -433,29 +432,18 @@ export function MembershipRegistrationForm({
                 className="h-11 rounded-xl bg-white"
               />
             </label>
-            <label className="block space-y-2">
+            <label className="block space-y-2 sm:col-span-2">
               <span className="text-sm font-medium text-foreground">
-                Age *
+                Date of birth *
               </span>
-              <div className="relative">
-                <Input
-                  name="age"
-                  type="number"
-                  min={1}
-                  max={119}
-                  required
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  className="h-11 rounded-xl bg-white pr-16"
-                  aria-describedby="age-years-suffix"
-                />
-                <span
-                  id="age-years-suffix"
-                  className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground"
-                >
-                  years
-                </span>
-              </div>
+              <DobField
+                name="date_of_birth"
+                value={dateOfBirth}
+                onChange={setDateOfBirth}
+                minAge={1}
+                maxAge={119}
+                required
+              />
             </label>
             <label className="block space-y-2">
               <span className="text-sm font-medium text-foreground">

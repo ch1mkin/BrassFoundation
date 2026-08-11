@@ -7,6 +7,7 @@ import { MEMBERSHIP_CONSENT_VERSION } from "@/lib/membership/consent";
 import { REGISTRATION_FEE_PAISE } from "@/lib/payments/constants";
 import { MEMBERSHIP_CATEGORIES } from "@/lib/membership/categories";
 import { readReferralCookie } from "@/lib/membership/referral";
+import { ageFromIsoDate, dobError } from "@/lib/membership/dob";
 import { z } from "zod";
 
 export type RegisterMembershipState = {
@@ -28,11 +29,15 @@ const guestSchema = z.object({
   email: z.string().email("Valid email is required."),
   phone: z.string().min(10, "Mobile number is required.").max(20),
   address: z.string().min(1, "Address is required.").max(500),
-  age: z
-    .number({ message: "Age is required." })
-    .int("Age must be a whole number.")
-    .min(1, "Enter a valid age.")
-    .max(119, "Enter a valid age."),
+  date_of_birth: z
+    .string()
+    .min(1, "Date of birth is required.")
+    .superRefine((v, ctx) => {
+      const err = dobError(v, { minAge: 1, maxAge: 119 });
+      if (err) {
+        ctx.addIssue({ code: "custom", message: err });
+      }
+    }),
   gender: z.enum(GENDERS, { message: "Select gender." }),
   category: z.enum(MEMBERSHIP_CATEGORIES, {
     message: "Select category: SC, ST, OBC, or General.",
@@ -95,7 +100,7 @@ async function ensureApplication(
     email: string;
     phone: string;
     address: string;
-    age: number;
+    date_of_birth: string;
     gender: string;
     category: string;
     signature_data_url: string;
@@ -119,12 +124,15 @@ async function ensureApplication(
     } as const;
   }
 
+  const age = ageFromIsoDate(data.date_of_birth);
+
   const payload = {
     full_name: data.full_name,
     email: data.email,
     phone: data.phone,
     address: data.address,
-    age: data.age,
+    date_of_birth: data.date_of_birth,
+    age: age ?? null,
     gender: data.gender,
     category: data.category,
     government_id: null,
@@ -197,7 +205,7 @@ export async function registerMembershipAction(
       .toLowerCase(),
     phone: String(formData.get("phone") || "").trim(),
     address: String(formData.get("address") || "").trim(),
-    age: Number(formData.get("age") || 0),
+    date_of_birth: String(formData.get("date_of_birth") || "").trim(),
     gender: String(formData.get("gender") || "").trim(),
     category: String(formData.get("category") || "").trim().toUpperCase(),
     password: String(formData.get("password") || ""),
