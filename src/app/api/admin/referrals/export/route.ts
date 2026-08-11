@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
+import {
+  buildReferralReportPdf,
+  referralRowsToCsv,
+  type ReferralReportRow,
+} from "@/lib/reports/referral-report";
+
+export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const context = await getUserContext();
@@ -10,6 +17,7 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
+  const format = (searchParams.get("format") || "csv").toLowerCase();
   const from = searchParams.get("from");
   const to = searchParams.get("to");
   const gender = searchParams.get("gender");
@@ -93,46 +101,55 @@ export async function GET(request: Request) {
     rows = rows.filter((r) => r.user_id && mandateUsers.has(r.user_id));
   }
 
-  const header = [
-    "full_name",
-    "email",
-    "phone",
-    "membership_id",
-    "referred_by",
-    "age",
-    "gender",
-    "payment_status",
-    "status",
-    "contribution",
-    "created_at",
-  ];
-  const lines = [
-    header.join(","),
-    ...rows.map((r) =>
-      [
-        r.full_name,
-        r.email,
-        r.phone,
-        r.membership_id,
-        r.referred_by_membership_id,
-        r.age,
-        r.gender,
-        r.payment_status,
-        r.status,
-        r.user_id && mandateUsers.has(r.user_id)
-          ? "Contributed"
-          : r.membership_id || r.payment_status === "paid"
-            ? "Member"
-            : "Pending",
-        r.created_at,
-      ]
-        .map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`)
-        .join(","),
-    ),
-  ];
+  const reportRows: ReferralReportRow[] = rows.map((r) => ({
+    full_name: r.full_name,
+    email: r.email,
+    phone: r.phone,
+    membership_id: r.membership_id,
+    referred_by_membership_id: r.referred_by_membership_id,
+    age: r.age,
+    gender: r.gender,
+    payment_status: r.payment_status,
+    status: r.status,
+    contribution:
+      r.user_id && mandateUsers.has(r.user_id)
+        ? "Contributed"
+        : r.membership_id || r.payment_status === "paid"
+          ? "Member"
+          : "Pending",
+    created_at: r.created_at,
+  }));
 
   const stamp = new Date().toISOString().slice(0, 10);
-  return new NextResponse(lines.join("\n"), {
+  const filterBits = [
+    referrer ? `referrer=${referrer}` : null,
+    q ? `q=${q}` : null,
+    from ? `from=${from}` : null,
+    to ? `to=${to}` : null,
+    gender ? `gender=${gender}` : null,
+    ageMin ? `age_min=${ageMin}` : null,
+    ageMax ? `age_max=${ageMax}` : null,
+    mandatesOnly ? "mandates_only" : null,
+  ].filter(Boolean);
+  const filtersLabel = filterBits.length
+    ? `Filters: ${filterBits.join(", ")}`
+    : "Filters: none";
+
+  if (format === "pdf") {
+    const pdf = await buildReferralReportPdf({
+      rows: reportRows,
+      filtersLabel,
+    });
+    return new NextResponse(new Uint8Array(pdf), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="referral-report-${stamp}.pdf"`,
+      },
+    });
+  }
+
+  return new NextResponse(referralRowsToCsv(reportRows), {
     status: 200,
     headers: {
       "Content-Type": "text/csv; charset=utf-8",

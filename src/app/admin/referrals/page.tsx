@@ -144,7 +144,8 @@ export default async function AdminReferralsPage({
   for (const [k, v] of Object.entries(filters)) {
     if (v) exportParams.set(k, String(v));
   }
-  const downloadHref = `/api/admin/referrals/export?${exportParams.toString()}`;
+  const csvHref = `/api/admin/referrals/export?${exportParams.toString()}&format=csv`;
+  const pdfHref = `/api/admin/referrals/export?${exportParams.toString()}&format=pdf`;
 
   const referrerIds = leaderboard.map((r) => r.id).slice(0, 50);
   const { data: referrerApps } = referrerIds.length
@@ -163,16 +164,24 @@ export default async function AdminReferralsPage({
         <div>
           <h1 className="font-heading text-3xl font-semibold">Referrals</h1>
           <p className="mt-2 text-muted-foreground">
-            Leaderboard, charts, filters, and CSV download for referral
-            registrations and mandates.
+            Leaderboard, charts, filters, and CSV/PDF report downloads for
+            referral registrations and mandates.
           </p>
         </div>
-        <a
-          href={downloadHref}
-          className="inline-flex h-11 items-center rounded-xl bg-primary px-5 text-sm font-semibold text-white"
-        >
-          Download CSV report
-        </a>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href={csvHref}
+            className="inline-flex h-11 items-center rounded-xl border border-border bg-white px-5 text-sm font-semibold text-foreground"
+          >
+            Download CSV
+          </a>
+          <a
+            href={pdfHref}
+            className="inline-flex h-11 items-center rounded-xl bg-primary px-5 text-sm font-semibold text-white"
+          >
+            Download PDF
+          </a>
+        </div>
       </div>
 
       <form className="glass-card grid gap-3 rounded-2xl p-4 sm:grid-cols-3">
