@@ -11,6 +11,9 @@ export type LeaderboardBarItem = {
   highlight?: boolean;
 };
 
+/**
+ * Mathematical stick / lollipop chart with axes, gridlines, and dual series.
+ */
 export function ReferralLeaderboardChart({
   items,
   title = "Referral leaderboard",
@@ -20,10 +23,24 @@ export function ReferralLeaderboardChart({
   title?: string;
   description?: string;
 }) {
-  const max = Math.max(
+  const top = items.slice(0, 10);
+  const maxValue = Math.max(
     1,
-    ...items.map((i) => Math.max(i.registrations, i.mandates)),
+    ...top.map((i) => Math.max(i.registrations, i.mandates)),
   );
+  // Nice y-axis ceiling (ceil to next step of 1/2/5 * 10^n)
+  const yMax = niceCeil(maxValue);
+  const ticks = 4;
+  const yTicks = Array.from({ length: ticks + 1 }, (_, i) =>
+    Math.round((yMax / ticks) * i),
+  );
+
+  const width = 720;
+  const height = 320;
+  const pad = { top: 28, right: 24, bottom: 72, left: 44 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const groupW = plotW / Math.max(top.length, 1);
 
   return (
     <section className="glass-card space-y-5 rounded-2xl p-6">
@@ -34,94 +51,201 @@ export function ReferralLeaderboardChart({
         ) : null}
       </div>
 
-      {!items.length ? (
+      {!top.length ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
           No referral data yet.
         </p>
       ) : (
-        <ul className="space-y-4">
-          {items.map((item, index) => (
-            <li key={item.id} className="space-y-2">
-              <div className="flex items-baseline justify-between gap-3">
-                <div className="min-w-0">
-                  <p
-                    className={cn(
-                      "truncate text-sm font-semibold",
-                      item.highlight ? "text-primary" : "text-foreground",
-                    )}
+        <div className="w-full overflow-x-auto">
+          <svg
+            viewBox={`0 0 ${width} ${height}`}
+            className="min-w-[540px] w-full"
+            role="img"
+            aria-label="Referral stick chart"
+          >
+            {/* Grid + Y axis */}
+            {yTicks.map((tick) => {
+              const y = pad.top + plotH - (tick / yMax) * plotH;
+              return (
+                <g key={`yt-${tick}`}>
+                  <line
+                    x1={pad.left}
+                    x2={width - pad.right}
+                    y1={y}
+                    y2={y}
+                    stroke="currentColor"
+                    className="text-border"
+                    strokeWidth={1}
+                    strokeDasharray={tick === 0 ? undefined : "3 4"}
+                    opacity={tick === 0 ? 1 : 0.7}
+                  />
+                  <text
+                    x={pad.left - 8}
+                    y={y + 3}
+                    textAnchor="end"
+                    className="fill-muted-foreground"
+                    fontSize={10}
                   >
-                    #{index + 1} {item.label}
-                  </p>
-                  {item.subtitle ? (
-                    <p className="truncate font-mono text-[11px] text-muted-foreground">
-                      {item.subtitle}
-                    </p>
+                    {tick}
+                  </text>
+                </g>
+              );
+            })}
+
+            {/* Y axis line */}
+            <line
+              x1={pad.left}
+              x2={pad.left}
+              y1={pad.top}
+              y2={pad.top + plotH}
+              stroke="currentColor"
+              className="text-foreground/40"
+              strokeWidth={1.25}
+            />
+            {/* X axis line */}
+            <line
+              x1={pad.left}
+              x2={width - pad.right}
+              y1={pad.top + plotH}
+              y2={pad.top + plotH}
+              stroke="currentColor"
+              className="text-foreground/40"
+              strokeWidth={1.25}
+            />
+            <text
+              x={12}
+              y={pad.top + plotH / 2}
+              transform={`rotate(-90, 12, ${pad.top + plotH / 2})`}
+              textAnchor="middle"
+              className="fill-muted-foreground"
+              fontSize={10}
+            >
+              Count
+            </text>
+
+            {top.map((item, index) => {
+              const cx = pad.left + groupW * index + groupW / 2;
+              const regX = cx - 10;
+              const manX = cx + 10;
+              const regH = (item.registrations / yMax) * plotH;
+              const manH = (item.mandates / yMax) * plotH;
+              const regY = pad.top + plotH - regH;
+              const manY = pad.top + plotH - manH;
+              const shortLabel =
+                item.label.length > 12
+                  ? `${item.label.slice(0, 11)}…`
+                  : item.label;
+
+              return (
+                <g key={item.id}>
+                  {/* Registration stick */}
+                  <line
+                    x1={regX}
+                    x2={regX}
+                    y1={pad.top + plotH}
+                    y2={regY}
+                    stroke={item.highlight ? "#0d9488" : "#006875"}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx={regX}
+                    cy={regY}
+                    r={5.5}
+                    fill={item.highlight ? "#0d9488" : "#006875"}
+                  />
+                  {item.registrations > 0 ? (
+                    <text
+                      x={regX}
+                      y={regY - 8}
+                      textAnchor="middle"
+                      className="fill-foreground"
+                      fontSize={9}
+                      fontWeight={600}
+                    >
+                      {item.registrations}
+                    </text>
                   ) : null}
-                </div>
-                <p className="shrink-0 text-xs text-muted-foreground">
-                  {item.registrations} regs · {item.mandates} mandates
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <Bar
-                  label="Registrations"
-                  value={item.registrations}
-                  max={max}
-                  className="bg-primary"
-                />
-                <Bar
-                  label="Mandates"
-                  value={item.mandates}
-                  max={max}
-                  className="bg-secondary"
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+
+                  {/* Mandate stick */}
+                  <line
+                    x1={manX}
+                    x2={manX}
+                    y1={pad.top + plotH}
+                    y2={manY}
+                    stroke={item.highlight ? "#f59e0b" : "#002B5B"}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx={manX}
+                    cy={manY}
+                    r={5.5}
+                    fill={item.highlight ? "#f59e0b" : "#002B5B"}
+                  />
+                  {item.mandates > 0 ? (
+                    <text
+                      x={manX}
+                      y={manY - 8}
+                      textAnchor="middle"
+                      className="fill-foreground"
+                      fontSize={9}
+                      fontWeight={600}
+                    >
+                      {item.mandates}
+                    </text>
+                  ) : null}
+
+                  <text
+                    x={cx}
+                    y={pad.top + plotH + 16}
+                    textAnchor="middle"
+                    className={cn(
+                      item.highlight
+                        ? "fill-primary"
+                        : "fill-muted-foreground",
+                    )}
+                    fontSize={10}
+                    fontWeight={item.highlight ? 700 : 500}
+                  >
+                    #{index + 1}
+                  </text>
+                  <text
+                    x={cx}
+                    y={pad.top + plotH + 32}
+                    textAnchor="middle"
+                    className="fill-foreground"
+                    fontSize={9}
+                  >
+                    {shortLabel}
+                  </text>
+                  <title>{`${item.label}: ${item.registrations} registrations, ${item.mandates} mandates`}</title>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
       )}
 
-      <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+      <div className="flex flex-wrap gap-5 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-2">
-          <span className="inline-block size-2.5 rounded-sm bg-primary" />{" "}
-          Registrations
+          <span className="inline-block size-2.5 rounded-full bg-[#006875]" />
+          Registrations (stick)
         </span>
         <span className="inline-flex items-center gap-2">
-          <span className="inline-block size-2.5 rounded-sm bg-secondary" />{" "}
-          Mandates
+          <span className="inline-block size-2.5 rounded-full bg-[#002B5B]" />
+          Mandates (stick)
         </span>
       </div>
     </section>
   );
 }
 
-function Bar({
-  label,
-  value,
-  max,
-  className,
-}: {
-  label: string;
-  value: number;
-  max: number;
-  className?: string;
-}) {
-  const pct = Math.max(2, Math.round((value / max) * 100));
-  return (
-    <div className="flex items-center gap-2">
-      <span className="w-24 shrink-0 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-        {label}
-      </span>
-      <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-full bg-muted/60">
-        <div
-          className={cn("h-full rounded-full transition-all", className)}
-          style={{ width: `${pct}%` }}
-          title={`${label}: ${value}`}
-        />
-      </div>
-      <span className="w-6 shrink-0 text-right text-[11px] font-semibold tabular-nums">
-        {value}
-      </span>
-    </div>
-  );
+function niceCeil(n: number) {
+  if (n <= 1) return 1;
+  const exp = Math.floor(Math.log10(n));
+  const base = 10 ** exp;
+  const frac = n / base;
+  const nice = frac <= 1 ? 1 : frac <= 2 ? 2 : frac <= 5 ? 5 : 10;
+  return nice * base;
 }

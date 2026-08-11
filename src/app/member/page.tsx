@@ -226,113 +226,128 @@ export default async function MemberDashboardPage() {
         </div>
       </div>
 
-      <section className="glass-card mt-6 rounded-2xl p-6 sm:p-8">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 className="font-heading text-xl font-semibold">
+      <section
+        id="family-membership-card"
+        className="relative mt-6 overflow-hidden rounded-2xl bg-secondary p-6 text-white sm:p-8"
+      >
+        <div
+          className="pointer-events-none absolute inset-0 opacity-60"
+          style={{
+            background:
+              "radial-gradient(ellipse 55% 45% at 10% 0%, rgba(17,181,201,0.32), transparent 55%), radial-gradient(ellipse 50% 40% at 100% 100%, rgba(245,158,11,0.18), transparent 50%)",
+          }}
+          aria-hidden
+        />
+        <div className="relative z-10 flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs tracking-[0.18em] text-white/55 uppercase">
+              {SITE.name}
+            </p>
+            <h2 className="font-heading mt-2 text-2xl font-semibold">
               Family Membership Card
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Members under your household as head of family, with membership
-              status.
+            <p className="mt-1 text-sm text-white/70">
+              Household of {displayName} · Head of family
             </p>
           </div>
-          <a
-            href="/member/family"
-            className="text-sm font-semibold text-primary underline"
-          >
-            Manage family
-          </a>
+          <div className="flex items-center gap-3">
+            <a
+              href="/member/family"
+              className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+            >
+              Manage family
+            </a>
+            <BrandLogo size="sm" href={null} />
+          </div>
         </div>
 
-        <div className="mt-5 overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="text-xs tracking-wide text-muted-foreground uppercase">
-              <tr>
-                <th className="pb-2 pr-4 font-semibold">Name</th>
-                <th className="pb-2 pr-4 font-semibold">Age</th>
-                <th className="pb-2 pr-4 font-semibold">Membership ID</th>
-                <th className="pb-2 font-semibold">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              <tr>
-                <td className="py-3 pr-4 font-medium">
-                  {displayName}{" "}
-                  <span className="text-xs font-normal text-muted-foreground">
-                    (You · Head)
-                  </span>
-                </td>
-                <td className="py-3 pr-4 text-muted-foreground">—</td>
-                <td className="py-3 pr-4 font-mono text-xs">
-                  {application?.membership_id || "—"}
-                </td>
-                <td className="py-3">
-                  <StatusPill
-                    status={
-                      application?.membership_id ||
-                      application?.status === "approved"
-                        ? "Member"
-                        : application?.status || "Pending"
-                    }
-                  />
-                </td>
-              </tr>
-              {familyMembers.map((row) => (
-                <tr key={row.id}>
-                  <td className="py-3 pr-4 font-medium">{row.full_name}</td>
-                  <td className="py-3 pr-4 text-muted-foreground">
-                    {row.age ?? "—"}
-                  </td>
-                  <td className="py-3 pr-4 font-mono text-xs">
-                    {row.membership_id || "—"}
-                  </td>
-                  <td className="py-3">
-                    <StatusPill
-                      status={
-                        row.payment_status === "paid" || row.membership_id
-                          ? "Member"
-                          : row.payment_status === "unpaid"
-                            ? "Unpaid"
-                            : row.payment_status || "Pending"
-                      }
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="relative z-10 mt-6 space-y-3">
+          <FamilyCardRow
+            name={`${displayName} (Head)`}
+            meta={application?.membership_id || "ID pending"}
+            status={
+              application?.membership_id || application?.status === "approved"
+                ? "Member"
+                : application?.status || "Pending"
+            }
+          />
+          {familyMembers.map((row) => (
+            <FamilyCardRow
+              key={row.id}
+              name={row.full_name}
+              meta={[
+                typeof row.age === "number" ? `Age ${row.age}` : null,
+                row.membership_id || null,
+              ]
+                .filter(Boolean)
+                .join(" · ") || "—"}
+              status={
+                row.payment_status === "paid" || row.membership_id
+                  ? "Member"
+                  : row.payment_status === "unpaid"
+                    ? "Unpaid"
+                    : row.payment_status || "Pending"
+              }
+            />
+          ))}
           {!familyMembers.length ? (
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="rounded-xl border border-dashed border-white/25 bg-white/5 px-4 py-5 text-sm text-white/65">
               No family members added yet. Add relatives from{" "}
-              <a href="/member/family" className="font-medium text-primary underline">
+              <a href="/member/family" className="font-semibold text-brand underline">
                 Family
               </a>
               .
             </p>
           ) : null}
         </div>
+
+        <div className="relative z-10 mt-6 flex flex-wrap items-end justify-between gap-4 border-t border-white/15 pt-5">
+          <div>
+            <p className="text-xs text-white/50 uppercase">Household size</p>
+            <p className="mt-1 font-mono text-lg tracking-wide text-brand">
+              {1 + familyMembers.length} member
+              {1 + familyMembers.length === 1 ? "" : "s"}
+            </p>
+          </div>
+          <p className="text-xs text-white/50">
+            Primary ID: {application?.membership_id || "Not issued"}
+          </p>
+        </div>
       </section>
     </>
   );
 }
 
-function StatusPill({ status }: { status: string }) {
+function FamilyCardRow({
+  name,
+  meta,
+  status,
+}: {
+  name: string;
+  meta: string;
+  status: string;
+}) {
   const lower = status.toLowerCase();
   const tone =
     lower === "member" || lower === "paid" || lower === "approved"
-      ? "bg-emerald-500/15 text-emerald-800"
+      ? "bg-emerald-400/20 text-emerald-100 ring-emerald-300/30"
       : lower === "unpaid" || lower === "pending"
-        ? "bg-amber-500/15 text-amber-900"
-        : "bg-muted text-muted-foreground";
+        ? "bg-amber-400/20 text-amber-100 ring-amber-300/30"
+        : "bg-white/10 text-white/80 ring-white/15";
   return (
-    <span
-      className={cn(
-        "inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold capitalize",
-        tone,
-      )}
-    >
-      {status}
-    </span>
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-[2px]">
+      <div className="min-w-0">
+        <p className="truncate font-medium text-white">{name}</p>
+        <p className="mt-0.5 truncate font-mono text-xs text-white/55">{meta}</p>
+      </div>
+      <span
+        className={cn(
+          "shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ring-1",
+          tone,
+        )}
+      >
+        {status}
+      </span>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getSessionUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -128,16 +127,24 @@ export async function updateMemberProfileAction(
         }
       }
 
-      const orgPatch: Record<string, string> = { full_name: fullName };
-      if (avatarUrl) orgPatch.avatar_url = avatarUrl;
-      await admin.from("org_nodes").update(orgPatch).eq("profile_id", user.id);
+      // Fire-and-forget secondary sync so the client is not left waiting.
+      void (async () => {
+        try {
+          const orgPatch: Record<string, string> = { full_name: fullName };
+          if (avatarUrl) orgPatch.avatar_url = avatarUrl;
+          await admin
+            .from("org_nodes")
+            .update(orgPatch)
+            .eq("profile_id", user.id);
+        } catch (orgErr) {
+          console.error("[profile] org_nodes sync failed:", orgErr);
+        }
+      })();
     } catch (adminErr) {
       // Profile row already saved — don't block the member on secondary sync.
       console.error("[profile] secondary sync failed:", adminErr);
     }
 
-    revalidatePath("/member");
-    revalidatePath("/member/profile");
     return { success: "Profile saved." };
   } catch (err) {
     console.error("[profile] update failed:", err);
