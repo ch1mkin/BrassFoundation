@@ -437,16 +437,25 @@ export function MembershipRegistrationForm({
               <span className="text-sm font-medium text-foreground">
                 Age *
               </span>
-              <Input
-                name="age"
-                type="number"
-                min={1}
-                max={119}
-                required
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                className="h-11 rounded-xl bg-white"
-              />
+              <div className="relative">
+                <Input
+                  name="age"
+                  type="number"
+                  min={1}
+                  max={119}
+                  required
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  className="h-11 rounded-xl bg-white pr-16"
+                  aria-describedby="age-years-suffix"
+                />
+                <span
+                  id="age-years-suffix"
+                  className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground"
+                >
+                  years
+                </span>
+              </div>
             </label>
             <label className="block space-y-2">
               <span className="text-sm font-medium text-foreground">

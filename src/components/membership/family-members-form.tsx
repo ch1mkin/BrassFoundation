@@ -200,22 +200,31 @@ export function FamilyMembersForm() {
               </label>
               <label className="space-y-1 text-sm">
                 <span>Age *</span>
-                <Input
-                  name={`age_${i}`}
-                  type="number"
-                  min={1}
-                  max={119}
-                  required
-                  value={row.age}
-                  onChange={(e) =>
-                    setRows((r) =>
-                      r.map((x, idx) =>
-                        idx === i ? { ...x, age: e.target.value } : x,
-                      ),
-                    )
-                  }
-                  className="h-11 rounded-xl"
-                />
+                <div className="relative">
+                  <Input
+                    name={`age_${i}`}
+                    type="number"
+                    min={1}
+                    max={119}
+                    required
+                    value={row.age}
+                    onChange={(e) =>
+                      setRows((r) =>
+                        r.map((x, idx) =>
+                          idx === i ? { ...x, age: e.target.value } : x,
+                        ),
+                      )
+                    }
+                    className="h-11 rounded-xl pr-16"
+                    aria-describedby={`age-years-suffix-${i}`}
+                  />
+                  <span
+                    id={`age-years-suffix-${i}`}
+                    className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground"
+                  >
+                    years
+                  </span>
+                </div>
               </label>
               <label className="space-y-1 text-sm">
                 <span>Gender *</span>
