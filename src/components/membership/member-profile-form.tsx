@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ export function MemberProfileForm({
   };
 }) {
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const [saving, setSaving] = useState(false);
   const [state, setState] = useState<UpdateProfileState>({});
   const [firstName, setFirstName] = useState(defaults.firstName);
   const [surname, setSurname] = useState(defaults.surname);
@@ -44,28 +44,28 @@ export function MemberProfileForm({
     }
   }, [state.success, state.error]);
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    if (saving) return;
+    const formData = new FormData(e.currentTarget);
     setState({});
-
-    startTransition(async () => {
-      try {
-        const result = await updateMemberProfileAction({}, formData);
-        setState(result);
-        if (result.success) {
-          router.refresh();
-        }
-      } catch (err) {
-        setState({
-          error:
-            err instanceof Error
-              ? err.message
-              : "Could not save profile. Please try again.",
-        });
+    setSaving(true);
+    try {
+      const result = await updateMemberProfileAction({}, formData);
+      setState(result);
+      if (result.success) {
+        router.refresh();
       }
-    });
+    } catch (err) {
+      setState({
+        error:
+          err instanceof Error
+            ? err.message
+            : "Could not save profile. Please try again.",
+      });
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -201,10 +201,10 @@ export function MemberProfileForm({
 
       <Button
         type="submit"
-        disabled={pending}
+        disabled={saving}
         className="h-11 rounded-xl bg-primary px-8 text-white"
       >
-        {pending ? "Saving…" : "Save profile"}
+        {saving ? "Saving…" : "Save profile"}
       </Button>
     </form>
   );
