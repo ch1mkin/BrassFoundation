@@ -118,7 +118,12 @@ export async function createFamilyMembersAction(
 
   if (error || !inserted) {
     if (error && /date_of_birth/i.test(error.message)) {
-      const withoutDob = rows.map(({ date_of_birth: _dob, ...rest }) => rest);
+      const withoutDob = rows.map((row) => {
+        // Retry without DOB when the column is missing in older DBs.
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { date_of_birth, ...rest } = row;
+        return rest;
+      });
       const retry = await admin
         .from("family_members")
         .insert(withoutDob)

@@ -123,8 +123,10 @@ export default async function AdminReferralsPage({
 
   const genderBuckets = { Female: 0, Male: 0, Other: 0, Unknown: 0 };
   for (const row of rows) {
-    const g = (row.gender || "").trim();
-    if (g === "Female" || g === "Male" || g === "Other") genderBuckets[g] += 1;
+    const g = String(row.gender || "").trim();
+    if (g === "Female") genderBuckets.Female += 1;
+    else if (g === "Male") genderBuckets.Male += 1;
+    else if (g === "Other") genderBuckets.Other += 1;
     else genderBuckets.Unknown += 1;
   }
   const genderMax = Math.max(1, ...Object.values(genderBuckets));
