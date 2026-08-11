@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import { FamilyMembersForm } from "@/components/membership/family-members-form";
+import { FamilyPayButton } from "@/components/membership/family-pay-button";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/session";
+import { formatInrFromPaise } from "@/lib/payments/constants";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = { title: "Family members" };
+
+function isPayableStatus(status: string | null | undefined) {
+  return status === "unpaid" || status === "pending";
+}
 
 export default async function MemberFamilyPage() {
   const user = await getSessionUser();
@@ -33,13 +39,22 @@ export default async function MemberFamilyPage() {
     ? `${appUrl}/membership?ref=${encodeURIComponent(me.membership_id)}`
     : null;
 
+  const unpaid = (family || []).filter((row) =>
+    isPayableStatus(row.payment_status),
+  );
+  const unpaidTotalPaise = unpaid.reduce(
+    (sum, row) => sum + (row.fee_paise || 0),
+    0,
+  );
+
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div>
         <h1 className="font-heading text-3xl font-semibold">Family members</h1>
         <p className="mt-2 text-muted-foreground">
-          Add relatives to your membership. Members under 18 are free; each
-          adult is ₹10.
+          Save relatives first — payment is optional until you&apos;re ready.
+          Members under 18 are free; each adult is ₹10 and receives a membership
+          ID after payment.
         </p>
       </div>
 
@@ -62,17 +77,60 @@ export default async function MemberFamilyPage() {
       <FamilyMembersForm />
 
       <section className="space-y-3">
-        <h2 className="font-heading text-xl font-semibold">Your family list</h2>
-        {(family || []).map((row) => (
-          <div key={row.id} className="glass-card rounded-2xl p-4 text-sm">
-            <p className="font-medium">{row.full_name}</p>
-            <p className="text-muted-foreground">
-              Age {row.age} · {row.gender} · {row.category} ·{" "}
-              {row.payment_status}
-              {row.membership_id ? ` · ${row.membership_id}` : ""}
-            </p>
-          </div>
-        ))}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-heading text-xl font-semibold">
+            Your family list
+          </h2>
+          {unpaid.length > 0 && unpaidTotalPaise > 0 ? (
+            <FamilyPayButton
+              familyIds={unpaid.map((r) => r.id)}
+              amountPaise={unpaidTotalPaise}
+              label={`Pay all unpaid (${formatInrFromPaise(unpaidTotalPaise)})`}
+              size="default"
+            />
+          ) : null}
+        </div>
+
+        {(family || []).map((row) => {
+          const payable = isPayableStatus(row.payment_status);
+          const fee = row.fee_paise || 0;
+          return (
+            <div
+              key={row.id}
+              className="glass-card flex flex-col gap-3 rounded-2xl p-4 text-sm sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <p className="font-medium">{row.full_name}</p>
+                <p className="text-muted-foreground">
+                  Age {row.age} · {row.gender} · {row.category}
+                  {row.membership_id ? ` · ${row.membership_id}` : ""}
+                </p>
+                <p className="mt-1 text-xs">
+                  <span
+                    className={
+                      row.payment_status === "paid" ||
+                      row.payment_status === "waived"
+                        ? "font-semibold text-success"
+                        : "font-semibold text-amber-700"
+                    }
+                  >
+                    {row.payment_status}
+                  </span>
+                  {payable && fee > 0
+                    ? ` · ${formatInrFromPaise(fee)} due`
+                    : null}
+                </p>
+              </div>
+              {payable && fee > 0 ? (
+                <FamilyPayButton
+                  familyIds={[row.id]}
+                  amountPaise={fee}
+                  label={`Pay ${formatInrFromPaise(fee)}`}
+                />
+              ) : null}
+            </div>
+          );
+        })}
         {!family?.length ? (
           <p className="text-sm text-muted-foreground">No family members yet.</p>
         ) : null}

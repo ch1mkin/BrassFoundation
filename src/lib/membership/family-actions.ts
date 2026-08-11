@@ -157,7 +157,7 @@ function finishFamilySave(
   }
 
   return {
-    success: `Family saved. Pay ₹${(totalPaise / 100).toFixed(0)} to activate fee-paying members.`,
+    success: `Family saved. Adults stay unpaid until you pay — use Pay on each card or Pay all unpaid when ready.`,
     familyIds: payable.map((r) => r.id),
     totalPaise,
   };

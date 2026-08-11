@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     let amountPaise = body.amountPaise;
     const applicationId = body.applicationId || null;
     const marketplaceItemId = body.marketplaceItemId || null;
-    const familyMemberIds = body.familyMemberIds || [];
+    let familyMemberIds = body.familyMemberIds || [];
     let bookTitle = "";
     const contributionNote = String(body.note || "")
       .trim()
@@ -79,15 +79,21 @@ export async function POST(request: Request) {
       if (familyRows.some((r) => r.parent_user_id !== user.id)) {
         return NextResponse.json({ error: "Unauthorized family payment." }, { status: 403 });
       }
-      amountPaise = familyRows
-        .filter((r) => r.payment_status === "unpaid")
-        .reduce((sum, r) => sum + (r.fee_paise || 0), 0);
-      if (!amountPaise || amountPaise < 1000) {
+      const payableRows = familyRows.filter(
+        (r) =>
+          r.payment_status === "unpaid" || r.payment_status === "pending",
+      );
+      amountPaise = payableRows.reduce(
+        (sum, r) => sum + (r.fee_paise || 0),
+        0,
+      );
+      if (!amountPaise || amountPaise < 1000 || !payableRows.length) {
         return NextResponse.json(
           { error: "No payable family members found." },
           { status: 400 },
         );
       }
+      familyMemberIds = payableRows.map((r) => r.id);
     } else if (purpose === "contribution") {
       if (!amountPaise || amountPaise < 10000) {
         return NextResponse.json(

@@ -170,7 +170,8 @@ export async function POST(request: Request) {
             updated_at: new Date().toISOString(),
           })
           .eq("id", id)
-          .eq("parent_user_id", user.id);
+          .eq("parent_user_id", user.id)
+          .in("payment_status", ["unpaid", "pending"]);
       }
 
       await admin.from("transactions").insert({
