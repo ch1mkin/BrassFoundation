@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       period: "monthly",
       interval: 1,
       item: {
-        name: `Brass Foundation monthly ₹${amountInr}`,
+        name: `BRASS Foundation monthly ₹${amountInr}`,
         amount: amountPaise,
         currency: "INR",
         description: `Monthly contribution of ₹${amountInr}`,

@@ -129,7 +129,7 @@ export function OrgTree({ nodes }: { nodes: Node[] }) {
       className="overflow-x-auto rounded-2xl bg-surface-low p-6 sm:p-8"
     >
       <p className="mb-6 text-center text-xs text-muted-foreground">
-        Organization tree — members connect under Brass Foundation. Scroll
+        Organization tree — members connect under BRASS Foundation. Scroll
         horizontally on small screens if needed.
       </p>
       {tree.length === 0 ? (

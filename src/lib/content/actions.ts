@@ -148,7 +148,7 @@ export async function notifyMembershipReceived(input: {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   await sendEmail({
     to: input.email,
-    subject: "Membership application received — Brass Foundation",
+    subject: "Membership application received — BRASS Foundation",
     html: membershipReceivedEmailHtml({
       name: input.name,
       appUrl,

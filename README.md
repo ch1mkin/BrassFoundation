@@ -1,6 +1,6 @@
-# Brass Foundation OMS
+# BRASS Foundation OMS
 
-Headless Organization Management System for Brass Foundation — public website, admin CMS, and member portal on a shared Supabase-backed API.
+Headless Organization Management System for BRASS Foundation — public website, admin CMS, and member portal on a shared Supabase-backed API.
 
 ## Stack
 

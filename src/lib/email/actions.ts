@@ -36,12 +36,12 @@ export async function sendSmtpTestEmailAction(
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const result = await sendEmail({
     to,
-    subject: "Brass Foundation — SMTP test",
+    subject: "BRASS Foundation — SMTP test",
     html: smtpTestEmailHtml({
       adminName: context.profile?.full_name || context.email,
       appUrl,
     }),
-    text: `Hi ${context.profile?.full_name || "Admin"},\n\nThis is a test email from Brass Foundation. SMTP is working.\n\nOpen settings: ${appUrl}/admin/settings`,
+    text: `Hi ${context.profile?.full_name || "Admin"},\n\nThis is a test email from BRASS Foundation. SMTP is working.\n\nOpen settings: ${appUrl}/admin/settings`,
   });
 
   if (!result.sent) {

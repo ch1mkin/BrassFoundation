@@ -47,7 +47,7 @@ export function LoginForm() {
           Welcome Back
         </h2>
         <p className="text-muted-foreground">
-          Sign in to your Brass Foundation member account
+          Sign in to your BRASS Foundation member account
         </p>
       </div>
 

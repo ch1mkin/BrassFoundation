@@ -1,4 +1,4 @@
-# Brass Foundation Website
+# BRASS Foundation Website
 ### Context.md
 Version: 1.0
 
@@ -6,7 +6,7 @@ Version: 1.0
 
 # Project Overview
 
-Brass Foundation is an Ambedkarite social organization dedicated to education, empowerment, equality, leadership, and community development.
+BRASS Foundation is an Ambedkarite social organization dedicated to education, empowerment, equality, leadership, and community development.
 
 The website should not feel like a traditional NGO website. Instead, it should feel modern, premium, trustworthy and community-driven.
 
@@ -23,7 +23,7 @@ The design language should reflect:
 This is a **Headless Organization Management System (OMS)**. The public website is only one consumer of the data.
 
 ```
-Brass Foundation OMS
+BRASS Foundation OMS
 
 ├── Website
 │   ├── Landing
@@ -127,7 +127,7 @@ Logo asset: `/public/brand/logo.png` (slogan: Education to Prosperity)
 # Website Structure
 
 - Landing Page
-- About Brass Foundation
+- About BRASS Foundation
 - Mission
 - Vision
 - History
@@ -154,7 +154,7 @@ Logo asset: `/public/brand/logo.png` (slogan: Education to Prosperity)
 ## Hero Section
 - Animated pen nib logo
 - Small Three.js particle background
-- CTAs: Join Brass Foundation, Become a Member, Explore Resources
+- CTAs: Join BRASS Foundation, Become a Member, Explore Resources
 
 ## About Section
 - Who We Are

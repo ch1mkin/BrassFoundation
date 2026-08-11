@@ -1,5 +1,5 @@
 export const SITE = {
-  name: "Brass Foundation",
+  name: "BRASS Foundation",
   tagline: "Education · Empowerment · Equality",
   slogan: "Education to Prosperity",
   description:
@@ -383,10 +383,10 @@ export const DEFAULT_ABOUT_QUOTES = [
 ] as const;
 
 export const DEFAULT_HOMEPAGE = {
-  hero_eyebrow: "Brass Foundation",
+  hero_eyebrow: "BRASS Foundation",
   hero_headline: "Empowering Communities\nThrough Education.",
   hero_subheadline:
-    "Brass Foundation is dedicated to education, equality, leadership and community development inspired by the vision of Dr. B. R. Ambedkar.",
+    "BRASS Foundation is dedicated to education, equality, leadership and community development inspired by the vision of Dr. B. R. Ambedkar.",
   hero_cta_primary_label: "Become a Member",
   hero_cta_primary_href: "/membership",
   hero_cta_secondary_label: "Explore Resources",

@@ -871,7 +871,7 @@ export function MembershipCta({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/brand/logo.png"
-                alt="Brass Foundation"
+                alt="BRASS Foundation"
                 className="floating-animation h-36 w-36 rounded-full bg-white object-contain p-3 shadow-2xl sm:h-56 sm:w-56 sm:p-4"
               />
             </div>

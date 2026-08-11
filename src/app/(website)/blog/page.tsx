@@ -19,7 +19,7 @@ export default async function BlogIndexPage() {
     <PageShell
       eyebrow="Blog"
       title="Stories & Insights"
-      description="Articles and reflections from Brass Foundation."
+      description="Articles and reflections from BRASS Foundation."
       wide
     >
       {!data?.length ? (

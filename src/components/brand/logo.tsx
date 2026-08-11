@@ -28,7 +28,7 @@ export function BrandLogo({
   className,
   priority = false,
   href = "/",
-  alt = "Brass Foundation",
+  alt = "BRASS Foundation",
   plate = true,
   showWordmark = false,
   wordmarkClassName,
@@ -77,7 +77,7 @@ export function BrandLogo({
   return (
     <a
       href={href}
-      aria-label="Brass Foundation home"
+      aria-label="BRASS Foundation home"
       className="inline-flex min-w-0 max-w-full items-center"
     >
       {content}

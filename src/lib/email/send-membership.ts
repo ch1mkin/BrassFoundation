@@ -33,12 +33,12 @@ export async function sendMembershipWelcomeEmail(input: {
     membershipId: input.membershipId,
     appUrl,
   });
-  const text = `Dear ${name},\n\nThank you for joining Brass Foundation. Your membership payment was successful.\n\nContribute: ${appUrl}/member/payments\nMember panel: ${appUrl}/member\n${input.membershipId ? `Membership ID: ${input.membershipId}\n` : ""}\nWith gratitude,\nTeam Brass Foundation`;
+  const text = `Dear ${name},\n\nThank you for joining BRASS Foundation. Your membership payment was successful.\n\nContribute (monthly mandate): ${appUrl}/membership\nMember panel: ${appUrl}/member\n${input.membershipId ? `Membership ID: ${input.membershipId}\n` : ""}\nWith gratitude,\nTeam BRASS Foundation`;
 
   const attempt = async () =>
     sendEmail({
       to,
-      subject: "Welcome to Brass Foundation — thank you for joining",
+      subject: "Welcome to BRASS Foundation — thank you for joining",
       html,
       text,
     });

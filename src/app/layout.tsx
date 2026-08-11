@@ -53,8 +53,8 @@ const devanagari = Noto_Sans_Devanagari({
 
 export const metadata: Metadata = {
   title: {
-    default: "Brass Foundation",
-    template: "%s · Brass Foundation",
+    default: "BRASS Foundation",
+    template: "%s · BRASS Foundation",
   },
   description:
     "Empowering communities through education, equality, leadership and community development inspired by Dr. B. R. Ambedkar.",

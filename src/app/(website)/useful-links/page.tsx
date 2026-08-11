@@ -28,7 +28,7 @@ export default async function UsefulLinksPage() {
     <PageShell
       eyebrow="Learn"
       title="Useful Links"
-      description="Curated references and external resources from Brass Foundation."
+      description="Curated references and external resources from BRASS Foundation."
       wide
     >
       {links.length ? (

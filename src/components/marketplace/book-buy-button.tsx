@@ -93,7 +93,7 @@ export function BookBuyButton({
         key: data.keyId,
         amount: data.amount,
         currency: data.currency || "INR",
-        name: "Brass Foundation",
+        name: "BRASS Foundation",
         description: `Featured book: ${title}`,
         order_id: data.orderId,
         handler: async (response) => {

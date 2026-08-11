@@ -105,7 +105,7 @@ create policy "Admins manage org nodes"
 
 -- Seed a simple root if empty
 insert into public.org_nodes (full_name, role_title, sort_order)
-select 'Brass Foundation', 'Organization', 0
+select 'BRASS Foundation', 'Organization', 0
 where not exists (select 1 from public.org_nodes);
 
 -- ---------------------------------------------------------------------------

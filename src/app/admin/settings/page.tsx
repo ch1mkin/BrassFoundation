@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { SmtpTestEmailForm } from "@/components/admin/smtp-test-email-form";
+import { DailyReportEmailForm } from "@/components/admin/daily-report-email-form";
+import { ShareMembershipReportForm } from "@/components/admin/share-membership-report-form";
 import { getUserContext } from "@/lib/auth/session";
 import { isSmtpConfigured } from "@/lib/email/smtp";
 import { isRazorpayConfigured } from "@/lib/payments/razorpay";
 import { isRazorpayLiveMode } from "@/lib/payments/constants";
+import { getDailyReportEmail } from "@/lib/cms/site-settings";
 
 export const metadata: Metadata = { title: "Admin · Settings" };
 
@@ -16,6 +19,7 @@ export default async function AdminSettingsPage() {
   const smtpReady = isSmtpConfigured();
   const razorpayOk = isRazorpayConfigured();
   const razorpayLive = isRazorpayLiveMode();
+  const dailyReportEmail = await getDailyReportEmail();
 
   const checks = [
     {
@@ -50,6 +54,14 @@ export default async function AdminSettingsPage() {
       label: "App URL",
       ok: Boolean(process.env.NEXT_PUBLIC_APP_URL),
     },
+    {
+      label: "Cron secret",
+      ok: Boolean(process.env.CRON_SECRET),
+    },
+    {
+      label: "Daily report email",
+      ok: Boolean(dailyReportEmail),
+    },
   ];
 
   return (
@@ -73,6 +85,10 @@ export default async function AdminSettingsPage() {
         ))}
       </div>
 
+      <DailyReportEmailForm defaultEmail={dailyReportEmail} />
+
+      <ShareMembershipReportForm />
+
       <SmtpTestEmailForm
         smtpReady={smtpReady}
         defaultTo={context?.email || contactInbox || undefined}
@@ -82,7 +98,7 @@ export default async function AdminSettingsPage() {
         <p>
           New members receive a branded welcome email (with logo) after
           successful ₹10 payment, thanking them by name and linking to the
-          member panel / contribute page.
+          Membership Contribute page for monthly mandates.
         </p>
         <p>
           For production payments, set Vercel env{" "}
@@ -96,7 +112,9 @@ export default async function AdminSettingsPage() {
           <code className="text-xs">SMTP_*</code> /{" "}
           <code className="text-xs">CONTACT_INBOX</code>). Set{" "}
           <code className="text-xs">NEXT_PUBLIC_APP_URL</code> so the logo and
-          buttons use your live domain.
+          buttons use your live domain. Set{" "}
+          <code className="text-xs">CRON_SECRET</code> for the midnight IST
+          daily PDF report (Vercel cron: 18:30 UTC).
         </p>
       </div>
     </div>

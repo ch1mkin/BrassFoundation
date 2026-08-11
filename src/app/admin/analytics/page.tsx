@@ -40,7 +40,7 @@ export default async function AdminAnalyticsPage() {
       <div>
         <h1 className="font-heading text-3xl font-semibold">Analytics</h1>
         <p className="mt-2 text-muted-foreground">
-          Live counts from your Brass Foundation database.
+          Live counts from your BRASS Foundation database.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

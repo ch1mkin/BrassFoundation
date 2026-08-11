@@ -18,7 +18,7 @@ export default async function AchieversPage() {
     <PageShell
       eyebrow="Celebrate"
       title="Our Achievers"
-      description="Recognising excellence, leadership, and inspiration within the Brass Foundation family."
+      description="Recognising excellence, leadership, and inspiration within the BRASS Foundation family."
       wide
     >
       {!rows.length ? (

@@ -217,7 +217,7 @@ export function LeadershipSection({
         </h2>
         <GoldHairline className="mx-auto mb-3 mt-3 sm:mx-0" />
         <p className="mx-auto max-w-2xl text-sm text-muted-foreground sm:mx-0 sm:text-base">
-          The committee guiding Brass Foundation&apos;s mission of education,
+          The committee guiding BRASS Foundation&apos;s mission of education,
           equality, and community development.
         </p>
       </div>

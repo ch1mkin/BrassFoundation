@@ -64,7 +64,7 @@ export const AUTH_SUCCESS = {
   signedIn: "Welcome back. Redirecting you now…",
   signedUp: "Your account has been created successfully.",
   resetSent:
-    "If an account exists for that email, a password reset link has been sent from Brass Foundation. Check your inbox (and spam folder).",
+    "If an account exists for that email, a password reset link has been sent from BRASS Foundation. Check your inbox (and spam folder).",
   passwordUpdated:
     "Your password has been updated. You may continue to your dashboard.",
 } as const;

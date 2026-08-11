@@ -1,4 +1,4 @@
--- Brass Foundation OMS — core identity, RBAC, audit
+-- BRASS Foundation OMS — core identity, RBAC, audit
 -- Run in Supabase SQL Editor or via supabase db push
 
 create extension if not exists "pgcrypto";

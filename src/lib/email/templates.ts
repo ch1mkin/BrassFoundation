@@ -56,9 +56,9 @@ export function brandedEmailLayout({
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 10px 40px rgba(0,43,91,0.08);">
           <tr>
             <td style="background:linear-gradient(135deg,#002B5B 0%,#006875 55%,#11B5C9 100%);padding:28px 32px;text-align:center;">
-              <img src="${logo}" alt="Brass Foundation" width="72" height="72" style="display:inline-block;border-radius:999px;background:#ffffff;padding:8px;box-sizing:content-box;" />
+              <img src="${logo}" alt="BRASS Foundation" width="72" height="72" style="display:inline-block;border-radius:999px;background:#ffffff;padding:8px;box-sizing:content-box;" />
               <p style="margin:14px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:0.02em;">
-                Brass Foundation
+                BRASS Foundation
               </p>
               <p style="margin:6px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:rgba(255,255,255,0.88);letter-spacing:0.08em;text-transform:uppercase;">
                 Knowledge to Prosperity
@@ -74,7 +74,7 @@ export function brandedEmailLayout({
             <td style="padding:8px 28px 28px;font-family:Arial,Helvetica,sans-serif;">
               <hr style="border:none;border-top:1px solid #E8ECF0;margin:8px 0 20px;" />
               <p style="margin:0;font-size:12px;line-height:1.5;color:#5C6670;text-align:center;">
-                Brass Foundation · Knowledge to Prosperity<br />
+                BRASS Foundation · Knowledge to Prosperity<br />
                 This is an automated message. Please do not reply directly unless a reply address is provided.
               </p>
             </td>
@@ -109,7 +109,7 @@ export function membershipWelcomeEmailHtml({
   const base = (appUrl || appBaseUrl()).replace(/\/$/, "");
   const safeName = escapeHtml(name || "Friend");
   const portalUrl = `${base}/member`;
-  const contributeUrl = `${base}/member/payments`;
+  const contributeUrl = `${base}/membership`;
   const idLine = membershipId
     ? `<p style="margin:16px 0;padding:12px 14px;background:#F4F6F8;border-radius:12px;font-size:14px;color:#002B5B;">
         <strong>Membership ID:</strong> ${escapeHtml(membershipId)}
@@ -118,11 +118,11 @@ export function membershipWelcomeEmailHtml({
 
   const body = `
     <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.25;color:#002B5B;">
-      Welcome to Brass Foundation
+      Welcome to BRASS Foundation
     </h1>
     <p style="margin:0 0 14px;">Dear ${safeName},</p>
     <p style="margin:0 0 14px;">
-      Thank you for joining <strong>Brass Foundation</strong>. Your membership payment was successful,
+      Thank you for joining <strong>BRASS Foundation</strong>. Your membership payment was successful,
       and we are delighted to welcome you into our community dedicated to education, empowerment, and equality.
     </p>
     <p style="margin:0 0 14px;">
@@ -138,12 +138,12 @@ export function membershipWelcomeEmailHtml({
     </p>
     <p style="margin:24px 0 0;">
       With gratitude,<br />
-      <strong>Team Brass Foundation</strong>
+      <strong>Team BRASS Foundation</strong>
     </p>
   `;
 
   return brandedEmailLayout({
-    title: "Welcome to Brass Foundation",
+    title: "Welcome to BRASS Foundation",
     preheader: `Thank you for joining, ${name || "friend"}. Contribute from your member panel.`,
     bodyHtml: body,
   });
@@ -174,7 +174,7 @@ export function passwordResetEmailHtml({
     </h1>
     <p>Hi ${safeName},</p>
     <p>
-      We received a request to reset your Brass Foundation account password.
+      We received a request to reset your BRASS Foundation account password.
       Click the button below to choose a new password. This link expires in about
       one hour and can be used once.
     </p>
@@ -190,7 +190,7 @@ export function passwordResetEmailHtml({
   `;
   return brandedEmailLayout({
     title: "Reset your password",
-    preheader: "Reset your Brass Foundation password securely.",
+    preheader: "Reset your BRASS Foundation password securely.",
     bodyHtml: body,
   });
 }
@@ -211,7 +211,7 @@ export function membershipReceivedEmailHtml({
     </h1>
     <p>Hi ${safeName},</p>
     <p>
-      Thank you for applying to Brass Foundation. Please complete payment if you have not already,
+      Thank you for applying to BRASS Foundation. Please complete payment if you have not already,
       so we can activate your membership.
     </p>
     <p style="font-size:13px;color:#5C6670;">Reference: ${escapeHtml(applicationId)}</p>
@@ -286,7 +286,7 @@ export function contactAutoReplyEmailHtml({ name }: { name: string }) {
     </h1>
     <p>Hi ${safeName},</p>
     <p>
-      Thank you for contacting Brass Foundation. Our team has received your
+      Thank you for contacting BRASS Foundation. Our team has received your
       message and will get back to you as soon as we can.
     </p>
   `;
@@ -312,7 +312,7 @@ export function smtpTestEmailHtml({
     </h1>
     <p>Hi ${safeName},</p>
     <p>
-      This is a test email from the Brass Foundation admin panel.
+      This is a test email from the BRASS Foundation admin panel.
       If you received it, Hostinger SMTP is configured correctly.
     </p>
     ${ctaButton(`${base}/admin/settings`, "Back to Settings")}
@@ -320,7 +320,7 @@ export function smtpTestEmailHtml({
   `;
   return brandedEmailLayout({
     title: "SMTP test successful",
-    preheader: "Brass Foundation email delivery is working.",
+    preheader: "BRASS Foundation email delivery is working.",
     bodyHtml: body,
   });
 }

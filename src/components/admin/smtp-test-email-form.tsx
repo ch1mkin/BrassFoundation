@@ -39,7 +39,7 @@ export function SmtpTestEmailForm({
             Send test email
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Sends a branded Brass Foundation SMTP test message so you can
+            Sends a branded BRASS Foundation SMTP test message so you can
             confirm delivery.
           </p>
         </div>

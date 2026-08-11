@@ -12,7 +12,7 @@ export default async function NewsPage() {
     <PageShell
       eyebrow="News"
       title="Announcements & Articles"
-      description="Stay informed about Brass Foundation programs, press, and community stories."
+      description="Stay informed about BRASS Foundation programs, press, and community stories."
       wide
     >
       <div className="grid gap-6 md:grid-cols-2">

@@ -139,9 +139,9 @@ export async function POST(request: Request) {
     try {
       await sendEmail({
         to: email,
-        subject: "We received your message — Brass Foundation",
+        subject: "We received your message — BRASS Foundation",
         html: contactAutoReplyEmailHtml({ name: safeName }),
-        text: `Hi ${name},\n\nThank you for contacting Brass Foundation. We received your message and will get back to you soon.\n\nEducation · Empowerment · Equality`,
+        text: `Hi ${name},\n\nThank you for contacting BRASS Foundation. We received your message and will get back to you soon.\n\nEducation · Empowerment · Equality`,
       });
     } catch (autoReplyError) {
       console.error("[contact] Auto-reply failed:", autoReplyError);

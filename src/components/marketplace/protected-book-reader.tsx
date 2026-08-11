@@ -99,7 +99,7 @@ export function ProtectedBookReader({ bookId, title, watermark }: Props) {
     ctx.rotate(-Math.PI / 6);
     for (let y = -canvas.height; y < canvas.height; y += 80) {
       for (let x = -canvas.width; x < canvas.width; x += 280) {
-        ctx.fillText(label || "Brass Foundation", x, y);
+        ctx.fillText(label || "BRASS Foundation", x, y);
       }
     }
     ctx.restore();
@@ -198,7 +198,7 @@ export function ProtectedBookReader({ bookId, title, watermark }: Props) {
           className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/50 to-transparent px-4 py-3 text-center text-[10px] text-white/90"
           aria-hidden
         >
-          Licensed to {label || "member"} · Brass Foundation
+          Licensed to {label || "member"} · BRASS Foundation
         </div>
         {hidden ? (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80 text-sm font-medium">

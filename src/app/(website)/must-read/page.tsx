@@ -5,7 +5,7 @@ import { getPublishedMustReadBooks } from "@/lib/content/must-read-actions";
 
 export const metadata: Metadata = {
   title: "Must Read",
-  description: "Books you must read — curated by Brass Foundation.",
+  description: "Books you must read — curated by BRASS Foundation.",
 };
 
 export default async function MustReadPage() {
@@ -21,7 +21,7 @@ export default async function MustReadPage() {
           Books You Must Read
         </h1>
         <p className="mt-3 text-muted-foreground">
-          Essential reads shared by Brass Foundation. Tap the ? icon for a
+          Essential reads shared by BRASS Foundation. Tap the ? icon for a
           description, or Read PDF to open the book.
         </p>
       </div>

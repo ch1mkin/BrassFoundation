@@ -1,7 +1,7 @@
 import { createServiceClient } from "@/lib/supabase/admin";
 
 /**
- * Attach a newly approved member under the Brass Foundation root node.
+ * Attach a newly approved member under the BRASS Foundation root node.
  * Idempotent — skips if this profile is already on the tree.
  */
 export async function attachMemberToOrgTree(input: {
@@ -46,7 +46,7 @@ export async function attachMemberToOrgTree(input: {
     const { data: createdRoot } = await admin
       .from("org_nodes")
       .insert({
-        full_name: "Brass Foundation",
+        full_name: "BRASS Foundation",
         role_title: "Organization",
         sort_order: 0,
         is_active: true,

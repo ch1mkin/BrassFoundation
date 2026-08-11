@@ -171,7 +171,7 @@ export async function requestPasswordResetAction(
   if (!isSmtpConfigured()) {
     return {
       error:
-        "Password reset email is not available yet. Please contact Brass Foundation support.",
+        "Password reset email is not available yet. Please contact BRASS Foundation support.",
     };
   }
 
@@ -212,9 +212,9 @@ export async function requestPasswordResetAction(
 
     const mailed = await sendEmail({
       to: email,
-      subject: "Reset your Brass Foundation password",
+      subject: "Reset your BRASS Foundation password",
       html: passwordResetEmailHtml({ name, resetUrl }),
-      text: `Hi ${name},\n\nReset your Brass Foundation password using this link (expires in about one hour):\n${resetUrl}\n\nIf you did not request this, ignore this email.\n\nTeam Brass Foundation`,
+      text: `Hi ${name},\n\nReset your BRASS Foundation password using this link (expires in about one hour):\n${resetUrl}\n\nIf you did not request this, ignore this email.\n\nTeam BRASS Foundation`,
     });
 
     if (!mailed.sent) {

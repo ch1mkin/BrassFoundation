@@ -117,7 +117,7 @@ export function MembershipPayStep({
           </p>
         ) : null}
         <p className="mt-4 text-sm text-muted-foreground">
-          Monthly mandates are available in your member payments panel.
+          Monthly mandates are set up on Membership / Contribute.
         </p>
         <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <a
@@ -127,7 +127,7 @@ export function MembershipPayStep({
             Open member portal
           </a>
           <a
-            href="/member/payments"
+            href="/membership"
             className="inline-flex h-12 items-center justify-center rounded-xl border border-border px-8 text-sm font-medium"
           >
             Set up monthly mandate

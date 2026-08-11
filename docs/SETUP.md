@@ -1,4 +1,4 @@
-# Brass Foundation OMS — setup
+# BRASS Foundation OMS — setup
 
 ## 1. Environment
 
@@ -15,7 +15,7 @@ Copy `.env.example` → `.env` (local) and add the same keys in Vercel → Proje
 - `SMTP_SECURE=true`
 - `SMTP_USER` — full mailbox address (e.g. `noreply@yourdomain.com`)
 - `SMTP_PASS` — mailbox password
-- `SMTP_FROM_NAME=Brass Foundation`
+- `SMTP_FROM_NAME=BRASS Foundation`
 - `SMTP_FROM_EMAIL` — usually same as `SMTP_USER`
 - `CONTACT_INBOX` — where Contact Us + membership alerts land (e.g. `contact@yourdomain.com`; defaults to `SMTP_FROM_EMAIL`)
 

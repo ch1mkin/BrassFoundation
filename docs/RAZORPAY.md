@@ -1,4 +1,4 @@
-# Razorpay setup — Brass Foundation
+# Razorpay setup — BRASS Foundation
 
 Use this for **₹10 membership registration** (one-time), **family membership fees**, and **monthly contribution mandates**.
 

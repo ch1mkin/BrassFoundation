@@ -23,7 +23,7 @@ export function ForgotPasswordForm() {
           Reset password
         </h2>
         <p className="text-muted-foreground">
-          Enter your email and we will send a branded reset link from Brass
+          Enter your email and we will send a branded reset link from BRASS
           Foundation.
         </p>
       </div>

@@ -132,7 +132,7 @@ export function MembershipForm() {
           name="reason_for_joining"
           required
           multiline
-          placeholder="Tell us why you want to join Brass Foundation"
+          placeholder="Tell us why you want to join BRASS Foundation"
         />
       </section>
 

@@ -46,7 +46,7 @@ export default async function AdminFamilyPage() {
     <div className="space-y-8">
       <div>
         <h1 className="font-heading text-3xl font-semibold">
-          Brass Foundation Family
+          BRASS Foundation Family
         </h1>
         <p className="mt-2 text-muted-foreground">
           Organization tree for screenshots — profile images as nodes, names and

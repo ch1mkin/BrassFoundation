@@ -186,7 +186,7 @@ function defaultShareMessage(
   membershipId: string,
   referralLink: string,
 ) {
-  const name = inviterName.trim() || "A Brass Foundation member";
+  const name = inviterName.trim() || "A BRASS Foundation member";
   return [
     `Become a Part of the BRASS Foundation.`,
     ``,

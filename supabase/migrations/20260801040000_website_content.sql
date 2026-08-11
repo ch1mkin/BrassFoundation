@@ -277,7 +277,7 @@ values
     'scholarship-outreach-expansion',
     'Foundation expands scholarship outreach',
     'New district partners join our education support network.',
-    'Brass Foundation is expanding scholarship outreach with new district partners focused on school readiness and higher-education access.',
+    'BRASS Foundation is expanding scholarship outreach with new district partners focused on school readiness and higher-education access.',
     'announcement',
     true
   ),

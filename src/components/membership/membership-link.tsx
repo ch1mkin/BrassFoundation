@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Become a Member CTA that navigates reliably.
- * Paid members → Become a Contributor → /member/payments.
+ * Paid members → Become a Contributor → monthly mandate on /membership.
  */
 export function MembershipLink({
   className,
@@ -16,7 +16,7 @@ export function MembershipLink({
   onClick,
   style,
   href = "/membership",
-  memberHref = "/member/payments",
+  memberHref = "/membership",
   memberLabel = "Become a Contributor",
 }: {
   className?: string;

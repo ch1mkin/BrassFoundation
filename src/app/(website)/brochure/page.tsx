@@ -18,7 +18,7 @@ export default async function BrochurePage() {
     <PageShell
       eyebrow="About us"
       title="Organisation Brochure"
-      description="Download and explore the official Brass Foundation brochure."
+      description="Download and explore the official BRASS Foundation brochure."
     >
       {!rows.length ? (
         <div className="glass-card rounded-2xl p-10 text-center text-muted-foreground">

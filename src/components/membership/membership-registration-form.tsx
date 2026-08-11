@@ -50,6 +50,8 @@ export function MembershipRegistrationForm({
 }: {
   defaults?: {
     fullName?: string;
+    firstName?: string;
+    surname?: string;
     email?: string;
     phone?: string;
     address?: string;
@@ -76,6 +78,17 @@ export function MembershipRegistrationForm({
   const submitGuard = useRef(false);
 
   const [fullName, setFullName] = useState(defaults?.fullName || "");
+  const splitDefault = (defaults?.fullName || "").trim().split(/\s+/);
+  const [firstName, setFirstName] = useState(
+    defaults?.firstName ||
+      (splitDefault.length > 1
+        ? splitDefault.slice(0, -1).join(" ")
+        : splitDefault[0] || ""),
+  );
+  const [surname, setSurname] = useState(
+    defaults?.surname ||
+      (splitDefault.length > 1 ? splitDefault[splitDefault.length - 1] : ""),
+  );
   const [email, setEmail] = useState(defaults?.email || "");
   const [phone, setPhone] = useState(defaults?.phone || "");
   const [address, setAddress] = useState(defaults?.address || "");
@@ -192,7 +205,8 @@ export function MembershipRegistrationForm({
         confirmPassword.length >= 8 &&
         password === confirmPassword;
     return (
-      fullName.trim().length >= 2 &&
+      firstName.trim().length >= 1 &&
+      surname.trim().length >= 1 &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
       phone.trim().length >= 10 &&
       address.trim().length >= 1 &&
@@ -204,7 +218,8 @@ export function MembershipRegistrationForm({
       passwordsOk
     );
   }, [
-    fullName,
+    firstName,
+    surname,
     email,
     phone,
     address,
@@ -393,18 +408,45 @@ export function MembershipRegistrationForm({
             </p>
           ) : null}
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block space-y-2 sm:col-span-2">
+            <label className="block space-y-2">
               <span className="text-sm font-medium text-foreground">
-                Full name with surname *
+                First name *
               </span>
               <Input
-                name="full_name"
+                name="first_name"
                 required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                value={firstName}
+                onChange={(e) => {
+                  setFirstName(e.target.value);
+                  setFullName(
+                    [e.target.value.trim(), surname.trim()]
+                      .filter(Boolean)
+                      .join(" "),
+                  );
+                }}
                 className="h-11 rounded-xl bg-white"
               />
             </label>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-foreground">
+                Surname *
+              </span>
+              <Input
+                name="surname"
+                required
+                value={surname}
+                onChange={(e) => {
+                  setSurname(e.target.value);
+                  setFullName(
+                    [firstName.trim(), e.target.value.trim()]
+                      .filter(Boolean)
+                      .join(" "),
+                  );
+                }}
+                className="h-11 rounded-xl bg-white"
+              />
+            </label>
+            <input type="hidden" name="full_name" value={fullName} />
             <label className="block space-y-2">
               <span className="text-sm font-medium text-foreground">
                 Email *

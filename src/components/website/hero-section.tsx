@@ -98,7 +98,7 @@ function HeroLogoWithSlogan({ hasBg }: { hasBg: boolean }) {
       <div className="relative z-[1] flex size-36 items-center justify-center rounded-full bg-white p-3 shadow-lg ring-1 ring-black/5 sm:size-44 sm:p-4">
         <Image
           src="/brand/logo.png"
-          alt="Brass Foundation"
+          alt="BRASS Foundation"
           width={176}
           height={176}
           priority

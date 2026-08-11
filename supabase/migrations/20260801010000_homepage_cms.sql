@@ -13,7 +13,7 @@ create table if not exists public.homepage_content (
   -- only one active row expected; keep history via is_published
   version integer not null default 1,
   is_published boolean not null default true,
-  hero_eyebrow text not null default 'Brass Foundation',
+  hero_eyebrow text not null default 'BRASS Foundation',
   hero_headline text not null default 'Knowledge that liberates.\nCommunity that rises.',
   hero_subheadline text not null default 'An Ambedkarite organization building education, equality, and leadership for generations ahead.',
   hero_cta_primary_label text not null default 'Become a Member',
@@ -22,8 +22,8 @@ create table if not exists public.homepage_content (
   hero_cta_secondary_href text not null default '/resources',
   about_eyebrow text not null default 'Who We Are',
   about_headline text not null default 'Building a platform for dignity, learning, and collective progress.',
-  about_body text not null default 'Brass Foundation exists to advance Ambedkarite values through education, community service, and leadership development.',
-  membership_headline text not null default 'Join Brass Foundation.',
+  about_body text not null default 'BRASS Foundation exists to advance Ambedkarite values through education, community service, and leadership development.',
+  membership_headline text not null default 'Join BRASS Foundation.',
   membership_body text not null default 'Register online, receive your digital membership card, and take part in programs that advance education and equality.',
   stats jsonb not null default '[
     {"label":"Members","value":2500,"suffix":"+"},

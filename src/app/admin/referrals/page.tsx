@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/admin";
 
 export const metadata: Metadata = { title: "Admin · Referrals" };
 
@@ -11,11 +12,12 @@ export default async function AdminReferralsPage({
 }) {
   const { q, referrer } = await searchParams;
   const supabase = await createClient();
+  const admin = createServiceClient();
 
   let query = supabase
     .from("membership_applications")
     .select(
-      "id, full_name, email, phone, membership_id, referred_by_membership_id, payment_status, approved_at, created_at",
+      "id, full_name, email, phone, membership_id, referred_by_membership_id, payment_status, approved_at, created_at, user_id, gender, age",
     )
     .not("referred_by_membership_id", "is", null)
     .order("created_at", { ascending: false });
@@ -33,28 +35,74 @@ export default async function AdminReferralsPage({
     );
   }
 
-  const { data, error } = await query.limit(200);
+  const { data, error } = await query.limit(500);
   const rows = data || [];
 
-  const byReferrer = new Map<string, number>();
+  const userIds = rows
+    .map((r) => r.user_id)
+    .filter((id): id is string => Boolean(id));
+  const mandateUsers = new Set<string>();
+  if (userIds.length) {
+    const { data: mandates } = await admin
+      .from("payment_mandates")
+      .select("user_id, status")
+      .in("user_id", userIds);
+    for (const m of mandates || []) {
+      if (
+        m.user_id &&
+        ["authenticated", "active", "completed"].includes(
+          String(m.status || "").toLowerCase(),
+        )
+      ) {
+        mandateUsers.add(m.user_id);
+      }
+    }
+  }
+
+  const byReferrer = new Map<
+    string,
+    { registrations: number; mandates: number }
+  >();
   for (const row of rows) {
     const key = row.referred_by_membership_id || "—";
-    byReferrer.set(key, (byReferrer.get(key) || 0) + 1);
+    if (!byReferrer.has(key)) {
+      byReferrer.set(key, { registrations: 0, mandates: 0 });
+    }
+    const entry = byReferrer.get(key)!;
+    entry.registrations += 1;
+    if (row.user_id && mandateUsers.has(row.user_id)) {
+      entry.mandates += 1;
+    }
   }
+
+  const leaderboard = [...byReferrer.entries()]
+    .map(([id, stats]) => ({ id, ...stats }))
+    .sort(
+      (a, b) =>
+        b.registrations + b.mandates * 2 - (a.registrations + a.mandates * 2),
+    );
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="font-heading text-3xl font-semibold">Referrals</h1>
         <p className="mt-2 text-muted-foreground">
-          Track members who joined through another member&apos;s referral link
-          (`/membership?ref=BF-YYYY-XXXXXX`).
+          Leaderboard of referrers by registrations and mandates from referral
+          links (`/membership?ref=BF-YYYY-XXXXXX`).
         </p>
       </div>
 
       <form className="glass-card grid gap-3 rounded-2xl p-4 sm:grid-cols-3">
-        <InputLike name="referrer" placeholder="Filter by referrer ID" defaultValue={referrer || ""} />
-        <InputLike name="q" placeholder="Search name / email / ID" defaultValue={q || ""} />
+        <InputLike
+          name="referrer"
+          placeholder="Filter by referrer ID"
+          defaultValue={referrer || ""}
+        />
+        <InputLike
+          name="q"
+          placeholder="Search name / email / ID"
+          defaultValue={q || ""}
+        />
         <button
           type="submit"
           className="h-11 rounded-xl bg-primary text-sm font-semibold text-white"
@@ -70,18 +118,22 @@ export default async function AdminReferralsPage({
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {[...byReferrer.entries()].map(([id, count]) => (
+        {leaderboard.map((row, index) => (
           <Link
-            key={id}
-            href={`/admin/referrals?referrer=${encodeURIComponent(id)}`}
+            key={row.id}
+            href={`/admin/referrals?referrer=${encodeURIComponent(row.id)}`}
             className="glass-card rounded-2xl p-4 transition hover:ring-1 hover:ring-primary/40"
           >
-            <p className="text-xs text-muted-foreground">Referrer</p>
-            <p className="font-mono text-sm font-semibold">{id}</p>
-            <p className="mt-2 text-2xl font-heading font-semibold text-primary">
-              {count}
+            <p className="text-xs text-muted-foreground">
+              #{index + 1} Referrer
             </p>
-            <p className="text-xs text-muted-foreground">referred joins (filtered)</p>
+            <p className="font-mono text-sm font-semibold">{row.id}</p>
+            <p className="mt-2 font-heading text-2xl font-semibold text-primary">
+              {row.registrations}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              registrations · {row.mandates} mandates
+            </p>
           </Link>
         ))}
       </div>
@@ -93,7 +145,7 @@ export default async function AdminReferralsPage({
               <th className="px-4 py-3">Member</th>
               <th className="px-4 py-3">Membership ID</th>
               <th className="px-4 py-3">Referred by</th>
-              <th className="px-4 py-3">Payment</th>
+              <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Joined</th>
             </tr>
           </thead>
@@ -102,7 +154,11 @@ export default async function AdminReferralsPage({
               <tr key={row.id} className="border-t border-border/70">
                 <td className="px-4 py-3">
                   <p className="font-medium">{row.full_name}</p>
-                  <p className="text-xs text-muted-foreground">{row.email}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {row.email}
+                    {typeof row.age === "number" ? ` · Age ${row.age}` : ""}
+                    {row.gender ? ` · ${row.gender}` : ""}
+                  </p>
                 </td>
                 <td className="px-4 py-3 font-mono text-xs">
                   {row.membership_id || "—"}
@@ -110,11 +166,17 @@ export default async function AdminReferralsPage({
                 <td className="px-4 py-3 font-mono text-xs">
                   {row.referred_by_membership_id}
                 </td>
-                <td className="px-4 py-3">{row.payment_status}</td>
+                <td className="px-4 py-3">
+                  {row.user_id && mandateUsers.has(row.user_id)
+                    ? "Contributed"
+                    : row.payment_status === "paid" || row.membership_id
+                      ? "Member"
+                      : row.payment_status || "Pending"}
+                </td>
                 <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {new Date(row.approved_at || row.created_at).toLocaleDateString(
-                    "en-IN",
-                  )}
+                  {new Date(
+                    row.approved_at || row.created_at,
+                  ).toLocaleDateString("en-IN")}
                 </td>
               </tr>
             ))}

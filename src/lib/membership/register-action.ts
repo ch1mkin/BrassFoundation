@@ -8,6 +8,7 @@ import { REGISTRATION_FEE_PAISE } from "@/lib/payments/constants";
 import { MEMBERSHIP_CATEGORIES } from "@/lib/membership/categories";
 import { readReferralCookie } from "@/lib/membership/referral";
 import { ageFromIsoDate, dobError } from "@/lib/membership/dob";
+import { uploadAvatarFromDataUrl } from "@/lib/membership/upload-avatar";
 import { z } from "zod";
 
 export type RegisterMembershipState = {
@@ -24,8 +25,10 @@ const GENDERS = ["Female", "Male", "Other"] as const;
 const guestSchema = z.object({
   full_name: z
     .string()
-    .min(2, "Full name with surname is required.")
+    .min(3, "First name and surname are required.")
     .max(120),
+  first_name: z.string().min(1, "First name is required.").max(60),
+  surname: z.string().min(1, "Surname is required.").max(60),
   email: z.string().email("Valid email is required."),
   phone: z.string().min(10, "Mobile number is required.").max(20),
   address: z.string().min(1, "Address is required.").max(500),
@@ -56,40 +59,6 @@ const loggedInSchema = guestSchema.omit({
   password: true,
   confirm_password: true,
 });
-
-async function uploadAvatarFromDataUrl(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  admin: any,
-  userId: string,
-  dataUrl: string,
-): Promise<string | null> {
-  const match = dataUrl.match(
-    /^data:(image\/(?:jpeg|jpg|png|webp));base64,([A-Za-z0-9+/=\s]+)$/i,
-  );
-  if (!match) return null;
-
-  const contentType = match[1].toLowerCase().replace("image/jpg", "image/jpeg");
-  const buffer = Buffer.from(match[2].replace(/\s/g, ""), "base64");
-  if (!buffer.length || buffer.length > 5 * 1024 * 1024) return null;
-
-  const ext =
-    contentType === "image/png"
-      ? "png"
-      : contentType === "image/webp"
-        ? "webp"
-        : "jpg";
-  const path = `${userId}/avatar.${ext}`;
-
-  const { error } = await admin.storage.from("avatars").upload(path, buffer, {
-    contentType,
-    upsert: true,
-    cacheControl: "3600",
-  });
-  if (error) return null;
-
-  const { data } = admin.storage.from("avatars").getPublicUrl(path);
-  return data?.publicUrl ? `${data.publicUrl}?v=${Date.now()}` : null;
-}
 
 async function ensureApplication(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -199,7 +168,9 @@ export async function registerMembershipAction(
   const referredFromCookie = await readReferralCookie();
 
   const raw = {
-    full_name: String(formData.get("full_name") || "").trim(),
+    first_name: String(formData.get("first_name") || "").trim(),
+    surname: String(formData.get("surname") || "").trim(),
+    full_name: "",
     email: String(formData.get("email") || "")
       .trim()
       .toLowerCase(),
@@ -216,6 +187,7 @@ export async function registerMembershipAction(
     referred_by_membership_id:
       referredFromForm || referredFromCookie || undefined,
   };
+  raw.full_name = [raw.first_name, raw.surname].filter(Boolean).join(" ");
 
   if (!sessionUser && raw.password !== raw.confirm_password) {
     return { error: "Passwords do not match." };
@@ -293,11 +265,7 @@ export async function registerMembershipAction(
 
   let avatarUrl: string | null = null;
   if (data.avatar_data_url && data.avatar_data_url.length > 40) {
-    avatarUrl = await uploadAvatarFromDataUrl(
-      admin,
-      userId,
-      data.avatar_data_url,
-    );
+    avatarUrl = await uploadAvatarFromDataUrl(userId, data.avatar_data_url);
   }
 
   await admin

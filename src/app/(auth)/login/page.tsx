@@ -73,7 +73,7 @@ export default async function LoginPage({
               built.&rdquo;
             </p>
             <cite className="mt-3 block text-xs font-semibold tracking-widest text-brand uppercase not-italic">
-              The Brass Foundation Ethos
+              The BRASS Foundation Ethos
             </cite>
           </blockquote>
         </div>

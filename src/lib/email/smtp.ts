@@ -40,6 +40,11 @@ export type SendEmailInput = {
   html: string;
   text?: string;
   replyTo?: string;
+  attachments?: {
+    filename: string;
+    content: Buffer | string;
+    contentType?: string;
+  }[];
 };
 
 export type SendEmailResult =
@@ -56,6 +61,7 @@ export async function sendEmail({
   html,
   text,
   replyTo,
+  attachments,
 }: SendEmailInput): Promise<SendEmailResult> {
   if (!isSmtpConfigured()) {
     if (process.env.NODE_ENV === "development") {
@@ -68,7 +74,7 @@ export async function sendEmail({
     };
   }
 
-  const fromName = process.env.SMTP_FROM_NAME || "Brass Foundation";
+  const fromName = process.env.SMTP_FROM_NAME || "BRASS Foundation";
   const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER!;
   const mailer = getTransporter();
 
@@ -79,6 +85,7 @@ export async function sendEmail({
     html,
     text: text || html.replace(/<[^>]+>/g, " "),
     replyTo,
+    attachments,
   });
 
   return { sent: true, messageId: info.messageId };
