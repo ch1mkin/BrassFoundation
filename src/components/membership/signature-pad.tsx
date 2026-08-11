@@ -1,6 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { CameraPermissionPrompt } from "@/components/membership/camera-permission-prompt";
+import {
+  requestCameraStream,
+  stopMediaStream,
+} from "@/lib/membership/camera";
 import { cn } from "@/lib/utils";
 
 const SIGNATURE_W = 480;
@@ -60,6 +65,7 @@ export function SignaturePad({
   const [cameraOn, setCameraOn] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [promptOpen, setPromptOpen] = useState(false);
 
   const resize = useCallback(() => {
     const canvas = canvasRef.current;
@@ -118,35 +124,50 @@ export function SignaturePad({
 
   useEffect(() => {
     return () => {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
+      stopMediaStream(streamRef.current);
     };
   }, []);
 
   function stopCamera() {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    stopMediaStream(streamRef.current);
     streamRef.current = null;
     setCameraOn(false);
     if (videoRef.current) videoRef.current.srcObject = null;
   }
 
-  async function startCamera() {
-    setPhotoError(null);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 } },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-      setCameraOn(true);
-    } catch {
+  useEffect(() => {
+    if (!cameraOn || !streamRef.current) return;
+    const video = videoRef.current;
+    if (!video) return;
+    video.srcObject = streamRef.current;
+    video.muted = true;
+    video.setAttribute("playsinline", "true");
+    void video.play().catch(() => {
       setPhotoError(
-        "Camera access was denied. You can upload a photo of your signature instead.",
+        "Could not start the camera preview. Try again or upload a photo.",
       );
+      stopCamera();
+    });
+  }, [cameraOn]);
+
+  async function openLiveCamera() {
+    setPromptOpen(false);
+    setPhotoError(null);
+    stopCamera();
+    const result = await requestCameraStream("environment");
+    if (!result.ok) {
+      // Try front camera if rear not available (desktops)
+      const fallback = await requestCameraStream("user");
+      if (!fallback.ok) {
+        setPhotoError(result.error);
+        return;
+      }
+      streamRef.current = fallback.stream;
+      setCameraOn(true);
+      return;
     }
+    streamRef.current = result.stream;
+    setCameraOn(true);
   }
 
   function pos(e: React.PointerEvent<HTMLCanvasElement>) {
@@ -310,9 +331,22 @@ export function SignaturePad({
         </>
       ) : (
         <div className="space-y-3">
+          <CameraPermissionPrompt
+            open={promptOpen}
+            title="Allow camera for signature photo"
+            description="We need camera access so you can photograph your handwritten signature. Your browser will ask you to Allow camera next — please choose Allow."
+            allowLabel="Continue & allow camera"
+            onAllow={() => void openLiveCamera()}
+            onUploadInstead={() => {
+              setPromptOpen(false);
+              fileRef.current?.click();
+            }}
+            onCancel={() => setPromptOpen(false)}
+          />
           <p className="text-xs text-muted-foreground">
-            Capture or upload a photo of your handwritten signature. It is
-            automatically cropped to a signature-sized frame.
+            Capture or upload a photo of your handwritten signature. Allow
+            camera when prompted. It is automatically cropped to a
+            signature-sized frame.
           </p>
           <div className="relative mx-auto aspect-[3/1] w-full max-w-lg overflow-hidden rounded-xl border border-dashed border-input bg-white">
             {cameraOn ? (
@@ -320,6 +354,7 @@ export function SignaturePad({
                 ref={videoRef}
                 playsInline
                 muted
+                autoPlay
                 className="size-full object-cover"
               />
             ) : photoPreview ? (
@@ -345,7 +380,10 @@ export function SignaturePad({
             {!cameraOn ? (
               <button
                 type="button"
-                onClick={() => void startCamera()}
+                onClick={() => {
+                  setPhotoError(null);
+                  setPromptOpen(true);
+                }}
                 className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white"
               >
                 Open camera
