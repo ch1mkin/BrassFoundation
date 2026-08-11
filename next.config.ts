@@ -6,7 +6,8 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), payment=(self)",
+    // camera=(self) required for membership selfie / signature capture
+    value: "camera=(self), microphone=(), geolocation=(), payment=(self)",
   },
   {
     key: "Strict-Transport-Security",

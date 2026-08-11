@@ -48,6 +48,12 @@ export async function requestCameraStream(
   }
 
   const attempts: MediaStreamConstraints[] = [
+    // Simplest first — works on more desktops / after permission grant
+    { audio: false, video: true },
+    {
+      audio: false,
+      video: { facingMode: facing },
+    },
     {
       audio: false,
       video: {
@@ -56,11 +62,6 @@ export async function requestCameraStream(
         height: { ideal: 720 },
       },
     },
-    {
-      audio: false,
-      video: { facingMode: facing },
-    },
-    { audio: false, video: true },
   ];
 
   let lastErr: unknown = null;
@@ -70,6 +71,14 @@ export async function requestCameraStream(
       return { ok: true, stream };
     } catch (err) {
       lastErr = err;
+      // If permission is hard-denied, further attempts won't help.
+      const name =
+        err && typeof err === "object" && "name" in err
+          ? String((err as DOMException).name)
+          : "";
+      if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+        break;
+      }
     }
   }
 
@@ -83,7 +92,7 @@ export async function requestCameraStream(
       ok: false,
       code: "denied",
       error:
-        "Camera permission was blocked. Allow camera access in your browser settings (or the prompt), then try again — or upload a photo instead.",
+        "Camera could not start. Tap Allow if your browser asks, check that this site can use the camera in browser settings, then try again — or use Phone camera / Upload from gallery.",
     };
   }
   if (name === "NotFoundError" || name === "DevicesNotFoundError") {
