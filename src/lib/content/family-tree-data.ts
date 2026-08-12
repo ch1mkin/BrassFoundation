@@ -6,7 +6,9 @@ export type FamilyTreePerson = {
   name: string;
   role: string;
   avatarUrl: string | null;
-  kind: "org" | "member" | "family";
+  kind: "org" | "member" | "referral";
+  /** Household members linked to this person (not shown as tree nodes). */
+  familyCount: number;
 };
 
 const ROOT_ID = "brass-root";
@@ -29,14 +31,12 @@ export async function loadFamilyTreePeople(): Promise<FamilyTreePerson[]> {
     admin
       .from("membership_applications")
       .select(
-        "id, user_id, full_name, membership_id, membership_type, status, photo_url",
+        "id, user_id, full_name, membership_id, membership_type, status, photo_url, referred_by_membership_id",
       )
       .order("created_at", { ascending: true }),
     admin
       .from("family_members")
-      .select(
-        "id, full_name, parent_user_id, parent_membership_id, membership_id, payment_status",
-      )
+      .select("id, parent_user_id, parent_membership_id")
       .order("created_at", { ascending: true }),
     admin.from("profiles").select("id, full_name, avatar_url"),
   ]);
@@ -62,6 +62,7 @@ export async function loadFamilyTreePeople(): Promise<FamilyTreePerson[]> {
       role: "Organization",
       avatarUrl: "/brand/logo.png",
       kind: "org",
+      familyCount: 0,
     });
   }
 
@@ -70,11 +71,13 @@ export async function loadFamilyTreePeople(): Promise<FamilyTreePerson[]> {
     if (node.profile_id) orgIdByProfile.set(node.profile_id, node.id);
     add({
       id: node.id,
-      parentId: node.parent_id || (orgRoot && node.id === orgRoot.id ? null : attachRootId),
+      parentId:
+        node.parent_id || (orgRoot && node.id === orgRoot.id ? null : attachRootId),
       name: node.full_name,
       role: node.role_title,
       avatarUrl: node.avatar_url,
       kind: "org",
+      familyCount: 0,
     });
   }
 
@@ -91,37 +94,44 @@ export async function loadFamilyTreePeople(): Promise<FamilyTreePerson[]> {
 
     const id = `member-${app.id}`;
     const profile = app.user_id ? profileById.get(app.user_id) : null;
+    const referrerId = app.referred_by_membership_id?.trim() || null;
+    const referrerNode = referrerId
+      ? memberNodeByMembership.get(referrerId)
+      : undefined;
+    const isReferral = Boolean(referrerNode && referrerNode !== id);
+
     add({
       id,
-      parentId: attachRootId,
+      parentId: isReferral ? referrerNode! : attachRootId,
       name: app.full_name || profile?.full_name || "Member",
-      role:
-        app.status === "approved"
+      role: isReferral
+        ? app.membership_id
+          ? `Referral · ${app.membership_id}`
+          : "Referral member"
+        : app.status === "approved"
           ? app.membership_id || "Member"
           : `${app.status || "pending"} application`,
       avatarUrl: profile?.avatar_url || app.photo_url || null,
-      kind: "member",
+      kind: isReferral ? "referral" : "member",
+      familyCount: 0,
     });
     if (app.user_id) memberNodeByUser.set(app.user_id, id);
     if (app.membership_id) memberNodeByMembership.set(app.membership_id, id);
   }
 
+  const familyCountByNode = new Map<string, number>();
   for (const fam of familyRes.data || []) {
-    const parentId =
+    const nodeId =
       (fam.parent_user_id && memberNodeByUser.get(fam.parent_user_id)) ||
       (fam.parent_membership_id &&
-        memberNodeByMembership.get(fam.parent_membership_id)) ||
-      attachRootId;
-    add({
-      id: `family-${fam.id}`,
-      parentId,
-      name: fam.full_name,
-      role: fam.membership_id
-        ? `Family · ${fam.membership_id}`
-        : `Family · ${fam.payment_status || "pending"}`,
-      avatarUrl: null,
-      kind: "family",
-    });
+        memberNodeByMembership.get(fam.parent_membership_id));
+    if (!nodeId) continue;
+    familyCountByNode.set(nodeId, (familyCountByNode.get(nodeId) || 0) + 1);
+  }
+
+  for (const person of people) {
+    const count = familyCountByNode.get(person.id) || 0;
+    if (count > 0) person.familyCount = count;
   }
 
   return people;

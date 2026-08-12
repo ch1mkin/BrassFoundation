@@ -55,9 +55,9 @@ export default async function AdminFamilyPage() {
           BRASS Foundation Family
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Every member and family household in one zoomable pyramid. Drag to
-          pan, scroll or use + / − to zoom. Leadership nodes can still be added
-          below.
+          Referrals appear as branches under the member who referred them.
+          Family households are shown as a count badge on each profile. Drag to
+          pan, scroll or use + / − to zoom.
         </p>
       </div>
 

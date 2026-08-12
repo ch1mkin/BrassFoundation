@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { cdnMediaUrl } from "@/lib/media/cdn";
 import type { FamilyTreePerson } from "@/lib/content/family-tree-data";
 import { cn } from "@/lib/utils";
@@ -83,22 +84,33 @@ function PersonCard({ node }: { node: LaidOut }) {
       className="absolute flex w-[132px] -translate-x-1/2 flex-col items-center text-center"
       style={{ left: node.x, top: node.y }}
     >
-      <div
-        className={cn(
-          "flex size-14 items-center justify-center overflow-hidden rounded-full border-2 bg-white shadow-md",
-          node.kind === "org"
-            ? "border-primary"
-            : node.kind === "family"
-              ? "border-gold"
-              : "border-white",
-        )}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={cdnMediaUrl(node.avatarUrl) || "/brand/logo.png"}
-          alt=""
-          className="size-full object-cover"
-        />
+      <div className="relative">
+        <div
+          className={cn(
+            "flex size-14 items-center justify-center overflow-hidden rounded-full border-2 bg-white shadow-md",
+            node.kind === "org"
+              ? "border-primary"
+              : node.kind === "referral"
+                ? "border-secondary"
+                : "border-white",
+          )}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={cdnMediaUrl(node.avatarUrl) || "/brand/logo.png"}
+            alt=""
+            className="size-full object-cover"
+          />
+        </div>
+        {node.familyCount > 0 ? (
+          <span
+            className="absolute -bottom-1 -right-1 flex items-center gap-0.5 rounded-full border-2 border-white bg-primary px-1.5 py-0.5 text-[10px] font-bold leading-none text-white shadow-md"
+            title={`${node.familyCount} family member${node.familyCount === 1 ? "" : "s"}`}
+          >
+            <MaterialIcon name="groups" className="text-[12px]" />
+            {node.familyCount}
+          </span>
+        ) : null}
       </div>
       <p className="mt-1.5 max-w-full truncate text-[11px] font-semibold leading-tight">
         {node.name}
@@ -214,7 +226,8 @@ export function FamilyTreeViewport({ people }: { people: FamilyTreePerson[] }) {
         <div>
           <p className="text-sm font-semibold">Family tree</p>
           <p className="text-xs text-muted-foreground">
-            {nodes.length} people · drag to pan · scroll to zoom
+            Referrals branch from their referrer · family size shown on profile ·
+            drag to pan · scroll to zoom
           </p>
         </div>
         <div className="flex items-center gap-2">
