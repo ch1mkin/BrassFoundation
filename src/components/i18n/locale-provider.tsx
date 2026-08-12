@@ -145,21 +145,25 @@ export function LocaleProvider({
     }
   }, []);
 
-  // Locale / route changes: one full translate pass behind the loader
+  // Locale / route changes: only show a loader when actually translating
+  // to Punjabi/Hindi. English is the default — never block the UI with
+  // the pen overlay on member/admin section switches.
   useEffect(() => {
+    const isFirst = skipInitialRouteTranslate.current;
+    skipInitialRouteTranslate.current = false;
+    const target = googleTranslateTarget(locale);
+
+    if (!target) {
+      restoreWritingContent();
+      setTranslating(false);
+      return;
+    }
+
     const observer = new MutationObserver(() => lockNonContentFromTranslate());
     observer.observe(document.body, { childList: true, subtree: true });
 
-    const isFirst = skipInitialRouteTranslate.current;
-    skipInitialRouteTranslate.current = false;
-
-    const target = googleTranslateTarget(locale);
-    // Loader when translating to PA/HI, restoring EN after first paint,
-    // or re-translating after navigation while in PA/HI.
-    const showLoader = Boolean(target) || (!isFirst && locale === "en");
-
     const timer = window.setTimeout(() => {
-      void runTranslate(locale, showLoader);
+      void runTranslate(locale, true);
     }, isFirst ? 120 : 40);
 
     return () => {
