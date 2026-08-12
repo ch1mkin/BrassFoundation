@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { cache } from "react";
 import type { Role, UserSessionContext } from "@/types/database";
 
 export async function getSessionUser() {
@@ -9,7 +10,8 @@ export async function getSessionUser() {
   return user;
 }
 
-export async function getUserContext(): Promise<UserSessionContext | null> {
+/** Deduped per request so layout + page don't fetch session twice. */
+export const getUserContext = cache(async (): Promise<UserSessionContext | null> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -72,7 +74,7 @@ export async function getUserContext(): Promise<UserSessionContext | null> {
     roles,
     permissions,
   };
-}
+});
 
 export function hasPermission(
   context: UserSessionContext | null,

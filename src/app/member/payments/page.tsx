@@ -23,7 +23,7 @@ export default async function MemberPaymentsPage() {
     .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(40);
 
   const { data: mandates } = await supabase
     .from("payment_mandates")

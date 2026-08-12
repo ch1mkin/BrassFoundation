@@ -69,7 +69,7 @@ export default async function MemberReferralsPage() {
       )
       .eq("referred_by_membership_id", membershipId)
       .order("created_at", { ascending: false })
-      .limit(500);
+      .limit(200);
 
     const rows = data || [];
     const userIds = rows
@@ -101,9 +101,9 @@ export default async function MemberReferralsPage() {
 
     const { data: allReferred } = await admin
       .from("membership_applications")
-      .select("referred_by_membership_id, user_id, full_name")
+      .select("referred_by_membership_id, user_id")
       .not("referred_by_membership_id", "is", null)
-      .limit(5000);
+      .limit(1500);
 
     const refMap = new Map<
       string,
@@ -125,7 +125,7 @@ export default async function MemberReferralsPage() {
       const { data: mandates } = await admin
         .from("payment_mandates")
         .select("user_id, status")
-        .in("user_id", allUids.slice(0, 2000));
+        .in("user_id", allUids.slice(0, 400));
       for (const m of mandates || []) {
         if (
           m.user_id &&

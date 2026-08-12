@@ -66,7 +66,7 @@ export default async function MemberDashboardPage() {
       .select("id, full_name, payment_status, membership_id, age")
       .eq("parent_user_id", userId)
       .order("created_at", { ascending: true })
-      .limit(50);
+      .limit(20);
     familyMembers = data || [];
   }
 
