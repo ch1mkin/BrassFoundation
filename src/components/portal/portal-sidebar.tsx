@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand/logo";
@@ -150,7 +149,6 @@ export function PortalSidebar({
       <nav className="mt-6 max-h-[calc(100svh-12rem)] flex-1 space-y-0.5 overflow-y-auto">
         {nav.map((item, index) => {
           const active = index === activeIndex;
-          const isHashOnly = item.href.includes("#");
           const className = cn(
             "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors",
             collapsed && "justify-center px-2",
@@ -158,33 +156,16 @@ export function PortalSidebar({
               ? "bg-primary/10 font-semibold text-primary"
               : "text-muted-foreground hover:bg-surface-low hover:text-foreground",
           );
-          const inner = (
-            <>
-              <MaterialIcon name={item.icon} className="text-[18px]" />
-              {!collapsed ? <span className="truncate">{item.label}</span> : null}
-            </>
-          );
-          return isHashOnly ? (
+          return (
             <a
               key={`${item.label}-${item.href}`}
               href={item.href}
               title={item.label}
               className={className}
-              onClick={() => setMobileOpen(false)}
             >
-              {inner}
+              <MaterialIcon name={item.icon} className="text-[18px]" />
+              {!collapsed ? <span className="truncate">{item.label}</span> : null}
             </a>
-          ) : (
-            <Link
-              key={`${item.label}-${item.href}`}
-              href={item.href}
-              title={item.label}
-              prefetch
-              className={className}
-              onClick={() => setMobileOpen(false)}
-            >
-              {inner}
-            </Link>
           );
         })}
       </nav>

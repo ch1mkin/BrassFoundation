@@ -10,7 +10,6 @@ import {
   useState,
 } from "react";
 import { usePathname } from "next/navigation";
-import { PageLoader } from "@/components/brand/page-loader";
 import {
   DEFAULT_LOCALE,
   GOOGTRANS_COOKIE,
@@ -66,12 +65,6 @@ function applyDocumentLocale(locale: Locale) {
   document.documentElement.classList.toggle("locale-pa", locale === "pa");
   document.documentElement.classList.toggle("locale-hi", locale === "hi");
   document.documentElement.classList.toggle("locale-en", locale === "en");
-}
-
-function loaderLabel(locale: Locale) {
-  if (locale === "pa") return "Translating to ਪੰਜਾਬੀ…";
-  if (locale === "hi") return "Translating to हिन्दी…";
-  return "Restoring English…";
 }
 
 export function LocaleProvider({
@@ -183,13 +176,6 @@ export function LocaleProvider({
   return (
     <LocaleContext.Provider value={value}>
       {children}
-      {translating ? (
-        <PageLoader
-          fullScreen
-          label={loaderLabel(locale)}
-          className="z-[500] bg-background/90"
-        />
-      ) : null}
     </LocaleContext.Provider>
   );
 }

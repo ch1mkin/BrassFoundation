@@ -1,17 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * Next.js Link that always does a full page navigation.
- * Soft client routing has been unreliable on this site (mobile overlays / i18n).
+ * Native full-page navigation. Next.js client routing on this site often
+ * shows a loader then stays on the same section when the RSC fetch aborts.
  */
 export function HardNavLink({
   href,
   className,
   children,
-  onClick,
   ...rest
 }: {
   href: string;
@@ -19,19 +17,8 @@ export function HardNavLink({
   children: React.ReactNode;
 } & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">) {
   return (
-    <Link
-      href={href}
-      prefetch={false}
-      className={cn("touch-manipulation", className)}
-      onClick={(e) => {
-        onClick?.(e);
-        if (e.defaultPrevented) return;
-        e.preventDefault();
-        window.location.assign(href);
-      }}
-      {...rest}
-    >
+    <a href={href} className={cn("touch-manipulation", className)} {...rest}>
       {children}
-    </Link>
+    </a>
   );
 }
