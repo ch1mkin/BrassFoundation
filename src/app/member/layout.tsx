@@ -39,7 +39,7 @@ export default async function MemberLayout({
           nav={NAV}
           storageKey="bf-member-sidebar-collapsed"
         />
-        <main className="min-w-0 flex-1 p-6 pt-16 sm:p-8 md:pt-8">
+        <main className="relative z-0 min-w-0 flex-1 p-6 pt-16 sm:p-8 md:pt-8">
           {children}
         </main>
       </div>

@@ -6,6 +6,7 @@ import { BrandLogo } from "@/components/brand/logo";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { cdnMediaUrl } from "@/lib/media/cdn";
+import { handleHardNavClick } from "@/lib/nav/hard-navigate";
 import { cn } from "@/lib/utils";
 
 type NavItem = {
@@ -88,7 +89,7 @@ export function PortalSidebar({
   const aside = (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-border/40 bg-white p-4 transition-all duration-200",
+        "relative z-30 flex h-full min-h-[100svh] flex-col border-r border-border/40 bg-white p-4 transition-all duration-200",
         collapsed ? "w-[72px]" : "w-64",
       )}
     >
@@ -150,7 +151,7 @@ export function PortalSidebar({
         {nav.map((item, index) => {
           const active = index === activeIndex;
           const className = cn(
-            "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors",
+            "relative z-30 flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors",
             collapsed && "justify-center px-2",
             active
               ? "bg-primary/10 font-semibold text-primary"
@@ -162,6 +163,7 @@ export function PortalSidebar({
               href={item.href}
               title={item.label}
               className={className}
+              onClick={(e) => handleHardNavClick(e, item.href)}
             >
               <MaterialIcon name={item.icon} className="text-[18px]" />
               {!collapsed ? <span className="truncate">{item.label}</span> : null}
@@ -200,7 +202,9 @@ export function PortalSidebar({
         </button>
       </div>
 
-      <div className="hidden md:block">{aside}</div>
+      <div className="relative z-30 hidden shrink-0 self-stretch md:block">
+        {aside}
+      </div>
 
       {mobileOpen ? (
         <div className="fixed inset-0 z-50 md:hidden">

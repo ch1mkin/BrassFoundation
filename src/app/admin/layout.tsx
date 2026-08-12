@@ -73,7 +73,7 @@ export default async function AdminLayout({
           nav={NAV}
           storageKey="bf-admin-sidebar-collapsed"
         />
-        <main className="relative z-10 min-w-0 flex-1 p-6 pt-16 sm:p-8 md:pt-8">
+        <main className="relative z-0 min-w-0 flex-1 p-6 pt-16 sm:p-8 md:pt-8">
           {children}
         </main>
       </div>

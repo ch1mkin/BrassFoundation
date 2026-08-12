@@ -127,15 +127,11 @@ export function LocaleProvider({
   // to Punjabi/Hindi. English is the default — never block the UI with
   // the pen overlay on member/admin section switches.
   useEffect(() => {
+    const target = googleTranslateTarget(locale);
+    if (!target) return;
+
     const isFirst = skipInitialRouteTranslate.current;
     skipInitialRouteTranslate.current = false;
-    const target = googleTranslateTarget(locale);
-
-    if (!target) {
-      restoreWritingContent();
-      setTranslating(false);
-      return;
-    }
 
     const observer = new MutationObserver(() => lockNonContentFromTranslate());
     observer.observe(document.body, { childList: true, subtree: true });
