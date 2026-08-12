@@ -1,60 +1,89 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AdminMembersTable } from "@/components/admin/admin-members-table";
 import { MembershipStatCards } from "@/components/admin/membership-stat-cards";
-import { MemberStatusForm } from "@/components/membership/member-status-form";
-import { MembershipReviewActions } from "@/components/membership/review-actions";
-import { MembershipQr } from "@/components/membership/membership-qr";
 import { buttonVariants } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import {
   getMembershipStats,
   isPaidFamilyStatus,
   isUnpaidFamilyStatus,
 } from "@/lib/membership/member-count";
-import { membershipTypeLabels } from "@/lib/membership/schema";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Membership Requests",
+  title: "Members",
 };
 
-export default async function AdminMembersPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>;
-}) {
-  const { q } = await searchParams;
-  const supabase = await createClient();
-  const stats = await getMembershipStats();
+async function loadAllApplications() {
+  const pageSize = 1000;
+  const rows: Array<{
+    id: string;
+    user_id: string | null;
+    full_name: string;
+    email: string;
+    phone: string | null;
+    membership_type: string;
+    status: string;
+    member_status: string | null;
+    district: string | null;
+    state: string | null;
+    membership_id: string | null;
+    payment_status: string | null;
+    created_at: string;
+  }> = [];
 
-  let query = supabase
-    .from("membership_applications")
-    .select(
-      "id, user_id, full_name, email, phone, membership_type, status, member_status, district, state, membership_id, payment_status, created_at",
-    )
-    .order("created_at", { ascending: false });
-
-  const term = q?.trim();
-  if (term) {
-    const pattern = `%${term}%`;
-    query = query.or(
-      `full_name.ilike.${pattern},email.ilike.${pattern},phone.ilike.${pattern},membership_id.ilike.${pattern},district.ilike.${pattern},state.ilike.${pattern}`,
-    );
+  let supabase;
+  try {
+    supabase = createServiceClient();
+  } catch {
+    supabase = await createClient();
   }
 
-  const { data, error } = await query.limit(term ? 200 : 100);
+  for (let from = 0; from < 20_000; from += pageSize) {
+    const { data, error } = await supabase
+      .from("membership_applications")
+      .select(
+        "id, user_id, full_name, email, phone, membership_type, status, member_status, district, state, membership_id, payment_status, created_at",
+      )
+      .order("created_at", { ascending: false })
+      .range(from, from + pageSize - 1);
+    if (error) throw error;
+    if (!data?.length) break;
+    rows.push(...data);
+    if (data.length < pageSize) break;
+  }
+  return rows;
+}
 
-  // Family paid/unpaid counts keyed by parent membership ID and parent user ID
-  const admin = createServiceClient();
-  const { data: familyRows } = await admin
-    .from("family_members")
-    .select("parent_membership_id, parent_user_id, payment_status");
+export default async function AdminMembersPage() {
+  const stats = await getMembershipStats();
+  let errorMessage: string | null = null;
+  let applications: Awaited<ReturnType<typeof loadAllApplications>> = [];
 
-  const familyByParent = new Map<
-    string,
-    { paid: number; unpaid: number }
-  >();
+  try {
+    applications = await loadAllApplications();
+  } catch (err) {
+    errorMessage = err instanceof Error ? err.message : "Could not load members.";
+  }
+
+  let familyRows: Array<{
+    parent_membership_id: string | null;
+    parent_user_id: string | null;
+    payment_status: string | null;
+  }> = [];
+  try {
+    const admin = createServiceClient();
+    const { data } = await admin
+      .from("family_members")
+      .select("parent_membership_id, parent_user_id, payment_status");
+    familyRows = data || [];
+  } catch {
+    familyRows = [];
+  }
+
+  const familyByParent = new Map<string, { paid: number; unpaid: number }>();
   for (const row of familyRows || []) {
     const keys = [row.parent_membership_id, row.parent_user_id].filter(
       Boolean,
@@ -67,30 +96,26 @@ export default async function AdminMembersPage({
     }
   }
 
-  function familyFor(row: {
-    membership_id: string | null;
-    user_id: string | null;
-  }) {
+  const rows = applications.map((row) => {
     const byId = row.membership_id
       ? familyByParent.get(row.membership_id)
       : null;
     const byUser = row.user_id ? familyByParent.get(row.user_id) : null;
     return {
-      paid: Math.max(byId?.paid || 0, byUser?.paid || 0),
-      unpaid: Math.max(byId?.unpaid || 0, byUser?.unpaid || 0),
+      ...row,
+      familyPaid: Math.max(byId?.paid || 0, byUser?.paid || 0),
+      familyUnpaid: Math.max(byId?.unpaid || 0, byUser?.unpaid || 0),
     };
-  }
+  });
 
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-heading text-3xl font-semibold">
-            Membership Requests
-          </h1>
+          <h1 className="font-heading text-3xl font-semibold">Members</h1>
           <p className="mt-2 text-muted-foreground">
-            Approve members, issue QR membership IDs, and update leave status.
-            Totals match the public live membership counter.
+            Every membership application. Search and filter without leaving this
+            page. Approve requests, issue IDs, and update leave status.
           </p>
         </div>
         <Link
@@ -105,136 +130,12 @@ export default async function AdminMembersPage({
         <MembershipStatCards {...stats} />
       </div>
 
-      <form className="glass-card mt-6 flex flex-wrap gap-3 rounded-2xl p-4">
-        <input
-          name="q"
-          defaultValue={term || ""}
-          placeholder="Search name, email, phone, membership ID…"
-          className="h-11 min-w-[220px] flex-1 rounded-xl border border-input bg-white px-3 text-sm"
-        />
-        <button
-          type="submit"
-          className="h-11 rounded-xl bg-primary px-5 text-sm font-semibold text-white"
-        >
-          Search
-        </button>
-        {term ? (
-          <Link
-            href="/admin/members"
-            className={cn(
-              buttonVariants({ variant: "outline" }),
-              "h-11 rounded-xl",
-            )}
-          >
-            Clear
-          </Link>
-        ) : null}
-      </form>
-
-      {error ? (
+      {errorMessage ? (
         <p className="mt-8 glass-card rounded-2xl p-6 text-sm text-destructive">
-          Could not load applications. ({error.message})
-        </p>
-      ) : !data?.length ? (
-        <p className="mt-8 glass-card rounded-2xl p-6 text-muted-foreground">
-          {term ? "No members matched your search." : "No applications yet."}
+          Could not load applications. ({errorMessage})
         </p>
       ) : (
-        <div className="mt-8 overflow-x-auto rounded-2xl bg-white shadow-soft">
-          <table className="w-full min-w-[980px] text-left text-sm">
-            <thead className="border-b border-border text-xs tracking-wide text-muted-foreground uppercase">
-              <tr>
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Type</th>
-                <th className="px-4 py-3 font-medium">ID / QR</th>
-                <th className="px-4 py-3 font-medium">Family</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((row) => {
-                const family = familyFor(row);
-                return (
-                  <tr
-                    key={row.id}
-                    className="border-b border-border/70 last:border-0"
-                  >
-                    <td className="px-4 py-3">
-                      <p className="font-medium">{row.full_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {row.phone || row.email}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {[row.district, row.state].filter(Boolean).join(", ")}
-                      </p>
-                    </td>
-                    <td className="px-4 py-3">
-                      {membershipTypeLabels[
-                        row.membership_type as keyof typeof membershipTypeLabels
-                      ] ?? row.membership_type}
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="font-mono text-xs">
-                        {row.membership_id || "—"}
-                      </p>
-                      {row.membership_id ? (
-                        <div className="mt-2 inline-block rounded-lg bg-white p-1">
-                          <MembershipQr
-                            membershipId={row.membership_id}
-                            size={72}
-                          />
-                        </div>
-                      ) : null}
-                    </td>
-                    <td className="px-4 py-3 text-xs">
-                      {family.paid === 0 && family.unpaid === 0 ? (
-                        <span className="text-muted-foreground">None</span>
-                      ) : (
-                        <div className="space-y-1">
-                          <p>
-                            <span className="font-semibold text-success">
-                              {family.paid} paid
-                            </span>
-                          </p>
-                          <p>
-                            <span className="font-semibold text-amber-700">
-                              {family.unpaid} unpaid
-                            </span>
-                          </p>
-                          <Link
-                            href="/admin/family-members"
-                            className="text-primary underline"
-                          >
-                            View
-                          </Link>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="text-xs capitalize">{row.status}</p>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        Member: {row.member_status || "active"}
-                      </p>
-                      {row.status === "approved" || row.membership_id ? (
-                        <MemberStatusForm
-                          applicationId={row.id}
-                          currentStatus={row.member_status}
-                        />
-                      ) : null}
-                    </td>
-                    <td className="px-4 py-3">
-                      <MembershipReviewActions
-                        applicationId={row.id}
-                        status={row.status}
-                      />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <AdminMembersTable rows={rows} />
       )}
     </>
   );

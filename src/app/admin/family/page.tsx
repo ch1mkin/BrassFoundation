@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
 import { AdminLockedForm } from "@/components/admin/admin-locked-form";
+import { FamilyTreeViewport } from "@/components/admin/family-tree-viewport";
 import { FileOrUrlField } from "@/components/admin/file-or-url-field";
 import { MembershipStatCards } from "@/components/admin/membership-stat-cards";
-import { OrgTree } from "@/components/admin/org-tree";
 import {
   deleteOrgNodeAction,
   upsertOrgNodeFormAction,
 } from "@/lib/content/gallery-org-actions";
+import { loadFamilyTreePeople } from "@/lib/content/family-tree-data";
 import { getMembershipStats } from "@/lib/membership/member-count";
 import { createClient } from "@/lib/supabase/server";
 
@@ -15,13 +16,18 @@ export const metadata: Metadata = { title: "Admin · Family" };
 
 export default async function AdminFamilyPage() {
   const supabase = await createClient();
-  const stats = await getMembershipStats();
-  const { data: rawNodes, error } = await supabase
-    .from("org_nodes")
-    .select(
-      "id, parent_id, full_name, role_title, avatar_url, sort_order, is_active, profile_id, profiles ( avatar_url )",
-    )
-    .order("sort_order", { ascending: true });
+  const [stats, treePeople, orgResult] = await Promise.all([
+    getMembershipStats(),
+    loadFamilyTreePeople().catch(() => []),
+    supabase
+      .from("org_nodes")
+      .select(
+        "id, parent_id, full_name, role_title, avatar_url, sort_order, is_active, profile_id, profiles ( avatar_url )",
+      )
+      .order("sort_order", { ascending: true }),
+  ]);
+
+  const { data: rawNodes, error } = orgResult;
 
   const nodes = (rawNodes || []).map((node) => {
     const linked = node.profiles as
@@ -49,9 +55,9 @@ export default async function AdminFamilyPage() {
           BRASS Foundation Family
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Organization tree for screenshots — profile images as nodes, names and
-          roles in compact labels. Membership totals include primary members and
-          paid family members (same as the public live counter).
+          Every member and family household in one zoomable pyramid. Drag to
+          pan, scroll or use + / − to zoom. Leadership nodes can still be added
+          below.
         </p>
       </div>
 
@@ -62,9 +68,9 @@ export default async function AdminFamilyPage() {
           Run <code>20260801050000_uploads_org_gallery.sql</code>. (
           {error.message})
         </p>
-      ) : (
-        <OrgTree nodes={nodes || []} />
-      )}
+      ) : null}
+
+      <FamilyTreeViewport people={treePeople} />
 
       <div className="grid gap-8 lg:grid-cols-2">
         <div className="glass-card space-y-4 rounded-2xl p-6">
