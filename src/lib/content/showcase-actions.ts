@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustPublicCmsCache } from "@/lib/cache/public";
 import { createClient } from "@/lib/supabase/server";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import type { ContentActionState } from "@/lib/content/utils";
@@ -31,6 +32,7 @@ export async function upsertAchieverAction(
     : await supabase.from("achievers").insert(payload);
 
   if (error) return { error: error.message };
+  bustPublicCmsCache();
   revalidatePath("/achievers");
   revalidatePath("/admin/achievers");
   return { success: id ? "Achiever updated." : "Achiever added." };
@@ -47,6 +49,7 @@ export async function deleteAchieverAction(
   const supabase = await createClient();
   const { error } = await supabase.from("achievers").delete().eq("id", id);
   if (error) return { error: error.message };
+  bustPublicCmsCache();
   revalidatePath("/achievers");
   revalidatePath("/admin/achievers");
   return { success: "Achiever deleted." };
@@ -80,6 +83,7 @@ export async function upsertBrochureAction(
     : await supabase.from("organisation_brochures").insert(payload);
 
   if (error) return { error: error.message };
+  bustPublicCmsCache();
   revalidatePath("/brochure");
   revalidatePath("/admin/brochure");
   return { success: id ? "Brochure updated." : "Brochure published." };
@@ -99,6 +103,7 @@ export async function deleteBrochureAction(
     .delete()
     .eq("id", id);
   if (error) return { error: error.message };
+  bustPublicCmsCache();
   revalidatePath("/brochure");
   revalidatePath("/admin/brochure");
   return { success: "Brochure deleted." };

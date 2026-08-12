@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { bustMemberCountCache, bustPublicCmsCache } from "@/lib/cache/public";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { attachMemberToOrgTree } from "@/lib/content/attach-org-member";
@@ -138,6 +139,8 @@ export async function POST(request: Request) {
       revalidatePath("/admin/family");
       revalidatePath("/admin/referrals");
       revalidatePath("/member");
+      bustMemberCountCache();
+      bustPublicCmsCache();
       revalidatePath("/");
 
       return NextResponse.json({
@@ -187,6 +190,8 @@ export async function POST(request: Request) {
 
       revalidatePath("/member/family");
       revalidatePath("/admin/family-members");
+      bustMemberCountCache();
+      bustPublicCmsCache();
       revalidatePath("/");
 
       return NextResponse.json({
@@ -240,6 +245,8 @@ export async function POST(request: Request) {
       revalidatePath("/admin/book-purchases");
       revalidatePath("/member/books");
       revalidatePath("/marketplace");
+      bustMemberCountCache();
+      bustPublicCmsCache();
       revalidatePath("/");
 
       return NextResponse.json({

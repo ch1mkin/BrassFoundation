@@ -12,6 +12,7 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { NAV_ITEMS, SITE, type NavItem } from "@/lib/constants";
 import { NAV_MESSAGE_KEYS } from "@/lib/i18n/messages";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 import { cn } from "@/lib/utils";
 
 /** Plain anchors — full navigation always works. */
@@ -210,7 +211,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                   {user.avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={user.avatarUrl}
+                      src={cdnMediaUrl(user.avatarUrl)}
                       alt=""
                       className="size-full object-cover"
                     />
@@ -334,7 +335,7 @@ export function SiteHeader({ user }: { user: HeaderUser | null }) {
                         {user.avatarUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={user.avatarUrl}
+                            src={cdnMediaUrl(user.avatarUrl)}
                             alt=""
                             className="size-full object-cover"
                           />

@@ -1,4 +1,6 @@
+import { unstable_cache } from "next/cache";
 import { createServiceClient } from "@/lib/supabase/admin";
+import { MEMBER_COUNT_TAG } from "@/lib/cache/public";
 
 /** Staff / admin portal roles — never counted as public members. */
 const ADMIN_ROLE_SLUGS = [
@@ -66,7 +68,13 @@ async function getAdminUserIds(): Promise<Set<string>> {
 /**
  * Breakdown used by homepage live counter and admin dashboards.
  */
-export async function getMembershipStats(): Promise<MembershipStats> {
+export const getMembershipStats = unstable_cache(
+  loadMembershipStats,
+  ["membership-stats"],
+  { revalidate: 60, tags: [MEMBER_COUNT_TAG] },
+);
+
+async function loadMembershipStats(): Promise<MembershipStats> {
   const empty: MembershipStats = {
     primaryMembers: 0,
     paidFamilyMembers: 0,

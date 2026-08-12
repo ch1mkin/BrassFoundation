@@ -1,4 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
+import { PUBLIC_CMS_TAG } from "@/lib/cache/public";
 import { EXECUTIVE_COMMITTEE } from "@/lib/constants";
 
 export type ExecutiveMember = {
@@ -9,9 +11,10 @@ export type ExecutiveMember = {
   sort_order: number;
 };
 
-export async function getExecutiveCommittee(): Promise<ExecutiveMember[]> {
+export const getExecutiveCommittee = unstable_cache(
+  async (): Promise<ExecutiveMember[]> => {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("executive_committee")
       .select("id, full_name, role_title, photo_url, sort_order")
@@ -38,4 +41,7 @@ export async function getExecutiveCommittee(): Promise<ExecutiveMember[]> {
       sort_order: i + 1,
     }));
   }
-}
+  },
+  ["executive-committee"],
+  { revalidate: 120, tags: [PUBLIC_CMS_TAG] },
+);

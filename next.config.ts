@@ -26,6 +26,7 @@ const nextConfig: NextConfig = {
     "/*": ["./public/brand/logo.png"],
   },
   images: {
+    minimumCacheTTL: 60 * 60 * 24 * 31,
     remotePatterns: [
       {
         protocol: "https",

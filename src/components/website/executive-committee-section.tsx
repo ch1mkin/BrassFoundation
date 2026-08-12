@@ -6,9 +6,8 @@ import {
   GoldHairline,
   SectionOrnaments,
 } from "@/components/website/premium-accents";
-import { InstantImg, preloadImages } from "@/components/website/instant-img";
+import { InstantImg } from "@/components/website/instant-img";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
 
 function initialsFor(name: string) {
   return name
@@ -197,13 +196,6 @@ export function LeadershipSection({
 
   const sizes = pyramidRowSizes(rest.length);
   const rows = splitIntoRows(rest, sizes);
-
-  const photoKey = members.map((m) => m.photo_url || "").join("|");
-
-  useEffect(() => {
-    preloadImages(members.map((m) => m.photo_url));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by photoKey
-  }, [photoKey]);
 
   return (
     <section

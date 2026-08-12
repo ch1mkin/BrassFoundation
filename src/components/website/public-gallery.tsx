@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { InstantImg, preloadImages } from "@/components/website/instant-img";
+import { useEffect, useState } from "react";
+import { InstantImg } from "@/components/website/instant-img";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 import { cn } from "@/lib/utils";
 
 type Album = {
@@ -30,14 +31,6 @@ export function PublicGallery({
   media: Media[];
 }) {
   const [lightbox, setLightbox] = useState<Media | null>(null);
-  const mediaKey = useMemo(
-    () => media.map((m) => m.media_url).join("|"),
-    [media],
-  );
-
-  useEffect(() => {
-    preloadImages(media.map((m) => m.media_url));
-  }, [mediaKey, media]);
 
   useEffect(() => {
     if (!lightbox) return;
@@ -114,7 +107,7 @@ export function PublicGallery({
                     <InstantImg
                       src={item.media_url}
                       alt={item.title || item.caption || "Gallery"}
-                      priority={i < 8}
+                      priority={i < 4}
                       className="w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
@@ -147,7 +140,7 @@ export function PublicGallery({
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={lightbox.media_url}
+            src={cdnMediaUrl(lightbox.media_url)}
             alt={lightbox.title || lightbox.caption || "Gallery"}
             className="max-h-[88vh] max-w-[94vw] rounded-xl object-contain shadow-2xl"
             onClick={(e) => e.stopPropagation()}

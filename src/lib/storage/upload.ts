@@ -38,6 +38,7 @@ export async function uploadAdminFile(
     const { error } = await admin.storage.from(bucket).upload(path, bytes, {
       contentType: file.type || "application/octet-stream",
       upsert: false,
+      cacheControl: "31536000",
     });
     if (error) return { ok: false, error: error.message };
 
@@ -49,6 +50,7 @@ export async function uploadAdminFile(
     const { error } = await supabase.storage.from(bucket).upload(path, bytes, {
       contentType: file.type || "application/octet-stream",
       upsert: false,
+      cacheControl: "31536000",
     });
     if (error) {
       return {

@@ -1,4 +1,7 @@
+import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
+import { PUBLIC_CMS_TAG } from "@/lib/cache/public";
 import { DEFAULT_RESOURCE_CATEGORIES } from "@/lib/constants";
 
 export type ResourceCategoryRow = {
@@ -15,8 +18,25 @@ export type ResourceCategoryRow = {
 export async function getResourceCategories(
   includeUnpublished = false,
 ): Promise<ResourceCategoryRow[]> {
+  if (includeUnpublished) {
+    return loadResourceCategories(true);
+  }
+  return loadPublishedResourceCategories();
+}
+
+const loadPublishedResourceCategories = unstable_cache(
+  () => loadResourceCategories(false),
+  ["resource-categories-published"],
+  { revalidate: 120, tags: [PUBLIC_CMS_TAG] },
+);
+
+async function loadResourceCategories(
+  includeUnpublished: boolean,
+): Promise<ResourceCategoryRow[]> {
   try {
-    const supabase = await createClient();
+    const supabase = includeUnpublished
+      ? await createClient()
+      : createPublicClient();
     let query = supabase
       .from("resource_categories")
       .select(

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustPublicCmsCache } from "@/lib/cache/public";
 import { createClient } from "@/lib/supabase/server";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import { ContentActionState, slugify } from "@/lib/content/utils";
@@ -64,6 +65,7 @@ export async function upsertResourceCategoryAction(
   revalidatePath("/admin/resources");
   revalidatePath("/resources");
   revalidatePath(`/resources/${slug}`);
+  bustPublicCmsCache();
   revalidatePath("/");
   return { success: "Category saved." };
 }
@@ -90,6 +92,7 @@ export async function deleteResourceCategoryAction(
 
   revalidatePath("/admin/resources");
   revalidatePath("/resources");
+  bustPublicCmsCache();
   revalidatePath("/");
   return { success: "Category deleted." };
 }

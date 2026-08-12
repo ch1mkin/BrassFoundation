@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import { compressImageForUpload } from "@/lib/storage/compress-image";
 
 export type UploadBucket = "gallery" | "resources" | "marketplace" | "avatars";
 
@@ -51,7 +52,8 @@ export async function uploadFileClient(
       return { ok: false, error: "Please sign in again, then retry the upload." };
     }
 
-    const ext = extFromName(file.name);
+    const fileToUpload = await compressImageForUpload(file, bucket);
+    const ext = extFromName(fileToUpload.name);
     const allowedExt = [
       "jpg",
       "jpeg",
@@ -65,25 +67,25 @@ export async function uploadFileClient(
     ];
     let safeExt = allowedExt.includes(ext) ? ext : "bin";
     if (safeExt === "bin") {
-      if (file.type.startsWith("image/")) safeExt = "jpg";
-      else if (file.type === "audio/mpeg" || file.type === "audio/mp3")
+      if (fileToUpload.type.startsWith("image/")) safeExt = "jpg";
+      else if (fileToUpload.type === "audio/mpeg" || fileToUpload.type === "audio/mp3")
         safeExt = "mp3";
-      else if (file.type === "application/pdf") safeExt = "pdf";
+      else if (fileToUpload.type === "application/pdf") safeExt = "pdf";
     }
     const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`;
 
     const contentType =
-      file.type ||
+      fileToUpload.type ||
       (safeExt === "pdf"
         ? "application/pdf"
         : safeExt === "mp3" || safeExt === "mpeg"
           ? "audio/mpeg"
           : `image/${safeExt === "jpg" ? "jpeg" : safeExt}`);
 
-    const { error } = await supabase.storage.from(bucket).upload(path, file, {
+    const { error } = await supabase.storage.from(bucket).upload(path, fileToUpload, {
       contentType,
       upsert: false,
-      cacheControl: "3600",
+      cacheControl: "31536000",
     });
 
     if (error) {

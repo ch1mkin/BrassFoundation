@@ -25,7 +25,7 @@ export async function uploadAvatarFromDataUrl(
   const { error } = await admin.storage.from("avatars").upload(path, buffer, {
     contentType,
     upsert: true,
-    cacheControl: "3600",
+    cacheControl: "31536000",
   });
   if (error) return null;
 

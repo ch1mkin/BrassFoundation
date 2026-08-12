@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustMemberCountCache } from "@/lib/cache/public";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { MEMBERSHIP_CONSENT_VERSION } from "@/lib/membership/consent";
@@ -290,6 +291,7 @@ export async function registerMembershipAction(
     return { error: ensured.error };
   }
 
+  bustMemberCountCache();
   revalidatePath("/member");
   revalidatePath("/member/referrals");
   revalidatePath("/membership");

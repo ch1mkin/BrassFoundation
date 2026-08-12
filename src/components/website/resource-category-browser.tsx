@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { InstantImg } from "@/components/website/instant-img";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import type { ResourceCategoryRow } from "@/lib/content/resource-categories";
 import type { ResourceRow } from "@/lib/content/queries";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 import { cn } from "@/lib/utils";
 
 const TYPE_FILTERS = [
@@ -124,7 +126,9 @@ export function ResourceCategoryBrowser({
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((item) => {
-            const href = item.file_url || item.external_url;
+            const href = item.file_url
+              ? cdnMediaUrl(item.file_url)
+              : item.external_url;
             const tone =
               item.tone in toneClass
                 ? (item.tone as keyof typeof toneClass)
@@ -138,8 +142,7 @@ export function ResourceCategoryBrowser({
                   )}
                 >
                   {item.thumbnail_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <InstantImg
                       src={item.thumbnail_url}
                       alt={item.title}
                       className="max-h-full max-w-full object-contain"

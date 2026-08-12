@@ -106,21 +106,6 @@ export function LocaleProvider({
     setTranslations(initialTranslations);
   }, [initialTranslations]);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/i18n/translations")
-      .then((r) => r.json())
-      .then((data) => {
-        if (!cancelled && data?.translations) {
-          setTranslations(data.translations);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   const runTranslate = useCallback(async (next: Locale, showLoader: boolean) => {
     const gen = ++translateGen.current;
     clearGoogleTranslateArtifacts();

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustPublicCmsCache } from "@/lib/cache/public";
 import { createClient } from "@/lib/supabase/server";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import { clampHeroFocus, clampHeroZoom } from "@/lib/cms/hero-frame";
@@ -64,6 +65,7 @@ function extractMissingColumn(message: string): string | null {
 }
 
 function revalidateHomepage() {
+  bustPublicCmsCache();
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/admin/website");

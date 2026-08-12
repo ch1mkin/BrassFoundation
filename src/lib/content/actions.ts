@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustPublicCmsCache } from "@/lib/cache/public";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
@@ -108,6 +109,7 @@ export async function registerForEventAction(
   revalidatePath(`/events/${event.slug}`);
   revalidatePath("/events");
   revalidatePath("/admin/events");
+  bustPublicCmsCache();
   revalidatePath("/");
   return { success: "You are registered. Check your email for confirmation." };
 }
@@ -222,6 +224,7 @@ export async function upsertEventAction(
 
   if (error) return { error: error.message };
 
+  bustPublicCmsCache();
   revalidatePath("/");
   revalidatePath("/events");
   revalidatePath("/admin/events");
@@ -243,6 +246,7 @@ export async function deleteEventAction(
   const { error } = await supabase.from("events").delete().eq("id", id);
   if (error) return { error: error.message };
 
+  bustPublicCmsCache();
   revalidatePath("/");
   revalidatePath("/events");
   revalidatePath("/admin/events");
@@ -366,6 +370,7 @@ export async function upsertResourceAction(
   revalidatePath("/resources");
   revalidatePath(`/resources/${category}`);
   revalidatePath("/admin/resources");
+  bustPublicCmsCache();
   revalidatePath("/");
   return { success: id ? "Resource updated." : "Resource created." };
 }
@@ -383,6 +388,7 @@ export async function deleteResourceAction(
   if (error) return { error: error.message };
   revalidatePath("/resources");
   revalidatePath("/admin/resources");
+  bustPublicCmsCache();
   revalidatePath("/");
   for (const cat of [
     "constitution-of-india",
@@ -431,6 +437,7 @@ export async function upsertCommunityAction(
     : await supabase.from("community_projects").insert(payload);
 
   if (error) return { error: error.message };
+  bustPublicCmsCache();
   revalidatePath("/");
   revalidatePath("/community");
   revalidatePath(`/community/${slug}`);
@@ -452,6 +459,7 @@ export async function deleteCommunityAction(
     .delete()
     .eq("id", id);
   if (error) return { error: error.message };
+  bustPublicCmsCache();
   revalidatePath("/");
   revalidatePath("/community");
   revalidatePath("/admin/community");
@@ -514,6 +522,7 @@ export async function upsertMarketplaceAction(
   if (error) return { error: error.message };
   revalidatePath("/marketplace");
   revalidatePath("/admin/marketplace");
+  bustPublicCmsCache();
   revalidatePath("/");
   return { success: id ? "Book updated." : "Book created." };
 }

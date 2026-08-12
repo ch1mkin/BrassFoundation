@@ -2,7 +2,9 @@
 
 import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
+import { InstantImg } from "@/components/website/instant-img";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 import { cn } from "@/lib/utils";
 
 export type MustReadBookCardData = {
@@ -66,8 +68,7 @@ function BookDescriptionDialog({
         <div className="mb-4 flex items-start gap-4">
           <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-highest">
             {book.cover_image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <InstantImg
                 src={book.cover_image_url}
                 alt=""
                 className="size-full object-cover"
@@ -102,7 +103,7 @@ function BookDescriptionDialog({
         </p>
         <div className="mt-6 flex flex-wrap gap-2">
           <a
-            href={book.pdf_url}
+            href={cdnMediaUrl(book.pdf_url)}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white"
@@ -146,8 +147,7 @@ export function MustReadBookCard({
         >
           <div className="relative flex h-48 items-center justify-center bg-surface-highest">
             {book.cover_image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <InstantImg
                 src={book.cover_image_url}
                 alt=""
                 className="size-full object-cover"
@@ -174,7 +174,7 @@ export function MustReadBookCard({
               <p className="mt-1 text-sm text-muted-foreground">{book.author}</p>
             ) : null}
             <a
-              href={book.pdf_url}
+              href={cdnMediaUrl(book.pdf_url)}
               target="_blank"
               rel="noreferrer"
               className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
@@ -202,14 +202,13 @@ export function MustReadBookCard({
         )}
       >
         <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-highest sm:size-24">
-          {book.cover_image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={book.cover_image_url}
-              alt=""
-              className="size-full object-cover transition duration-500 group-hover:scale-105"
-            />
-          ) : (
+            {book.cover_image_url ? (
+              <InstantImg
+                src={book.cover_image_url}
+                alt=""
+                className="size-full object-cover transition duration-500 group-hover:scale-105"
+              />
+            ) : (
             <MaterialIcon
               name="auto_stories"
               className="text-3xl text-primary/40"
@@ -235,7 +234,7 @@ export function MustReadBookCard({
             </p>
           ) : null}
           <a
-            href={book.pdf_url}
+            href={cdnMediaUrl(book.pdf_url)}
             target="_blank"
             rel="noreferrer"
             className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline"

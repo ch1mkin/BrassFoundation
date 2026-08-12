@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand/logo";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 import { cn } from "@/lib/utils";
 
 type NavItem = {
@@ -109,7 +110,7 @@ export function PortalSidebar({
                   {avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={avatarUrl}
+                      src={cdnMediaUrl(avatarUrl)}
                       alt=""
                       className="size-7 shrink-0 rounded-full object-cover bg-surface-low"
                     />
@@ -126,7 +127,7 @@ export function PortalSidebar({
             <div className="mt-3 flex justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={avatarUrl}
+                src={cdnMediaUrl(avatarUrl)}
                 alt=""
                 className="size-8 rounded-full object-cover bg-surface-low"
               />

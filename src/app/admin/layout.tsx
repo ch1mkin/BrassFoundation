@@ -3,6 +3,7 @@ import { PortalSidebar } from "@/components/portal/portal-sidebar";
 import { PortalNavProvider } from "@/components/portal/portal-nav-provider";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import { getAdminBackgroundUrl } from "@/lib/cms/homepage";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 
 const NAV = [
   { label: "Overview", href: "/admin", icon: "dashboard" },
@@ -58,7 +59,7 @@ export default async function AdminLayout({
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={adminBackgroundUrl}
+              src={cdnMediaUrl(adminBackgroundUrl)}
               alt=""
               className="pointer-events-none absolute inset-0 size-full object-cover opacity-25"
             />

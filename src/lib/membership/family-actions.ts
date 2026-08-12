@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustMemberCountCache } from "@/lib/cache/public";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { isMembershipCategory } from "@/lib/membership/categories";
@@ -238,6 +239,7 @@ export async function updateFamilyMemberAction(
       return { error: updateError.message || "Could not update member." };
     }
 
+    bustMemberCountCache();
     revalidatePath("/member/family");
     revalidatePath("/admin/family-members");
     revalidatePath("/member");
@@ -285,6 +287,7 @@ export async function deleteFamilyMemberAction(
       return { error: error.message || "Could not remove member." };
     }
 
+    bustMemberCountCache();
     revalidatePath("/member/family");
     revalidatePath("/admin/family-members");
     revalidatePath("/member");
@@ -304,6 +307,7 @@ function finishFamilySave(
   const payable = inserted.filter((r) => r.payment_status === "unpaid");
   const totalPaise = payable.reduce((sum, r) => sum + (r.fee_paise || 0), 0);
 
+  bustMemberCountCache();
   revalidatePath("/member/family");
   revalidatePath("/admin/family-members");
   revalidatePath("/");

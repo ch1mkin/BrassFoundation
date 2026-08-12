@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
+import { InstantImg } from "@/components/website/instant-img";
 import { PageShell } from "@/components/website/page-shell";
-import { createClient } from "@/lib/supabase/server";
+import { cdnMediaUrl } from "@/lib/media/cdn";
+import { createPublicClient } from "@/lib/supabase/public";
 
 export const metadata: Metadata = { title: "Brochure" };
 
 export default async function BrochurePage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("organisation_brochures")
     .select("id, title, description, file_url, cover_image_url")
@@ -32,8 +34,7 @@ export default async function BrochurePage() {
               className="glass-card flex flex-col gap-5 rounded-2xl p-6 sm:flex-row sm:items-center"
             >
               {doc.cover_image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <InstantImg
                   src={doc.cover_image_url}
                   alt=""
                   className="h-40 w-full rounded-xl object-cover sm:h-36 sm:w-28"
@@ -53,7 +54,7 @@ export default async function BrochurePage() {
                   </p>
                 ) : null}
                 <a
-                  href={doc.file_url}
+                  href={cdnMediaUrl(doc.file_url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-white"

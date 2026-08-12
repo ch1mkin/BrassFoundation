@@ -1,7 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
+import { bustPublicCmsCache, PUBLIC_CMS_TAG } from "@/lib/cache/public";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import type { ContentActionState } from "@/lib/content/utils";
 
@@ -12,6 +14,7 @@ async function requireAdmin() {
 }
 
 function revalidateMustRead() {
+  bustPublicCmsCache();
   revalidatePath("/");
   revalidatePath("/must-read");
   revalidatePath("/admin/must-read");
@@ -28,9 +31,10 @@ export type MustReadBook = {
   is_published: boolean;
 };
 
-export async function getPublishedMustReadBooks(): Promise<MustReadBook[]> {
+export const getPublishedMustReadBooks = unstable_cache(
+  async (): Promise<MustReadBook[]> => {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("must_read_books")
       .select(
@@ -43,7 +47,10 @@ export async function getPublishedMustReadBooks(): Promise<MustReadBook[]> {
   } catch {
     return [];
   }
-}
+  },
+  ["published-must-read"],
+  { revalidate: 120, tags: [PUBLIC_CMS_TAG] },
+);
 
 export async function upsertMustReadBookAction(
   _prev: ContentActionState,

@@ -1,4 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
+import { PUBLIC_CMS_TAG } from "@/lib/cache/public";
 import {
   COMMUNITY_WORK,
   CORE_VALUES,
@@ -133,9 +135,10 @@ function resolveMembershipHref(href: string | null | undefined, label?: string |
   return raw.split("#")[0] || raw;
 }
 
-export async function getPublishedHomepage(): Promise<HomepageContent> {
+export const getPublishedHomepage = unstable_cache(
+  async (): Promise<HomepageContent> => {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("homepage_content")
       .select("*")
@@ -211,21 +214,13 @@ export async function getPublishedHomepage(): Promise<HomepageContent> {
   } catch {
     return fallbackHomepage();
   }
-}
+  },
+  ["published-homepage"],
+  { revalidate: 120, tags: [PUBLIC_CMS_TAG] },
+);
 
 /** Lightweight fetch for admin chrome background only. */
 export async function getAdminBackgroundUrl(): Promise<string | null> {
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase
-      .from("homepage_content")
-      .select("admin_background_url")
-      .eq("is_published", true)
-      .order("updated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    return data?.admin_background_url ?? null;
-  } catch {
-    return null;
-  }
+  const home = await getPublishedHomepage();
+  return home.admin_background_url;
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustPublicCmsCache } from "@/lib/cache/public";
 import { createClient } from "@/lib/supabase/server";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import { ContentActionState, slugify } from "@/lib/content/utils";
@@ -46,6 +47,7 @@ export async function upsertGalleryAlbumAction(
     : await supabase.from("gallery_albums").insert(payload);
 
   if (error) return { error: error.message };
+  bustPublicCmsCache();
   revalidatePath("/gallery");
   revalidatePath("/admin/gallery");
   return { success: id ? "Album updated." : "Album created." };
@@ -62,6 +64,7 @@ export async function deleteGalleryAlbumAction(
   const supabase = await createClient();
   const { error } = await supabase.from("gallery_albums").delete().eq("id", id);
   if (error) return { error: error.message };
+  bustPublicCmsCache();
   revalidatePath("/gallery");
   revalidatePath("/admin/gallery");
   return { success: "Album deleted." };
@@ -102,6 +105,7 @@ export async function addGalleryImageAction(
   });
 
   if (error) return { error: error.message };
+  bustPublicCmsCache();
   revalidatePath("/gallery");
   revalidatePath("/admin/gallery");
   return { success: "Image added." };
@@ -125,6 +129,7 @@ export async function reorderGalleryMediaAction(
     ),
   );
 
+  bustPublicCmsCache();
   revalidatePath("/gallery");
   revalidatePath("/admin/gallery");
   return { success: "Order saved." };
@@ -141,6 +146,7 @@ export async function updateGalleryMediaTargetAction(formData: FormData) {
     .from("gallery_media")
     .update({ display_target: target })
     .eq("id", id);
+  bustPublicCmsCache();
   revalidatePath("/gallery");
   revalidatePath("/admin/gallery");
 }

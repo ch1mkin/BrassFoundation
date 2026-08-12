@@ -1,4 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
+import { PUBLIC_CMS_TAG } from "@/lib/cache/public";
 import {
   COMMUNITY_WORK,
 } from "@/lib/constants";
@@ -91,8 +93,13 @@ function monthDay(iso: string) {
 }
 
 export async function getPublishedEvents(limit = 20): Promise<EventRow[]> {
+  return loadPublishedEvents(limit);
+}
+
+const loadPublishedEvents = unstable_cache(
+  async (limit: number): Promise<EventRow[]> => {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("events")
       .select(
@@ -110,7 +117,10 @@ export async function getPublishedEvents(limit = 20): Promise<EventRow[]> {
   } catch {
     return [];
   }
-}
+  },
+  ["published-events"],
+  { revalidate: 120, tags: [PUBLIC_CMS_TAG] },
+);
 
 export function formatEventDate(event: EventRow) {
   return monthDay(event.starts_at);
@@ -120,7 +130,7 @@ export async function getEventBySlug(slug: string): Promise<EventRow | null> {
   const decoded = decodeURIComponent(slug || "").trim();
   if (!decoded) return null;
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("events")
       .select(
@@ -141,7 +151,7 @@ export async function getEventBySlug(slug: string): Promise<EventRow | null> {
 
 export async function getPublishedNews(limit = 20): Promise<NewsRow[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("news_posts")
       .select(
@@ -195,7 +205,7 @@ export async function getPublishedResources(
   limit = 80,
 ): Promise<ResourceRow[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("resources")
       .select(
@@ -217,7 +227,7 @@ export async function getPublishedResourcesByCategory(
   limit = 80,
 ): Promise<ResourceRow[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("resources")
       .select(
@@ -244,7 +254,7 @@ export async function getResourceCategoryCounts(): Promise<
     cats.map((c) => [c.slug, 0]),
   );
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("resources")
       .select("category")
@@ -265,7 +275,7 @@ export async function getPublishedCommunity(
   limit = 20,
 ): Promise<CommunityRow[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("community_projects")
       .select(
@@ -300,11 +310,16 @@ export async function getPublishedCommunity(
 export async function getHomepageCommunity(
   limit = 3,
 ): Promise<CommunityRow[]> {
+  return loadHomepageCommunity(limit);
+}
+
+const loadHomepageCommunity = unstable_cache(
+  async (limit: number): Promise<CommunityRow[]> => {
   const home = COMMUNITY_WORK.slice(0, limit);
   const slugs = home.map((c) => c.slug);
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data } = await supabase
       .from("community_projects")
       .select(
@@ -343,7 +358,10 @@ export async function getHomepageCommunity(
       is_featured: true,
     }));
   }
-}
+  },
+  ["homepage-community"],
+  { revalidate: 120, tags: [PUBLIC_CMS_TAG] },
+);
 
 export async function getCommunityBySlug(
   slug: string,
@@ -355,8 +373,13 @@ export async function getCommunityBySlug(
 export async function getPublishedMarketplace(
   limit = 20,
 ): Promise<MarketplaceRow[]> {
+  return loadPublishedMarketplace(limit);
+}
+
+const loadPublishedMarketplace = unstable_cache(
+  async (limit: number): Promise<MarketplaceRow[]> => {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("marketplace_items")
       .select(
@@ -371,13 +394,16 @@ export async function getPublishedMarketplace(
   } catch {
     return [];
   }
-}
+  },
+  ["published-marketplace"],
+  { revalidate: 120, tags: [PUBLIC_CMS_TAG] },
+);
 
 export async function getMarketplaceBySlug(
   slug: string,
 ): Promise<MarketplaceRow | null> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("marketplace_items")
       .select(
@@ -395,7 +421,7 @@ export async function getMarketplaceBySlug(
 
 export async function getFeaturedGallery(limit = 12): Promise<GalleryMediaRow[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("gallery_media")
       .select("id, title, media_url, caption, media_type")

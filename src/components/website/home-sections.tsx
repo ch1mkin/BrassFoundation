@@ -21,7 +21,7 @@ import type {
 import type { BookPurchaseStatus } from "@/lib/content/book-purchases";
 import type { ResourceCategoryRow } from "@/lib/content/resource-categories";
 import { cn } from "@/lib/utils";
-import { InstantImg, preloadImages } from "@/components/website/instant-img";
+import { InstantImg } from "@/components/website/instant-img";
 import { MemberMilestoneConfetti } from "@/components/website/member-milestone-confetti";
 import { MustReadBookCard } from "@/components/website/must-read-book-card";
 import { BookBuyButton } from "@/components/marketplace/book-buy-button";
@@ -213,14 +213,6 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
-  const imageKey = slides.map((s) => s.image_url || "").join("|");
-
-  // Prefetch every slide image so swipes feel instant
-  useEffect(() => {
-    preloadImages(slides.map((s) => s.image_url));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed by imageKey
-  }, [imageKey]);
-
   useEffect(() => {
     if (slides.length <= 1) return;
     const id = window.setInterval(() => {
@@ -270,29 +262,33 @@ function QuoteVisionSlider({ quotes }: { quotes: HomepageQuote[] }) {
       aria-roledescription="carousel"
       aria-label="Vision quotes"
     >
-      {/* Keep all backgrounds mounted so they load once and swap instantly */}
-      {slides.map((slide, i) => (
-        <div
-          key={`bg-${i}-${slide.image_url || "gradient"}`}
-          className={cn(
-            "absolute inset-0 transition-opacity duration-300",
-            i === index ? "opacity-100" : "pointer-events-none opacity-0",
-          )}
-          aria-hidden={i !== index}
-        >
-          {slide.image_url ? (
-            <InstantImg
-              src={slide.image_url}
-              alt=""
-              priority={i === 0}
-              className="pointer-events-none size-full object-cover"
-              draggable={false}
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-secondary/70 to-primary/40" />
-          )}
-        </div>
-      ))}
+      {slides.map((slide, i) => {
+        const isActive = i === index;
+        const isNext = slides.length > 1 && i === (index + 1) % slides.length;
+        if (!isActive && !isNext) return null;
+        return (
+          <div
+            key={`bg-${i}-${slide.image_url || "gradient"}`}
+            className={cn(
+              "absolute inset-0 transition-opacity duration-300",
+              isActive ? "opacity-100" : "pointer-events-none opacity-0",
+            )}
+            aria-hidden={!isActive}
+          >
+            {slide.image_url ? (
+              <InstantImg
+                src={slide.image_url}
+                alt=""
+                priority={isActive && i === 0}
+                className="pointer-events-none size-full object-cover"
+                draggable={false}
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/80 via-secondary/70 to-primary/40" />
+            )}
+          </div>
+        );
+      })}
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
 
@@ -534,7 +530,7 @@ export function EventsSection({
       {backgroundUrl ? (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <InstantImg
             src={backgroundUrl}
             alt=""
             className="pointer-events-none absolute inset-0 z-0 size-full object-cover object-center"
@@ -578,8 +574,7 @@ export function EventsSection({
                 >
                   <div className="flex shrink-0 items-center gap-3">
                     {event.cover_image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <InstantImg
                         src={event.cover_image_url}
                         alt=""
                         className="size-20 rounded-xl object-cover ring-2 ring-white/20"
@@ -670,8 +665,7 @@ export function ResourcesSection({
                 )}
               >
                 {item.thumbnail_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <InstantImg
                     src={item.thumbnail_url}
                     alt=""
                     className="max-h-full max-w-full object-contain transition duration-300 group-hover:scale-[1.03]"
@@ -727,8 +721,7 @@ export function MarketplaceSection({
               <Link href={`/marketplace/${book.slug}`} className="block">
                 <div className="mb-3 flex h-36 items-center justify-center overflow-hidden rounded-lg bg-surface-highest sm:mb-4 sm:h-72 sm:rounded-xl">
                   {book.cover_image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <InstantImg
                       src={book.cover_image_url}
                       alt=""
                       className="h-full w-full object-cover"

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { bustPublicCmsCache } from "@/lib/cache/public";
 import { createClient } from "@/lib/supabase/server";
 import { canAccessAdmin, getUserContext } from "@/lib/auth/session";
 import type { ContentActionState } from "@/lib/content/utils";
@@ -12,6 +13,7 @@ async function requireAdmin() {
 }
 
 function revalidateCommittee() {
+  bustPublicCmsCache();
   revalidatePath("/");
   revalidatePath("/about");
   revalidatePath("/admin/committee");
