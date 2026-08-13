@@ -1,25 +1,25 @@
-"use client";
-
 import { cdnMediaUrl } from "@/lib/media/cdn";
 import { cn } from "@/lib/utils";
 
 type InstantImgProps = Omit<
   React.ImgHTMLAttributes<HTMLImageElement>,
-  "loading" | "decoding"
+  "decoding"
 > & {
   /** Prefer high for LCP / above-the-fold card images */
   priority?: boolean;
 };
 
 /**
- * Card/media images. Supabase Storage URLs are rewritten through /api/media
- * so repeat views are served from Vercel instead of burning cached egress.
+ * Same-origin media via /api/media (Vercel CDN). No client JS required —
+ * keeps first paint fast while avoiding direct supabase.co egress.
  */
 export function InstantImg({
   className,
   priority = false,
   alt = "",
   src,
+  loading,
+  fetchPriority,
   ...props
 }: InstantImgProps) {
   const resolved = typeof src === "string" ? cdnMediaUrl(src) : src;
@@ -29,9 +29,11 @@ export function InstantImg({
     <img
       alt={alt}
       src={resolved}
-      loading={priority ? "eager" : "lazy"}
+      loading={loading ?? (priority ? "eager" : "lazy")}
       decoding="async"
-      fetchPriority={priority ? "high" : "auto"}
+      fetchPriority={
+        fetchPriority ?? (priority ? "high" : "auto")
+      }
       className={cn(className)}
       {...props}
     />

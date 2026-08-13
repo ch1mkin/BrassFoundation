@@ -10,6 +10,7 @@ import { useLocale } from "@/components/i18n/locale-provider";
 import { GOLD_SHINY_BTN } from "@/components/website/premium-accents";
 import { InstantImg } from "@/components/website/instant-img";
 import { SITE } from "@/lib/constants";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 import {
   DEFAULT_HERO_FRAME,
   heroFrameStyle,
@@ -175,12 +176,36 @@ export function HeroSection({
     <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-surface pt-20">
       {hasBg ? (
         <>
+          {/* Media-query preloads: only the viewport-matching hero starts early. */}
+          {mobileBg ? (
+            <link
+              rel="preload"
+              as="image"
+              href={cdnMediaUrl(mobileBg)}
+              media="(max-width: 767.98px)"
+              fetchPriority="high"
+            />
+          ) : null}
+          {desktopBg ? (
+            <link
+              rel="preload"
+              as="image"
+              href={cdnMediaUrl(desktopBg)}
+              media="(min-width: 768px)"
+              fetchPriority="high"
+            />
+          ) : null}
+
           {mobileBg ? (
             <div className="pointer-events-none absolute inset-0 overflow-hidden md:hidden">
               <InstantImg
                 src={mobileBg}
                 alt=""
-                priority
+                // When both heroes exist, rely on media-query preload so desktop
+                // does not also download the mobile file (and vice versa).
+                loading={desktopBg ? "lazy" : "eager"}
+                fetchPriority="high"
+                priority={!desktopBg}
                 className="h-full w-full object-cover"
                 style={heroFrameStyle(mobileFrame)}
               />
@@ -194,7 +219,9 @@ export function HeroSection({
               <InstantImg
                 src={desktopBg}
                 alt=""
-                priority
+                loading={mobileBg ? "lazy" : "eager"}
+                fetchPriority="high"
+                priority={!mobileBg}
                 className="h-full w-full object-cover"
                 style={heroFrameStyle(desktopFrame)}
               />

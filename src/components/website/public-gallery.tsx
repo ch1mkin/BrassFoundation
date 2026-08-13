@@ -107,7 +107,7 @@ export function PublicGallery({
                     <InstantImg
                       src={item.media_url}
                       alt={item.title || item.caption || "Gallery"}
-                      priority={i < 4}
+                      priority={i < 2}
                       className="w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />

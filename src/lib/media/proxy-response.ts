@@ -16,8 +16,8 @@ export function mediaCacheHeaders(contentType: string, length?: number) {
     "Vercel-CDN-Cache-Control",
     "public, s-maxage=31536000, immutable",
   );
-  // Avoid cookie/auth variance so the edge can cache one response per URL.
-  headers.set("Vary", "Accept");
+  // Do NOT set Vary: Accept — it fragments the CDN cache and slows repeat views.
+  headers.set("X-Content-Type-Options", "nosniff");
   if (length) headers.set("Content-Length", String(length));
   return headers;
 }
@@ -63,12 +63,22 @@ export function allowedStorageUrl(raw: string): URL | null {
 }
 
 export async function proxyStorageUrl(target: string): Promise<Response> {
-  const upstream = await fetch(target, {
-    headers: { Accept: "image/*,application/pdf,video/*,audio/*,*/*" },
-    // Prefer CDN-cached origin responses when the edge must fetch once.
-    cache: "force-cache",
-    next: { revalidate: 60 * 60 * 24 * 30 },
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12_000);
+
+  let upstream: Response;
+  try {
+    upstream = await fetch(target, {
+      headers: { Accept: "image/*,application/pdf,video/*,audio/*,*/*" },
+      // Edge HTTP cache + long CDN headers on our response = fast after first hit.
+      cache: "force-cache",
+      signal: controller.signal,
+    });
+  } catch {
+    return new Response("Media upstream timeout", { status: 504 });
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!upstream.ok || !upstream.body) {
     return new Response("Media not found", { status: upstream.status || 404 });
