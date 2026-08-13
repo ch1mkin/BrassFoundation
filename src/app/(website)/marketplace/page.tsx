@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { BookBuyButton } from "@/components/marketplace/book-buy-button";
+import { InstantImg } from "@/components/website/instant-img";
 import { PageShell } from "@/components/website/page-shell";
 import { getUserContext } from "@/lib/auth/session";
 import { getUserBookPurchaseMap } from "@/lib/content/book-purchases";
@@ -43,8 +44,7 @@ export default async function MarketplacePage() {
                 <Link href={`/marketplace/${book.slug}`} className="block">
                   <div className="mb-4 flex h-64 items-center justify-center overflow-hidden rounded-xl bg-surface-low">
                     {book.cover_image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <InstantImg
                         src={book.cover_image_url}
                         alt=""
                         className="h-full w-full object-cover"

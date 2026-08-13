@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { InstantImg } from "@/components/website/instant-img";
 import { PageShell } from "@/components/website/page-shell";
 import { HardNavLink } from "@/components/website/hard-nav-link";
 import {
@@ -38,8 +39,7 @@ export default async function EventsPage() {
             >
               <div className="flex shrink-0 items-center gap-3">
                 {event.cover_image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <InstantImg
                     src={event.cover_image_url}
                     alt=""
                     className="size-20 rounded-xl object-cover ring-1 ring-border"

@@ -1,5 +1,6 @@
 import { BrandLogo } from "@/components/brand/logo";
 import { MembershipQr } from "@/components/membership/membership-qr";
+import { InstantImg } from "@/components/website/instant-img";
 import { buttonVariants } from "@/components/ui/button";
 import { getUserContext } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -114,8 +115,7 @@ export default async function MemberDashboardPage() {
           <div className="relative z-10 flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-start gap-3">
               {context?.profile?.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <InstantImg
                   src={context.profile.avatar_url}
                   alt=""
                   className="size-14 shrink-0 rounded-full object-cover ring-2 ring-white/30"

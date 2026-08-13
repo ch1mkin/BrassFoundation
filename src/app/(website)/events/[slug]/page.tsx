@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EventRegisterForm } from "@/components/website/event-register-form";
+import { InstantImg } from "@/components/website/instant-img";
 import { PageShell } from "@/components/website/page-shell";
 import { getUserContext } from "@/lib/auth/session";
 import { formatEventDate, getEventBySlug } from "@/lib/content/queries";
@@ -30,8 +31,7 @@ export default async function EventDetailPage({ params }: Props) {
         <div>
           <div className="mb-6 flex flex-wrap items-center gap-3">
             {event.cover_image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <InstantImg
                 src={event.cover_image_url}
                 alt=""
                 className="size-20 rounded-xl object-cover ring-1 ring-border"

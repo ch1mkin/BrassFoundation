@@ -22,6 +22,7 @@ import {
 } from "@/lib/content/gallery-org-actions";
 import { deleteGalleryMediaAction } from "@/lib/content/actions";
 import { AdminDeleteButton } from "@/components/admin/admin-delete-button";
+import { InstantImg } from "@/components/website/instant-img";
 
 type MediaItem = {
   id: string;
@@ -57,8 +58,7 @@ function SortableCard({
         {...attributes}
         {...listeners}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <InstantImg
           src={item.media_url}
           alt={item.title || "Gallery"}
           className="h-28 w-full object-cover"

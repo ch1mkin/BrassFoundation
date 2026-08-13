@@ -33,11 +33,8 @@ const nextConfig: NextConfig = {
         hostname: "api.qrserver.com",
         pathname: "/v1/create-qr-code/**",
       },
-      {
-        protocol: "https",
-        hostname: "*.supabase.co",
-        pathname: "/storage/v1/object/public/**",
-      },
+      // Do not allow next/image to pull from supabase.co — that burns Storage
+      // cached egress. Use InstantImg / cdnMediaUrl → /api/media instead.
     ],
   },
   async headers() {

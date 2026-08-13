@@ -7,6 +7,7 @@ import {
   upsertExecutiveMemberFormAction,
 } from "@/lib/content/committee-actions";
 import { createClient } from "@/lib/supabase/server";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 
 export const metadata: Metadata = { title: "Admin · Executive Committee" };
 
@@ -83,7 +84,7 @@ export default async function AdminCommitteePage() {
                     {member.photo_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={member.photo_url}
+                        src={cdnMediaUrl(member.photo_url)}
                         alt=""
                         className="size-full object-cover"
                       />

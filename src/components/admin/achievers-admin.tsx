@@ -14,6 +14,7 @@ import {
   upsertAchieverAction,
 } from "@/lib/content/showcase-actions";
 import type { ContentActionState } from "@/lib/content/utils";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 
 type Row = {
   id: string;
@@ -161,7 +162,7 @@ export function AchieversAdmin({ rows }: { rows: Row[] }) {
             {row.photo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={row.photo_url}
+                src={cdnMediaUrl(row.photo_url)}
                 alt=""
                 className="size-16 rounded-full object-cover"
               />

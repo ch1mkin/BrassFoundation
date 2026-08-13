@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 import { cn } from "@/lib/utils";
 
 type Node = {
@@ -46,7 +47,7 @@ function PersonCard({
     <div className="relative z-10 flex w-[7.5rem] flex-col items-center text-center sm:w-32">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={node.avatar_url || "/brand/logo.png"}
+        src={cdnMediaUrl(node.avatar_url) || "/brand/logo.png"}
         alt={node.full_name}
         className={cn(
           "rounded-full border-2 border-white bg-white object-cover shadow-md",

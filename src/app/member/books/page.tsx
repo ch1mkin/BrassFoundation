@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { InstantImg } from "@/components/website/instant-img";
 import { getUserContext } from "@/lib/auth/session";
 import { getMemberBookLibrary } from "@/lib/content/book-purchases";
 import { redirect } from "next/navigation";
@@ -50,8 +51,7 @@ export default async function MemberBooksPage({
               >
                 <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
                   {item.cover_image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <InstantImg
                       src={item.cover_image_url}
                       alt=""
                       className="size-full object-cover"
@@ -95,8 +95,7 @@ export default async function MemberBooksPage({
               >
                 <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
                   {item.cover_image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <InstantImg
                       src={item.cover_image_url}
                       alt=""
                       className="size-full object-cover"

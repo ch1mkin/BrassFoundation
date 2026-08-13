@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { InstantImg } from "@/components/website/instant-img";
 import { PageShell } from "@/components/website/page-shell";
 import { createClient } from "@/lib/supabase/server";
 
@@ -39,8 +40,7 @@ export default async function BlogDetailPage({ params }: Props) {
         </p>
       ) : null}
       {data.cover_image_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <InstantImg
           src={data.cover_image_url}
           alt=""
           className="mb-8 max-h-[420px] w-full rounded-2xl object-cover"

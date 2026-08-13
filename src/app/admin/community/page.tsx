@@ -9,6 +9,7 @@ import { InitiativeThumbnailForm } from "@/components/admin/initiative-thumbnail
 import { deleteCommunityAction } from "@/lib/content/actions";
 import { COMMUNITY_WORK } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 
 export const metadata: Metadata = { title: "Admin · Community" };
 
@@ -102,7 +103,7 @@ export default async function AdminCommunityPage({
                   {row.cover_image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={row.cover_image_url}
+                      src={cdnMediaUrl(row.cover_image_url)}
                       alt=""
                       className="size-16 shrink-0 rounded-xl object-cover"
                     />

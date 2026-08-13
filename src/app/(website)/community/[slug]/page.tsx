@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { InstantImg } from "@/components/website/instant-img";
 import { PageShell } from "@/components/website/page-shell";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { COMMUNITY_PAGE } from "@/lib/constants";
@@ -81,8 +82,7 @@ export default async function CommunityDetailPage({ params }: Props) {
       description={project.summary || undefined}
     >
       {project.cover_image_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <InstantImg
           src={project.cover_image_url}
           alt=""
           className="mb-8 aspect-[16/9] w-full rounded-2xl object-cover"

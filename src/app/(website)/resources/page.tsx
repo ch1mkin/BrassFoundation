@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { InstantImg } from "@/components/website/instant-img";
 import { PageShell } from "@/components/website/page-shell";
 import { getResourceCategoryCounts } from "@/lib/content/queries";
 import { getResourceCategories } from "@/lib/content/resource-categories";
@@ -48,8 +49,7 @@ export default async function ResourcesPage() {
                 )}
               >
                 {item.thumbnail_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <InstantImg
                     src={item.thumbnail_url}
                     alt=""
                     className="max-h-full max-w-full object-contain transition duration-300 group-hover:scale-[1.03]"

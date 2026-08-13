@@ -1,8 +1,8 @@
 "use client";
 
-const AVATAR_MAX_EDGE = 720;
-const DEFAULT_MAX_EDGE = 1600;
-const SKIP_UNDER_BYTES = 220_000;
+const AVATAR_MAX_EDGE = 512;
+const DEFAULT_MAX_EDGE = 1280;
+const SKIP_UNDER_BYTES = 120_000;
 
 function maxEdgeForBucket(bucket: string) {
   if (bucket === "avatars") return AVATAR_MAX_EDGE;
@@ -34,7 +34,7 @@ export async function compressImageForUpload(
     bitmap.close();
 
     const blob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob(resolve, "image/jpeg", 0.78);
+      canvas.toBlob(resolve, "image/jpeg", 0.72);
     });
     if (!blob || blob.size >= file.size) return file;
 

@@ -11,6 +11,7 @@ import {
 import { loadFamilyTreePeople } from "@/lib/content/family-tree-data";
 import { getMembershipStats } from "@/lib/membership/member-count";
 import { createClient } from "@/lib/supabase/server";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 
 export const metadata: Metadata = { title: "Admin · Family" };
 
@@ -123,7 +124,7 @@ export default async function AdminFamilyPage() {
               <div className="flex items-center gap-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={node.avatar_url || "/brand/logo.png"}
+                  src={cdnMediaUrl(node.avatar_url) || "/brand/logo.png"}
                   alt=""
                   className="size-10 rounded-full object-cover bg-white"
                 />

@@ -8,6 +8,7 @@ import { deleteResourceAction } from "@/lib/content/actions";
 import { deleteResourceCategoryAction } from "@/lib/content/resource-category-actions";
 import { getResourceCategories } from "@/lib/content/resource-categories";
 import { createClient } from "@/lib/supabase/server";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 
 export const metadata: Metadata = { title: "Admin · Resources" };
 
@@ -78,7 +79,7 @@ export default async function AdminResourcesPage() {
                   {cat.thumbnail_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={cat.thumbnail_url}
+                      src={cdnMediaUrl(cat.thumbnail_url)}
                       alt=""
                       className="size-10 rounded-xl object-cover"
                     />

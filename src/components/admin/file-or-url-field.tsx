@@ -7,6 +7,7 @@ import {
   uploadFileClient,
   type UploadBucket,
 } from "@/lib/storage/client-upload";
+import { cdnMediaUrl } from "@/lib/media/cdn";
 
 export function FileOrUrlField({
   name,
@@ -84,7 +85,7 @@ export function FileOrUrlField({
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={url}
+          src={cdnMediaUrl(url)}
           alt=""
           className="mt-1 h-28 w-auto max-w-full rounded-xl border border-border object-cover"
         />

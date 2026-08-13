@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { BookBuyButton } from "@/components/marketplace/book-buy-button";
+import { InstantImg } from "@/components/website/instant-img";
 import { PageShell } from "@/components/website/page-shell";
 import { getUserContext } from "@/lib/auth/session";
 import { getUserBookPurchaseMap } from "@/lib/content/book-purchases";
@@ -37,8 +38,7 @@ export default async function MarketplaceBookPage({ params }: Props) {
       <div className="grid gap-10 lg:grid-cols-[280px_1fr]">
         <div className="overflow-hidden rounded-2xl bg-surface-low">
           {book.cover_image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <InstantImg
               src={book.cover_image_url}
               alt=""
               className="aspect-[3/4] w-full object-cover"

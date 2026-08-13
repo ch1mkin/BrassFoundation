@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { InstantImg } from "@/components/website/instant-img";
 import { PageShell } from "@/components/website/page-shell";
 import { createClient } from "@/lib/supabase/server";
 
@@ -41,8 +42,7 @@ export default async function AchieversPage() {
                 </span>
                 <div className="size-32 overflow-hidden rounded-full bg-primary/10 ring-4 ring-gold/70 shadow-[0_0_24px_rgba(242,178,51,0.35)]">
                   {person.photo_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <InstantImg
                       src={person.photo_url}
                       alt={person.full_name}
                       className="size-full object-cover transition duration-500 group-hover:scale-105"
